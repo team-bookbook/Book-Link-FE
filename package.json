@@ -8,7 +8,8 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "lint:fix": "eslint . --ext .ts,.tsx --fix",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "icons:gen": "tsx src/shared/libs/gen-icons-list.js"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.13",
@@ -18,7 +19,8 @@
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "react-hook-form": "^7.63.0",
-    "uuid": "^13.0.0"
+    "uuid": "^13.0.0",
+    "vite-plugin-svg-icons": "^2.0.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.36.0",
