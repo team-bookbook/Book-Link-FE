@@ -219,6 +219,19 @@
     letter-spacing: var(--ls);
   }
 
+  .bg-linear-sky {
+    background-image: var(--color-linear-sky);
+  }
+  .bg-linear-peach {
+    background-image: var(--color-linear-peach);
+  }
+  .bg-linear-pink {
+    background-image: var(--color-linear-pink);
+  }
+  .bg-linear-purple {
+    background-image: var(--color-linear-purple);
+  }
+
   /* Scrollbar helper */
   .u-scrollbar-hide {
     &::-webkit-scrollbar {
