@@ -3,12 +3,12 @@ export default {
   extends: ['@commitlint/config-conventional'],
   parserPreset: {
     parserOpts: {
-      headerPattern: /^(feat|fix|chore|style|docs|refactor|init|build)(?:\(([^)]+)\))?(!)?: (.+) \(#\d+\)$/u,
+      headerPattern: /^(Feat|Fix|Chore|Style|Docs|Refactor|Init|Build)(?:\(([^)]+)\))?(!)?: (.+) \(#\d+\)$/u,
       headerCorrespondence: ['type', 'scope', 'breaking', 'subject'],
     },
   },
   rules: {
-    'type-enum': [2, 'always', ['feat', 'fix', 'chore', 'style', 'docs', 'refactor', 'init', 'build']],
+    'type-enum': [2, 'always', ['Feat', 'Fix', 'Chore', 'Style', 'Docs', 'Refactor', 'Init', 'Build']],
     'references-empty': [2, 'never'],
   },
 };
