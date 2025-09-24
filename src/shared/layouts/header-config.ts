@@ -30,12 +30,18 @@ const libraryRootRule: Rule = (path) => {
 
 // 라이브러리 상세
 const libraryDetailRule: Rule = (path) =>
-  matchPath(`${ROUTES.LIBRARY}/:id`, path) ? { left: 'back', title: '도서관 상세', safeTop: true } : undefined;
+  matchPath(`${ROUTES.LIBRARY}/:id`, path) ? { left: 'back', title: '도서관 이름', safeTop: true } : undefined;
 
 // 설정 (마이페이지)
 const settingRule: Rule = (path) =>
   matchPath({ path: ROUTES.SETTING, end: true }, path)
     ? { title: '마이페이지', actions: ['logout', 'bell'], safeTop: true }
+    : undefined;
+
+// 알림 목록
+const notiRole: Rule = (path) =>
+  ROUTES.NOTIFICATION && matchPath({ path: ROUTES.NOTIFICATION, end: true }, path)
+    ? { left: 'back', title: '알림' }
     : undefined;
 
 // 채팅 목록
@@ -70,6 +76,7 @@ const RULES: ReadonlyArray<Rule> = [
   libraryRootRule,
   libraryDetailRule,
   settingRule,
+  notiRole,
 ];
 
 export function getHeaderForRoute(pathname: string, search: string): HeaderProps {
