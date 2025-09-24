@@ -12,5 +12,8 @@
   "arrowParens": "always",
   "endOfLine": "lf",
   "proseWrap": "always",
-  "htmlWhitespaceSensitivity": "strict"
+  "htmlWhitespaceSensitivity": "strict",
+  "singleAttributePerLine": false,
+  "plugins": ["prettier-plugin-tailwindcss"],
+  "tailwindFunctions": ["clsx", "cn", "cva", "tw"]
 }

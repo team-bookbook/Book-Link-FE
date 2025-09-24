@@ -218,6 +218,13 @@
     line-height: var(--lh);
     letter-spacing: var(--ls);
   }
+  .caption6 {
+    font-family: var(--font-sans);
+    font-weight: 500;
+    font-size: 1.1rem;
+    line-height: var(--lh);
+    letter-spacing: var(--ls);
+  }
 
   .bg-linear-sky {
     background-image: var(--color-linear-sky);

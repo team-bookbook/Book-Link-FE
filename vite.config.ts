@@ -16,6 +16,7 @@ export default defineConfig({
   resolve: {
     alias: {
       '@pages': path.resolve(__dirname, 'src/pages'),
+      '@layouts': path.resolve(__dirname, 'src/shared/layouts'),
       '@apis': path.resolve(__dirname, 'src/shared/apis'),
       '@styles': path.resolve(__dirname, 'src/shared/styles'),
       '@components': path.resolve(__dirname, 'src/shared/components'),
@@ -24,7 +25,7 @@ export default defineConfig({
       '@hooks': path.resolve(__dirname, 'src/shared/hooks'),
       '@routes': path.resolve(__dirname, 'src/shared/routes'),
       '@img': path.resolve(__dirname, 'src/shared/assets/images'),
-      '@svg': path.resolve(__dirname, 'src/shared/assets/svgs'),
+      '@icons': path.resolve(__dirname, 'src/shared/assets/icons'),
       '@': path.resolve(__dirname, 'src'),
     },
   },
