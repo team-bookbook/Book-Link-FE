@@ -6,8 +6,8 @@ export default function Footer() {
   return (
     <footer className='flex-col-items-start gap-[2.5rem] px-[2.5rem] py-[4rem]'>
       <div className='flex-col gap-[0.8rem]'>
-        <Icon name='footer' width={16.5} height={4.5} />
-        <p className='ct4 text-gray-500'>booklink@gmail.com</p>
+        <Icon className='text-[#B5B5B5]' name='footer' width={16.5} height={4.5} />
+        <p className='caption5 text-gray-500'>booklink@gmail.com</p>
       </div>
 
       <div className='flex-col pb-[3rem]'>
