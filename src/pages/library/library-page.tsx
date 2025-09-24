@@ -1,35 +1,12 @@
-import { useMemo } from 'react';
-import { useSearchParams } from 'react-router-dom';
-import UnderlineTab from '@components/tab/underline-tab';
-
-type TabKey = 'libraries' | 'books';
+import LibraryTab, { type LibraryTabKey } from '@pages/library/components/library-tab';
+import { useQueryTab } from '@hooks/use-query-tab';
 
 export default function LibraryPage() {
-  const [params, setParams] = useSearchParams();
-  const tab = (params.get('tab') as TabKey) ?? 'books';
-
-  const items = useMemo(
-    () => [
-      { key: 'books', label: '도서' },
-      { key: 'libraries', label: '도서관' },
-    ],
-    []
-  );
-
-  const handleChange = (next: string) => {
-    setParams(
-      (prev) => {
-        const p = new URLSearchParams(prev);
-        p.set('tab', next);
-        return p;
-      },
-      { replace: true }
-    );
-  };
+  const [tab, setTab] = useQueryTab<LibraryTabKey>('tab', 'books', ['books', 'libraries']);
 
   return (
     <section>
-      <UnderlineTab items={items} value={tab} onChange={handleChange} />
+      <LibraryTab value={tab} onChange={setTab} />
 
       <div className='mt-[1.6rem]'>{tab === 'libraries' ? <LibraryList /> : <BookList />}</div>
     </section>
