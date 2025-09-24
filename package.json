@@ -9,7 +9,16 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --ext .ts,.tsx --fix",
     "preview": "vite preview",
-    "icons:gen": "tsx src/shared/libs/gen-icons-list.js"
+    "icons:gen": "tsx src/shared/libs/gen-icons-list.js",
+    "prepare": "husky"
+  },
+  "lint-staged": {
+    "*.{ts,tsx,js,jsx}": [
+      "pnpm exec eslint --fix"
+    ],
+    "*.{css,md,json}": [
+      "pnpm exec prettier --write"
+    ]
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.13",
@@ -23,6 +32,8 @@
     "vite-plugin-svg-icons": "^2.0.1"
   },
   "devDependencies": {
+    "@commitlint/cli": "^19.8.1",
+    "@commitlint/config-conventional": "^19.8.1",
     "@eslint/js": "^9.36.0",
     "@types/eslint": "^9.6.1",
     "@types/node": "^24.5.2",
@@ -41,6 +52,8 @@
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^5.2.0",
     "globals": "^16.4.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.2.0",
     "postcss": "^8.5.6",
     "prettier": "^3.6.2",
     "tailwindcss": "^4.1.13",
