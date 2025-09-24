@@ -1,7 +1,7 @@
 import { Link, useNavigate } from 'react-router-dom';
 import clsx from 'clsx';
 import Icon from '@components/icon';
-
+import SearchBar from '@components/search-bar';
 type LeftKind = 'none' | 'back' | 'logo' | 'close';
 type ActionId = 'search' | 'cart' | 'share' | 'kebab' | 'bell' | 'close';
 
@@ -75,8 +75,8 @@ export default function Header({
         {/* Left */}
         <div className='mr-2'>
           {left === 'logo' && (
-            <Link to='/' aria-label='Home' className='flex items-center gap-2'>
-              <img src='/logo-booklink.svg' alt='BookLink' className='h-6 w-auto' />
+            <Link to='/' aria-label='Home'>
+              <Icon name='logo-header' width={11.3} height={3} />
             </Link>
           )}
 
@@ -98,7 +98,7 @@ export default function Header({
         {/* Center */}
         <div className='min-w-0 flex-1'>
           {searchMode ? (
-            <SearchPill placeholder={searchPlaceholder} onSubmit={onSearchSubmit} />
+            <SearchBar placeholder={searchPlaceholder} onSubmit={onSearchSubmit} />
           ) : title != null ? (
             <h1 className='truncate text-base font-semibold'>{title}</h1>
           ) : null}
@@ -185,27 +185,5 @@ function ActionButton({
         </span>
       )}
     </button>
-  );
-}
-
-function SearchPill({ placeholder, onSubmit }: { placeholder: string; onSubmit?: (v: string) => void }) {
-  return (
-    <form
-      onSubmit={(e) => {
-        e.preventDefault();
-        const v = String(new FormData(e.currentTarget).get('q') ?? '');
-        onSubmit?.(v);
-      }}
-    >
-      <label className='group flex items-center gap-2 rounded-2xl border border-gray-200 bg-white px-3 py-2 shadow-[0_1px_0_0_rgba(0,0,0,0.04)] focus-within:ring-2 focus-within:ring-sky-200'>
-        <input
-          name='q'
-          inputMode='search'
-          placeholder={placeholder}
-          className='min-w-0 flex-1 bg-transparent text-[15px] outline-none placeholder:text-gray-400'
-        />
-        <Icon name='search' size={1.25} ariaHidden />
-      </label>
-    </form>
   );
 }
