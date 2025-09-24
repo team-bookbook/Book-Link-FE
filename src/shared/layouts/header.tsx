@@ -1,0 +1,177 @@
+import { Link, useNavigate } from 'react-router-dom';
+import clsx from 'clsx';
+import Icon from '@components/icon';
+import SearchBar from '@components/search-bar';
+import { ROUTES } from '@routes/routes-config';
+
+type LeftKind = 'none' | 'back' | 'logo' | 'close';
+type ActionId = 'search' | 'cart' | 'share' | 'kebab' | 'bell' | 'close' | 'logout';
+
+type TextCTA = { kind: 'link'; label: string; to: string } | { kind: 'button'; label: string; onClick: () => void };
+
+export type HeaderProps = {
+  left?: LeftKind;
+  title?: React.ReactNode;
+  actions?: ActionId[];
+  notificationCount?: number;
+  rightTextCTA?: TextCTA;
+  searchMode?: boolean;
+  searchPlaceholder?: string;
+  onSearchSubmit?: (value: string) => void;
+  onAction?: (id: ActionId) => void;
+  safeTop?: boolean;
+  className?: string;
+};
+
+const ACTION_ICON: Record<ActionId, string> = {
+  search: 'search',
+  cart: 'cart',
+  share: 'share',
+  kebab: 'more',
+  bell: 'notification',
+  close: 'close',
+  logout: 'logout',
+};
+
+const ACTION_LABEL: Record<ActionId, string> = {
+  search: '검색',
+  cart: '장바구니',
+  share: '공유',
+  kebab: '더보기',
+  bell: '알림',
+  close: '닫기',
+  logout: '로그아웃',
+};
+
+export default function Header({
+  left = 'none',
+  title,
+  actions = [],
+  notificationCount,
+  rightTextCTA,
+  searchMode = false,
+  searchPlaceholder = '검색',
+  onSearchSubmit,
+  onAction,
+  safeTop = true,
+  className,
+}: HeaderProps) {
+  const nav = useNavigate();
+
+  const handleAction = (id: ActionId) => {
+    if (id === 'bell') {
+      nav(ROUTES.NOTIFICATION);
+      return;
+    }
+    if (id === 'close' && !onAction) {
+      nav(-1);
+      return;
+    }
+    onAction?.(id);
+  };
+
+  return (
+    <header
+      role='banner'
+      className={clsx(
+        'shadow-top-fixed bg-gray-white sticky top-0 z-[var(--z-header)]',
+        safeTop && 'pt-[env(safe-area-inset-top)]',
+        className
+      )}
+    >
+      <div className={clsx('mx-auto flex w-full items-center px-[2rem]', searchMode ? 'py-[0.5rem]' : 'py-[1.5rem]')}>
+        {/* Left */}
+        <div className='mr-2'>
+          {left === 'logo' && (
+            <Link to='/' aria-label='Home'>
+              <Icon name='logo-header' width={11.3} height={3} />
+            </Link>
+          )}
+          {left === 'back' && (
+            <button aria-label='뒤로가기' onClick={() => nav(-1)}>
+              <Icon name='back' size={2.4} ariaHidden />
+            </button>
+          )}
+          {left === 'close' && (
+            <button aria-label='닫기' onClick={() => handleAction('close')}>
+              <Icon name='close' size={2.4} ariaHidden />
+            </button>
+          )}
+          {left === 'none' && <span className='inline-block' />}
+        </div>
+
+        {/* Center */}
+        <div className='min-w-0 flex-1'>
+          {searchMode ? (
+            <SearchBar placeholder={searchPlaceholder} onSubmit={onSearchSubmit} />
+          ) : title != null ? (
+            <h1 className='title5 truncate'>{title}</h1>
+          ) : null}
+        </div>
+
+        {/* Right */}
+        <div className='flex items-center gap-[1rem]'>
+          {rightTextCTA ? (
+            rightTextCTA.kind === 'link' ? (
+              <Link to={rightTextCTA.to} className='text-sm font-semibold text-sky-800 hover:opacity-80'>
+                {rightTextCTA.label}
+              </Link>
+            ) : (
+              <button
+                type='button'
+                onClick={rightTextCTA.onClick}
+                className='text-sm font-semibold text-sky-800 hover:opacity-80'
+              >
+                {rightTextCTA.label}
+              </button>
+            )
+          ) : (
+            actions.map((id) =>
+              id === 'bell' ? (
+                <BellButton
+                  key='bell'
+                  count={notificationCount}
+                  label={ACTION_LABEL.bell}
+                  onClick={() => handleAction('bell')}
+                />
+              ) : (
+                <ActionButton
+                  key={id}
+                  icon={ACTION_ICON[id]}
+                  label={ACTION_LABEL[id]}
+                  onClick={() => handleAction(id)}
+                />
+              )
+            )
+          )}
+        </div>
+      </div>
+    </header>
+  );
+}
+
+function ActionButton({ icon, label, onClick }: { icon: string; label: string; onClick?: () => void }) {
+  return (
+    <button
+      type='button'
+      className='cursor-pointer text-gray-900 hover:text-gray-700'
+      aria-label={label}
+      onClick={onClick}
+    >
+      <Icon name={icon} size={2.4} ariaHidden />
+    </button>
+  );
+}
+
+function BellButton({ count, label, onClick }: { count?: number; label: string; onClick?: () => void }) {
+  return (
+    <button type='button' aria-label={label} onClick={onClick} className='relative'>
+      <Icon name='notification' size={2.4} ariaHidden className='cursor-pointer text-gray-900 hover:text-gray-700' />
+      {typeof count === 'number' && count > 0 && (
+        <span className='absolute -top-[0.4rem] -right-[0.4rem] inline-flex h-[1.8rem] min-w-[1.8rem] items-center justify-center rounded-full bg-sky-400 px-[0.4rem] text-[1.0rem] leading-none font-bold text-white ring-[0.2rem] ring-white'>
+          {count > 99 ? '99+' : count}
+        </span>
+      )}
+    </button>
+  );
+}
