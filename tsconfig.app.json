@@ -1,43 +1,44 @@
 {
-   "compilerOptions": {
-      "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
-      "target": "ES2020",
-      "useDefineForClassFields": true,
-      "lib": ["ES2022", "DOM", "DOM.Iterable"],
-      "module": "ESNext",
-      "skipLibCheck": true,
+  "compilerOptions": {
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
+    "target": "ES2020",
+    "useDefineForClassFields": true,
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "skipLibCheck": true,
 
-      /* Bundler mode */
-      "moduleResolution": "bundler",
-      "allowImportingTsExtensions": true,
-      "verbatimModuleSyntax": true,
-      "moduleDetection": "force",
-      "noEmit": true,
-      "jsx": "react-jsx",
+    /* Bundler mode */
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "verbatimModuleSyntax": true,
+    "moduleDetection": "force",
+    "noEmit": true,
+    "jsx": "react-jsx",
 
-      /* Linting */
-      "strict": true,
-      "noUnusedLocals": true,
-      "noUnusedParameters": true,
-      "erasableSyntaxOnly": true,
-      "noFallthroughCasesInSwitch": true,
-      "noUncheckedSideEffectImports": true,
+    /* Linting */
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "erasableSyntaxOnly": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedSideEffectImports": true,
 
-      /* path alias */
-      "baseUrl": ".",
-      "paths": {
-         "@pages/*": ["./src/pages/*"],
-         "@apis/*": ["./src/shared/apis/*"],
-         "@styles/*": ["./src/shared/styles/*"],
-         "@components/*": ["./src/shared/components/*"],
-         "@libs/*": ["./src/shared/libs/*"],
-         "@constants/*": ["./src/shared/constants/*"],
-         "@hooks/*": ["./src/shared/hooks/*"],
-         "@routes/*": ["./src/shared/routes/*"],
-         "@img/*": ["./src/shared/assets/images/*"],
-         "@svg/*": ["./src/shared/assets/svgs/*"],
-         "@/*": ["./src/*"]
-      }
-   },
-   "include": ["src", "src/.prettier", "vite-env.d.ts", "PRtest.tsx"]
+    /* path alias */
+    "baseUrl": ".",
+    "paths": {
+      "@pages/*": ["./src/pages/*"],
+      "@apis/*": ["./src/shared/apis/*"],
+      "@styles/*": ["./src/shared/styles/*"],
+      "@components/*": ["./src/shared/components/*"],
+      "@libs/*": ["./src/shared/libs/*"],
+      "@constants/*": ["./src/shared/constants/*"],
+      "@hooks/*": ["./src/shared/hooks/*"],
+      "@routes/*": ["./src/shared/routes/*"],
+      "@layouts/*": ["./src/shared/layouts/*"],
+      "@images/*": ["./src/shared/assets/images/*"],
+      "@icons/*": ["./src/shared/assets/icons/*"],
+      "@/*": ["./src/*"]
+    }
+  },
+  "include": ["src", "src/.prettier", "vite-env.d.ts", "PRtest.tsx"]
 }

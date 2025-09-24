@@ -4,11 +4,11 @@ import BottomNav from './bottom-nav';
 
 export default function Layout() {
   return (
-    <div className='h-full min-h-dvh flex-col bg-white text-gray-900'>
+    <div className='flex h-full min-h-dvh flex-col bg-white text-gray-900'>
       <Header />
 
       <main id='content' className='flex-1 overflow-x-hidden'>
-        <div className='scrollbar-hide mx-auto w-full max-w-[43rem]'>
+        <div className='mx-auto w-full max-w-[43rem]'>
           <Outlet />
         </div>
       </main>

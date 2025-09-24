@@ -1,12 +1,12 @@
 import queryClient from '@libs/query-client';
-import '@styles/global.css';
 import { QueryClientProvider } from '@tanstack/react-query';
+import { RouterProvider } from 'react-router-dom';
+import { router } from '@routes/router';
 
-const App = () => {
+export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <div className='bg-linear-sky w-full h-full title6 text-black p-4'>Init Project</div>
+      <RouterProvider router={router} />
     </QueryClientProvider>
   );
-};
-export default App;
+}
