@@ -6,7 +6,7 @@ type Rule = (path: string, search: string) => HeaderProps | undefined;
 
 const homeRule: Rule = (path) =>
   matchPath({ path: ROUTES.HOME, end: true }, path)
-    ? { left: 'logo', title: '홈', actions: ['bell'], notificationCount: 0, searchMode: false, safeTop: true }
+    ? { left: 'logo', actions: ['bell'], notificationCount: 0, searchMode: false, safeTop: true }
     : undefined;
 
 const libraryRootRule: Rule = (path) => {

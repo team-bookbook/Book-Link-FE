@@ -71,7 +71,7 @@ export default function Header({
         className
       )}
     >
-      <div className='mx-auto flex w-full items-center px-4'>
+      <div className={clsx('mx-auto flex w-full items-center px-[2rem]', searchMode ? 'py-[0.5rem]' : 'py-[1.5rem]')}>
         {/* Left */}
         <div className='mr-2'>
           {left === 'logo' && (
