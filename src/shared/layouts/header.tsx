@@ -2,8 +2,9 @@ import { Link, useNavigate } from 'react-router-dom';
 import clsx from 'clsx';
 import Icon from '@components/icon';
 import SearchBar from '@components/search-bar';
+
 type LeftKind = 'none' | 'back' | 'logo' | 'close';
-type ActionId = 'search' | 'cart' | 'share' | 'kebab' | 'bell' | 'close';
+type ActionId = 'search' | 'cart' | 'share' | 'kebab' | 'bell' | 'close' | 'logout';
 
 type TextCTA = { kind: 'link'; label: string; to: string } | { kind: 'button'; label: string; onClick: () => void };
 
@@ -28,6 +29,7 @@ const ACTION_ICON: Record<ActionId, string> = {
   kebab: 'more',
   bell: 'notification',
   close: 'close',
+  logout: 'logout',
 };
 
 const ACTION_LABEL: Record<ActionId, string> = {
@@ -37,6 +39,7 @@ const ACTION_LABEL: Record<ActionId, string> = {
   kebab: '더보기',
   bell: '알림',
   close: '닫기',
+  logout: '로그아웃',
 };
 
 export default function Header({
@@ -79,20 +82,17 @@ export default function Header({
               <Icon name='logo-header' width={11.3} height={3} />
             </Link>
           )}
-
           {left === 'back' && (
-            <RoundIconButton ariaLabel='뒤로가기' onClick={() => nav(-1)}>
-              <Icon name='arrow-left' size={1.25} ariaHidden />
-            </RoundIconButton>
+            <button aria-label='뒤로가기' onClick={() => nav(-1)}>
+              <Icon name='back' size={2.4} ariaHidden />
+            </button>
           )}
-
           {left === 'close' && (
-            <RoundIconButton ariaLabel='닫기' onClick={() => handleAction('close')}>
-              <Icon name='close' size={1.25} ariaHidden />
-            </RoundIconButton>
+            <button aria-label='닫기' onClick={() => handleAction('close')}>
+              <Icon name='close' size={2.4} ariaHidden />
+            </button>
           )}
-
-          {left === 'none' && <span className='inline-block h-9 w-9' />}
+          {left === 'none' && <span className='inline-block' />}
         </div>
 
         {/* Center */}
@@ -100,37 +100,44 @@ export default function Header({
           {searchMode ? (
             <SearchBar placeholder={searchPlaceholder} onSubmit={onSearchSubmit} />
           ) : title != null ? (
-            <h1 className='truncate text-base font-semibold'>{title}</h1>
+            <h1 className='title5 truncate'>{title}</h1>
           ) : null}
         </div>
 
         {/* Right */}
-        <div className='ml-2 flex items-center gap-1'>
+        <div className='flex items-center gap-[1rem]'>
           {rightTextCTA ? (
             rightTextCTA.kind === 'link' ? (
-              <Link to={rightTextCTA.to} className='ml-1 text-sm font-semibold text-sky-800 hover:opacity-80'>
+              <Link to={rightTextCTA.to} className='text-sm font-semibold text-sky-800 hover:opacity-80'>
                 {rightTextCTA.label}
               </Link>
             ) : (
               <button
                 type='button'
                 onClick={rightTextCTA.onClick}
-                className='ml-1 text-sm font-semibold text-sky-800 hover:opacity-80'
+                className='text-sm font-semibold text-sky-800 hover:opacity-80'
               >
                 {rightTextCTA.label}
               </button>
             )
           ) : (
-            actions.map((id) => (
-              <ActionButton
-                key={id}
-                id={id}
-                icon={ACTION_ICON[id]}
-                label={ACTION_LABEL[id]}
-                badge={id === 'bell' ? notificationCount : undefined}
-                onClick={() => handleAction(id)}
-              />
-            ))
+            actions.map((id) =>
+              id === 'bell' ? (
+                <BellButton
+                  key='bell'
+                  count={notificationCount}
+                  label={ACTION_LABEL.bell}
+                  onClick={() => handleAction('bell')}
+                />
+              ) : (
+                <ActionButton
+                  key={id}
+                  icon={ACTION_ICON[id]}
+                  label={ACTION_LABEL[id]}
+                  onClick={() => handleAction(id)}
+                />
+              )
+            )
           )}
         </div>
       </div>
@@ -138,50 +145,26 @@ export default function Header({
   );
 }
 
-function RoundIconButton({
-  children,
-  ariaLabel,
-  onClick,
-}: {
-  children: React.ReactNode;
-  ariaLabel: string;
-  onClick?: () => void;
-}) {
+function ActionButton({ icon, label, onClick }: { icon: string; label: string; onClick?: () => void }) {
   return (
     <button
       type='button'
-      aria-label={ariaLabel}
+      className='cursor-pointer text-gray-900 hover:text-gray-700'
+      aria-label={label}
       onClick={onClick}
-      className='inline-flex h-9 w-9 items-center justify-center rounded-xl hover:bg-black/5 active:opacity-80'
     >
-      {children}
+      <Icon name={icon} size={2.4} ariaHidden />
     </button>
   );
 }
 
-function ActionButton({
-  icon,
-  label,
-  badge,
-  onClick,
-}: {
-  id: ActionId;
-  icon: string;
-  label: string;
-  badge?: number;
-  onClick?: () => void;
-}) {
+function BellButton({ count, label, onClick }: { count?: number; label: string; onClick?: () => void }) {
   return (
-    <button
-      type='button'
-      aria-label={label}
-      className='relative inline-flex h-9 w-9 items-center justify-center rounded-xl hover:bg-black/5 active:opacity-80'
-      onClick={onClick}
-    >
-      <Icon name={icon} size={1.25} ariaHidden />
-      {typeof badge === 'number' && badge > 0 && (
-        <span className='absolute -top-0.5 -right-0.5 inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-sky-400 px-1 text-[10px] leading-none font-bold text-white ring-2 ring-white'>
-          {badge > 99 ? '99+' : badge}
+    <button type='button' aria-label={label} onClick={onClick} className='relative'>
+      <Icon name='notification' size={2.4} ariaHidden className='cursor-pointer text-gray-900 hover:text-gray-700' />
+      {typeof count === 'number' && count > 0 && (
+        <span className='absolute -top-[0.4rem] -right-[0.4rem] inline-flex h-[1.8rem] min-w-[1.8rem] items-center justify-center rounded-full bg-sky-400 px-[0.4rem] text-[1.0rem] leading-none font-bold text-white ring-[0.2rem] ring-white'>
+          {count > 99 ? '99+' : count}
         </span>
       )}
     </button>

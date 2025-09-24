@@ -6,6 +6,7 @@ import LibraryPage from '@pages/library/library-page';
 import SettingPage from '@pages/setting/setting-page';
 import BoardPage from '@pages/board/board-page';
 import ChatPage from '@pages/chat/chat-page';
+import NotificationPage from '@pages/notification/notification-page';
 import { ROUTES } from '@routes/routes-config';
 
 export const router = createBrowserRouter([
@@ -18,6 +19,7 @@ export const router = createBrowserRouter([
       { path: ROUTES.SETTING, element: <SettingPage /> },
       { path: ROUTES.BOARD, element: <BoardPage /> },
       { path: ROUTES.CHAT, element: <ChatPage /> },
+      { path: ROUTES.NOTIFICATION, element: <NotificationPage /> },
     ],
   },
 ]);
