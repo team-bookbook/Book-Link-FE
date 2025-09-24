@@ -5,7 +5,7 @@ import { QueryClientProvider } from '@tanstack/react-query';
 const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
-      <div className='bg-blue-500 text-white p-4'>Init Project</div>
+      <div className='bg-linear-sky w-full h-full title6 text-black p-4'>Init Project</div>
     </QueryClientProvider>
   );
 };

@@ -1,0 +1,242 @@
+@theme {
+  /* ===== Gray ===== */
+  --color-gray-white: #ffffff;
+  --color-gray-50: #fafafa;
+  --color-gray-100: #ebeef1;
+  --color-gray-200: #dbdee2;
+  --color-gray-300: #c4c8cd;
+  --color-gray-400: #a7adb2;
+  --color-gray-500: #8e9398;
+  --color-gray-600: #6c7378;
+  --color-gray-700: #565b60;
+  --color-gray-800: #34383c;
+  --color-gray-900: #1d2023;
+
+  /* ===== Primary ===== */
+  --color-primary-900: #003f69;
+  --color-primary-800: #1a5378;
+  --color-primary-700: #356b8e;
+  --color-primary-500: #668ca5;
+  --color-primary-300: #99b2c3;
+  --color-primary-100: #dbe8f0;
+
+  /* ===== Secondary ===== */
+  --color-secondary-900: #71c6ff;
+  --color-secondary-800: #80ccff;
+  --color-secondary-700: #8dd1ff;
+  --color-secondary-500: #aaddff;
+  --color-secondary-300: #c6e8ff;
+  --color-secondary-100: #e3f4ff;
+
+  /* ===== Etc ===== */
+  --color-etc-kakao: #fee500;
+  --color-opacity-light: rgb(46 46 46 / 20%);
+  --color-opacity-medium: rgb(46 46 46 / 50%);
+  --color-opacity-dark: rgb(46 46 46 / 80%);
+
+  /* ===== System ===== */
+  --color-system-error: #ff5656;
+  --color-system-error-15: #faeaea;
+  --color-system-success: #2c68ff;
+  --color-system-success-15: #e0e9ff;
+  --color-system-info: #ffdb66;
+
+  /* ===== Gradient ===== */
+  --color-linear-peach: linear-gradient(90deg, #ffc0b0 1.52%, #ffebd6 99.8%);
+  --color-linear-pink: linear-gradient(90deg, #fecfe0 0%, #feeef4 100%);
+  --color-linear-purple: linear-gradient(90deg, #deccf4 0%, #fbeffe 100%);
+  --color-linear-sky: linear-gradient(90deg, #ccdcf4 0%, #eff5fe 100%);
+
+  /* Z-Index */
+  --z-header: 5;
+  --z-overlay: 6;
+  --z-bottom-nav: 7;
+  --z-bottom-sheet: 8;
+
+  /* Radius / Shadow */
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --shadow-md: 0 6px 18px rgba(0, 0, 0, 0.12);
+  --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.16);
+}
+
+@layer utilities {
+  /* Shadow */
+  .shadow-bottom-fixed {
+    box-shadow: 0 -5px 20px 10px rgba(0, 0, 0, 0.02);
+  }
+
+  .shadow-top-fixed {
+    box-shadow: 0 4px 20px 10px rgba(0, 0, 0, 0.02);
+  }
+
+  .shadow-scroll-fixed {
+    box-shadow: 0 0 10px 3px rgba(0, 0, 0, 0.03);
+  }
+
+  /* ===== Typo ===== */
+  .title1 {
+    font-family: var(--font-sans);
+    font-weight: 600;
+    font-size: 3rem;
+    line-height: var(--lh);
+    letter-spacing: var(--ls);
+  }
+  .title2 {
+    font-family: var(--font-sans);
+    font-weight: 500;
+    font-size: 2.8rem;
+    line-height: var(--lh);
+    letter-spacing: var(--ls);
+  }
+  .title3 {
+    font-family: var(--font-sans);
+    font-weight: 600;
+    font-size: 2.4rem;
+    line-height: var(--lh);
+    letter-spacing: var(--ls);
+  }
+  .title4 {
+    font-family: var(--font-sans);
+    font-weight: 600;
+    font-size: 2rem;
+    line-height: var(--lh);
+    letter-spacing: var(--ls);
+  }
+  .title5 {
+    font-family: var(--font-sans);
+    font-weight: 600;
+    font-size: 1.8rem;
+    line-height: var(--lh);
+    letter-spacing: var(--ls);
+  }
+  .title6 {
+    font-family: var(--font-sans);
+    font-weight: 600;
+    font-size: 1.6rem;
+    line-height: var(--lh);
+    letter-spacing: var(--ls);
+  }
+
+  .body1 {
+    font-family: var(--font-sans);
+    font-weight: 500;
+    font-size: 2.2rem;
+    line-height: 150%;
+    letter-spacing: var(--ls);
+  }
+  .body2 {
+    font-family: var(--font-sans);
+    font-weight: 500;
+    font-size: 2rem;
+    line-height: 150%;
+    letter-spacing: var(--ls);
+  }
+  .body3 {
+    font-family: var(--font-sans);
+    font-weight: 500;
+    font-size: 1.8rem;
+    line-height: 150%;
+    letter-spacing: var(--ls);
+  }
+  .body4 {
+    font-family: var(--font-sans);
+    font-weight: 500;
+    font-size: 1.6rem;
+    line-height: 150%;
+    letter-spacing: var(--ls);
+  }
+  .body5 {
+    font-family: var(--font-sans);
+    font-weight: 500;
+    font-size: 1.4rem;
+    line-height: 150%;
+    letter-spacing: var(--ls);
+  }
+
+  .button1 {
+    font-family: var(--font-sans);
+    font-weight: 600;
+    font-size: 2rem;
+    line-height: var(--lh);
+    letter-spacing: var(--ls);
+  }
+  .button2 {
+    font-family: var(--font-sans);
+    font-weight: 600;
+    font-size: 1.8rem;
+    line-height: var(--lh);
+    letter-spacing: var(--ls);
+  }
+  .button3 {
+    font-family: var(--font-sans);
+    font-weight: 600;
+    font-size: 1.6rem;
+    line-height: var(--lh);
+    letter-spacing: var(--ls);
+  }
+  .button4 {
+    font-family: var(--font-sans);
+    font-weight: 500;
+    font-size: 1.4rem;
+    line-height: var(--lh);
+    letter-spacing: var(--ls);
+  }
+
+  .caption1 {
+    font-family: var(--font-sans);
+    font-weight: 500;
+    font-size: 1.6rem;
+    line-height: var(--lh);
+    letter-spacing: var(--ls);
+  }
+  .caption2 {
+    font-family: var(--font-sans);
+    font-weight: 600;
+    font-size: 1.4rem;
+    line-height: var(--lh);
+    letter-spacing: var(--ls);
+  }
+  .caption3 {
+    font-family: var(--font-sans);
+    font-weight: 500;
+    font-size: 1.4rem;
+    line-height: var(--lh);
+    letter-spacing: var(--ls);
+  }
+  .caption4 {
+    font-family: var(--font-sans);
+    font-weight: 600;
+    font-size: 1.2rem;
+    line-height: var(--lh);
+    letter-spacing: var(--ls);
+  }
+  .caption5 {
+    font-family: var(--font-sans);
+    font-weight: 500;
+    font-size: 1.2rem;
+    line-height: var(--lh);
+    letter-spacing: var(--ls);
+  }
+
+  .bg-linear-sky {
+    background-image: var(--color-linear-sky);
+  }
+  .bg-linear-peach {
+    background-image: var(--color-linear-peach);
+  }
+  .bg-linear-pink {
+    background-image: var(--color-linear-pink);
+  }
+  .bg-linear-purple {
+    background-image: var(--color-linear-purple);
+  }
+
+  /* Scrollbar helper */
+  .u-scrollbar-hide {
+    &::-webkit-scrollbar {
+      display: none;
+    }
+    scrollbar-width: none;
+  }
+}
