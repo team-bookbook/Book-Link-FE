@@ -2,6 +2,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import clsx from 'clsx';
 import Icon from '@components/icon';
 import SearchBar from '@components/search-bar';
+import { ROUTES } from '@routes/routes-config';
 
 type LeftKind = 'none' | 'back' | 'logo' | 'close';
 type ActionId = 'search' | 'cart' | 'share' | 'kebab' | 'bell' | 'close' | 'logout';
@@ -58,6 +59,10 @@ export default function Header({
   const nav = useNavigate();
 
   const handleAction = (id: ActionId) => {
+    if (id === 'bell') {
+      nav(ROUTES.NOTIFICATION);
+      return;
+    }
     if (id === 'close' && !onAction) {
       nav(-1);
       return;

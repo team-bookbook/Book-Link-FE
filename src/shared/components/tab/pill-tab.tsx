@@ -12,16 +12,16 @@ export type PillTabProps = {
 
 const ACTIVE_BG_CLASS = 'bg-secondary-900';
 const INACTIVE_TEXT_CLASS = 'text-gray-400';
-const INACTIVE_BORDER_CLASS = 'border-gray-100';
+const INACTIVE_OUTLINE_CLASS = 'outline-offset-[-1px] outline outline-gray-100';
 
 export default function PillTab({ items, value, onChange, className }: PillTabProps) {
   return (
     <div
       role='tablist'
       aria-label='필터 탭'
-      className={cn('w-full', 'scrollbar-hide overflow-x-auto whitespace-nowrap', 'px-[1.5rem]', className)}
+      className={cn('w-full', 'scrollbar-hide overflow-x-auto whitespace-nowrap', 'px-[2rem] py-[1rem]', className)}
     >
-      <div className='py-[0.4rem]w-full flex items-center gap-[0.8rem]'>
+      <div className='flex w-full items-center gap-[0.6rem]'>
         {items.map((it) => {
           const active = it.key === value;
           return (
@@ -34,12 +34,12 @@ export default function PillTab({ items, value, onChange, className }: PillTabPr
               onClick={() => onChange(it.key)}
               className={cn(
                 'flex-row-center',
-                'rounded-[22px] px-[1.2rem] py-[0.6rem]',
+                'cursor-pointer rounded-[22px] px-[1.6rem] py-[0.7rem]',
                 'caption2',
                 'transition-colors',
                 active
                   ? cn('text-gray-white', ACTIVE_BG_CLASS)
-                  : cn('bg-gray-white border-[0.1rem]', INACTIVE_BORDER_CLASS, INACTIVE_TEXT_CLASS)
+                  : cn('bg-gray-white', INACTIVE_OUTLINE_CLASS, INACTIVE_TEXT_CLASS)
               )}
             >
               {it.label}
