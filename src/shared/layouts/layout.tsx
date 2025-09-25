@@ -1,27 +1,46 @@
 import { Outlet, useLocation } from 'react-router-dom';
-import Header from '@layouts/header';
-import BottomNav from '@layouts/bottom-nav';
 import { useMemo } from 'react';
+import Header from '@layouts/header';
+import Footer from '@layouts/footer';
+import BottomNav from '@layouts/bottom-nav';
 import { getHeaderForRoute } from '@layouts/header-config';
-import Footer from './footer';
+import { ROUTES } from '@routes/routes-config';
+import { cn } from '@libs/cn';
+
+function isUnder(pathname: string, root: string) {
+  return pathname === root || pathname.startsWith(root + '/');
+}
 
 export default function Layout() {
   const { pathname, search } = useLocation();
 
   const headerProps = useMemo(() => getHeaderForRoute(pathname, search), [pathname, search]);
 
+  const isAuthOrOnboarding = useMemo(
+    () => isUnder(pathname, ROUTES.LOGIN) || isUnder(pathname, ROUTES.SIGNUP) || isUnder(pathname, ROUTES.ONBOARDING),
+    [pathname]
+  );
+
   return (
-    <div className='bg-gray-white flex h-full min-h-dvh flex-col text-gray-900'>
+    <div
+      className={cn(
+        'bg-gray-white flex min-h-dvh flex-col text-gray-900',
+        isAuthOrOnboarding ? 'h-dvh overflow-hidden' : 'h-full'
+      )}
+    >
       <Header {...headerProps} />
 
-      <main id='content' className='scrollbar-hide flex-1 overflow-x-hidden'>
+      <main
+        id='content'
+        className={cn('scrollbar-hide flex-1 overflow-x-hidden', isAuthOrOnboarding && 'h-dvh overflow-hidden')}
+      >
         <div className='mx-auto w-full'>
           <Outlet />
         </div>
-        <Footer />
+        {!isAuthOrOnboarding && <Footer />}
       </main>
 
-      <BottomNav />
+      {!isAuthOrOnboarding && <BottomNav />}
     </div>
   );
 }

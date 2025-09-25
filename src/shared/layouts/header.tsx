@@ -88,12 +88,16 @@ export default function Header({
             </Link>
           )}
           {left === 'back' && (
-            <button aria-label='뒤로가기' onClick={() => nav(-1)}>
+            <button
+              className='cursor-pointer text-gray-900 hover:opacity-80'
+              aria-label='뒤로가기'
+              onClick={() => nav(-1)}
+            >
               <Icon name='back' size={2.4} ariaHidden />
             </button>
           )}
           {left === 'close' && (
-            <button aria-label='닫기' onClick={() => handleAction('close')}>
+            <button className='cursor-pointer' aria-label='닫기' onClick={() => handleAction('close')}>
               <Icon name='close' size={2.4} ariaHidden />
             </button>
           )}
@@ -113,14 +117,14 @@ export default function Header({
         <div className='flex items-center gap-[1rem]'>
           {rightTextCTA ? (
             rightTextCTA.kind === 'link' ? (
-              <Link to={rightTextCTA.to} className='text-sm font-semibold text-sky-800 hover:opacity-80'>
+              <Link to={rightTextCTA.to} className='caption1 text-primary-900 hover:opacity-80'>
                 {rightTextCTA.label}
               </Link>
             ) : (
               <button
                 type='button'
                 onClick={rightTextCTA.onClick}
-                className='text-sm font-semibold text-sky-800 hover:opacity-80'
+                className='caption1 text-primary-900 hover:opacity-80'
               >
                 {rightTextCTA.label}
               </button>
@@ -154,7 +158,7 @@ function ActionButton({ icon, label, onClick }: { icon: string; label: string; o
   return (
     <button
       type='button'
-      className='cursor-pointer text-gray-900 hover:text-gray-700'
+      className='cursor-pointer text-gray-900 hover:opacity-80'
       aria-label={label}
       onClick={onClick}
     >
@@ -166,9 +170,9 @@ function ActionButton({ icon, label, onClick }: { icon: string; label: string; o
 function BellButton({ count, label, onClick }: { count?: number; label: string; onClick?: () => void }) {
   return (
     <button type='button' aria-label={label} onClick={onClick} className='relative'>
-      <Icon name='notification' size={2.4} ariaHidden className='cursor-pointer text-gray-900 hover:text-gray-700' />
+      <Icon name='notification' size={2.4} ariaHidden className='cursor-pointer text-gray-900 hover:opacity-80' />
       {typeof count === 'number' && count > 0 && (
-        <span className='absolute -top-[0.4rem] -right-[0.4rem] inline-flex h-[1.8rem] min-w-[1.8rem] items-center justify-center rounded-full bg-sky-400 px-[0.4rem] text-[1.0rem] leading-none font-bold text-white ring-[0.2rem] ring-white'>
+        <span className='absolute top-[-0.4rem] right-[-0.4rem] inline-flex h-[1.8rem] min-w-[1.8rem] items-center justify-center rounded-full bg-sky-400 px-[0.4rem] text-[1.0rem] leading-none font-bold text-white ring-[0.2rem] ring-white'>
           {count > 99 ? '99+' : count}
         </span>
       )}
