@@ -22,7 +22,11 @@ export default function ButtonFrame({ children, equalize = true, className }: Bu
 
   return (
     <div
-      className={cn('shadow-bottom-fixed sticky bottom-0 z-[var(--z-bottom-nav)] bg-white', 'p-[1.6rem]', className)}
+      className={cn(
+        'shadow-bottom-fixed fixed bottom-0 z-[var(--z-bottom-nav)] w-full max-w-[43rem] bg-white',
+        'p-[1.6rem]',
+        className
+      )}
     >
       <div className={cn('flex', 'gap-[0.8rem]')}>{content}</div>
     </div>
