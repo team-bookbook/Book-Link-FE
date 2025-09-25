@@ -10,6 +10,26 @@ const homeRule: Rule = (path) =>
     ? { left: 'logo', actions: ['search', 'cart', 'bell'], notificationCount: 0, searchMode: false, safeTop: true }
     : undefined;
 
+// 로그인
+const loginRule: Rule = (path) =>
+  matchPath({ path: ROUTES.LOGIN, end: true }, path)
+    ? {
+        left: 'back',
+        rightTextCTA: { kind: 'link', label: '회원가입', to: ROUTES.SIGNUP },
+        safeTop: true,
+      }
+    : undefined;
+
+// 회원가입
+const signupRule: Rule = (path) =>
+  matchPath({ path: ROUTES.SIGNUP, end: true }, path)
+    ? {
+        left: 'back',
+        rightTextCTA: { kind: 'link', label: '로그인', to: ROUTES.LOGIN },
+        safeTop: true,
+      }
+    : undefined;
+
 // 게시판
 const boardRule: Rule = (path) =>
   matchPath({ path: ROUTES.BOARD, end: true }, path)
@@ -77,6 +97,8 @@ const RULES: ReadonlyArray<Rule> = [
   libraryDetailRule,
   settingRule,
   notiRole,
+  loginRule,
+  signupRule,
 ];
 
 export function getHeaderForRoute(pathname: string, search: string): HeaderProps {

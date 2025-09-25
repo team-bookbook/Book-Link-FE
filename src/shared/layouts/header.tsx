@@ -113,14 +113,14 @@ export default function Header({
         <div className='flex items-center gap-[1rem]'>
           {rightTextCTA ? (
             rightTextCTA.kind === 'link' ? (
-              <Link to={rightTextCTA.to} className='text-sm font-semibold text-sky-800 hover:opacity-80'>
+              <Link to={rightTextCTA.to} className='caption1 text-primary-900 hover:opacity-80'>
                 {rightTextCTA.label}
               </Link>
             ) : (
               <button
                 type='button'
                 onClick={rightTextCTA.onClick}
-                className='text-sm font-semibold text-sky-800 hover:opacity-80'
+                className='caption1 text-primary-900 hover:opacity-80'
               >
                 {rightTextCTA.label}
               </button>
