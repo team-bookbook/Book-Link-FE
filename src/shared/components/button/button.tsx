@@ -1,29 +1,16 @@
 import React from 'react';
 import { cn } from '@libs/cn';
-
-type Variant = 'primarySoft' | 'primary' | 'neutral' | 'danger' | 'dangerSoft' | 'success' | 'outline';
-type Typo = 'button4' | 'button3';
-type Rounded = 'rounded-[12px]' | 'rounded-[8px]';
+import { BUTTON_TOKENS } from '@components/button/styles/token';
+import { variants, rounded, typo } from '@components/button/styles/button-varients';
+import type { ButtonVariant, Typo, Rounded } from '@components/button/types/button';
 
 export type ButtonProps = Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'className'> & {
-  variant?: Variant;
+  variant?: ButtonVariant;
   typoStyle?: Typo;
   fullWidth?: boolean;
   loading?: boolean;
   className?: string;
   roundStyle?: Rounded;
-};
-
-const base = 'flex-row-center transition active:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed';
-
-const variants: Record<Variant, string> = {
-  primarySoft: 'text-primary-700 bg-secondary-100',
-  primary: 'text-gray-white bg-primary-700',
-  neutral: 'text-gray-700 bg-gray-50',
-  danger: 'text-gray-white bg-system-error',
-  dangerSoft: 'text-system-error bg-system-error-15',
-  success: 'text-system-success bg-system-success',
-  outline: 'text-gray-900 bg-gray-white outline outline-1 outline-gray-300 outline-offset-[-1px]',
 };
 
 export default function Button({
@@ -39,7 +26,7 @@ export default function Button({
   type = 'button',
   ...rest
 }: ButtonProps) {
-  const disabledOverride = (disabled ?? false) ? 'bg-gray-300 text-gray-white outline-0' : '';
+  const disabledOverride = disabled ? BUTTON_TOKENS.disabled : '';
 
   const handleClick: React.MouseEventHandler<HTMLButtonElement> = (e) => {
     if (disabled || loading) {
@@ -56,12 +43,12 @@ export default function Button({
       disabled={disabled}
       onClick={handleClick}
       className={cn(
-        base,
+        BUTTON_TOKENS.base,
         variants[variant],
         fullWidth ? 'w-full' : 'w-auto',
-        roundStyle,
+        rounded[roundStyle === 'rounded-[8px]' ? 'md' : 'lg'],
+        typo[typoStyle],
         disabledOverride,
-        typoStyle,
         className
       )}
     >
