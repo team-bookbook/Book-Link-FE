@@ -17,14 +17,18 @@ export default function Layout() {
   const headerProps = useMemo(() => getHeaderForRoute(pathname, search), [pathname, search]);
 
   const isAuthOrOnboarding = useMemo(
-    () => isUnder(pathname, ROUTES.LOGIN) || isUnder(pathname, ROUTES.SIGNUP) || isUnder(pathname, ROUTES.ONBOARDING),
+    () =>
+      isUnder(pathname, ROUTES.LOGIN) ||
+      isUnder(pathname, ROUTES.SIGNUP) ||
+      isUnder(pathname, ROUTES.NOTIFICATION) ||
+      isUnder(pathname, ROUTES.ONBOARDING),
     [pathname]
   );
 
   return (
     <div
       className={cn(
-        'bg-gray-white flex min-h-dvh flex-col text-gray-900',
+        'bg-gray-white min-h-dvh flex-col text-gray-900',
         isAuthOrOnboarding ? 'h-dvh overflow-hidden' : 'h-full'
       )}
     >
