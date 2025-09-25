@@ -46,6 +46,12 @@
   --color-linear-pink: linear-gradient(90deg, #fecfe0 0%, #feeef4 100%);
   --color-linear-purple: linear-gradient(90deg, #deccf4 0%, #fbeffe 100%);
   --color-linear-sky: linear-gradient(90deg, #ccdcf4 0%, #eff5fe 100%);
+  --color-linear-home: linear-gradient(
+    103deg,
+    rgba(255, 255, 255, 0.3) -3.7%,
+    rgba(195, 209, 255, 0.3) 3.01%,
+    rgba(61, 105, 255, 0.3) 73.54%
+  );
 
   /* Z-Index */
   --z-header: 5;
@@ -237,6 +243,9 @@
   }
   .bg-linear-purple {
     background-image: var(--color-linear-purple);
+  }
+  .bg-linear-home {
+    background-image: var(--color-linear-home);
   }
 
   /* Scrollbar helper */

@@ -42,7 +42,7 @@ export default function Faq({ items, className = '', singleOpen = false }: Props
   );
 
   return (
-    <section className={cn('flex-col gap-[2.4rem]', className)} aria-label='자주 묻는 질문'>
+    <section className={cn('flex-col', className)} aria-label='자주 묻는 질문'>
       {items.map((it) => {
         const isOpen = openSet.has(it.id);
         const panelId = `faq-panel-${it.id}`;
