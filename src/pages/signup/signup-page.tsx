@@ -1,21 +1,30 @@
 import { useState } from 'react';
+import { cn } from '@libs/cn';
 import Input from '@components/input/input';
 import ProgressBar from '@pages/signup/components/progress-bar';
 import Button from '@components/button/button';
+import ButtonFrame from '@components/button/button-frame';
 
 export default function SignupPage() {
   const [name, setName] = useState('');
   const [nickname, setNickname] = useState('');
+  const [touched, setTouched] = useState({ name: false, nickname: false });
 
   const [nickState, setNickState] = useState<'idle' | 'checking' | 'valid' | 'invalid'>('idle');
 
   const isNameValid = name.trim().length > 0;
   const isNickBasicValid = /^[\p{Script=Hangul}A-Za-z0-9_]{2,12}$/u.test(nickname.trim());
-  const canNext = isNameValid && nickState === 'valid';
+
+  const nameError = touched.name && !isNameValid;
+  const nickFormatError = touched.nickname && !isNickBasicValid;
+  const dupError = nickState === 'invalid' && isNickBasicValid;
+
+  const showNickMessage = nickFormatError || dupError;
 
   const handleDupCheck = async () => {
     if (!isNickBasicValid) {
-      setNickState('invalid');
+      setTouched((t) => ({ ...t, nickname: true }));
+      setNickState('idle');
       return;
     }
     setNickState('checking');
@@ -47,11 +56,12 @@ export default function SignupPage() {
             placeholder='이름을 입력해 주세요.'
             value={name}
             onChange={(e) => setName(e.currentTarget.value)}
-            isError={!isNameValid && name.length > 0}
-            validationMessage={!isNameValid && name.length > 0 ? '이름을 입력해 주세요.' : undefined}
+            onBlur={() => setTouched((t) => ({ ...t, name: true }))}
+            isError={nameError}
+            validationMessage={nameError ? '이름을 입력해 주세요.' : undefined}
           />
 
-          <div className='flex items-end gap-3'>
+          <div className={cn('flex gap-3', showNickMessage ? 'items-center' : 'items-end')}>
             <div className='flex-1'>
               <Input
                 id='nickname'
@@ -62,13 +72,17 @@ export default function SignupPage() {
                   setNickname(e.currentTarget.value);
                   setNickState('idle');
                 }}
+                onBlur={() => setTouched((t) => ({ ...t, nickname: true }))}
                 maxLength={12}
                 hasLength
                 length={nickname.length}
-                isError={nickState === 'invalid'}
-                endIcon='cancel'
+                isError={showNickMessage}
                 validationMessage={
-                  nickState === 'invalid' ? '2–12자, 한글/영문/숫자/언더스코어만 가능해요.' : undefined
+                  nickFormatError
+                    ? '2–12자, 한글/영문/숫자/언더스코어만 가능해요.'
+                    : dupError
+                      ? '이미 사용 중인 닉네임입니다.'
+                      : undefined
                 }
               />
             </div>
@@ -86,17 +100,12 @@ export default function SignupPage() {
           </div>
         </div>
       </div>
-      <div className='pointer-events-none mt-auto bg-gradient-to-t from-white to-transparent px-5 pt-12 pb-8'>
-        <button
-          disabled={!canNext}
-          className={[
-            'pointer-events-auto h-[56px] w-full rounded-[18px] text-[17px] font-bold',
-            canNext ? 'bg-primary-700 text-white active:opacity-90' : 'bg-gray-300 text-white',
-          ].join(' ')}
-        >
+
+      <ButtonFrame>
+        <Button fullWidth={true} className='py-[1.2rem]'>
           다음
-        </button>
-      </div>
+        </Button>
+      </ButtonFrame>
     </div>
   );
 }

@@ -15,7 +15,7 @@ export type ButtonProps = Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'c
 
 export default function Button({
   variant = 'primary',
-  typoStyle = 'button4',
+  typoStyle = 'button3',
   fullWidth = false,
   roundStyle = 'rounded-[12px]',
   loading = false,
