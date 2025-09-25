@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useKeenSlider, type KeenSliderPlugin } from 'keen-slider/react';
 import 'keen-slider/keen-slider.min.css';
 import { cn } from '@libs/cn';
@@ -21,7 +21,7 @@ const HOURS24 = Array.from({ length: 24 }, (_, i) => pad2(i));
 const HOURS12 = Array.from({ length: 12 }, (_, i) => pad2((i + 1) % 12 || 12));
 const MINUTES = Array.from({ length: 60 }, (_, i) => pad2(i));
 
-/** 휠로 한 칸씩 이동시키는 플러그인 */
+/* 휠 한칸 이동 플러그인 */
 const wheelStep =
   (threshold = 20): KeenSliderPlugin =>
   (slider) => {
@@ -48,7 +48,9 @@ export default function TimePicker({
   defaultOpen = false,
   twelveHour = false,
 }: Props) {
-  // 초기값: 현재 시각 or 제어값
+  const rootRef = useRef<HTMLDivElement | null>(null);
+
+  // 초기값
   const now = new Date();
   const initial: HMValue = value ?? { hour: now.getHours(), minute: now.getMinutes() };
 
@@ -60,22 +62,22 @@ export default function TimePicker({
 
   const hoursList = twelveHour ? HOURS12 : HOURS24;
 
-  // 실제 값 인덱스(표시 기준) — 12h면 0~11, 24h면 0~23
+  // 표시 인덱스
   const valueHourIdx = twelveHour ? (inner.hour % 12 || 12) - 1 : inner.hour;
   const valueMinIdx = inner.minute;
 
+  // 중앙 선택(아이템 사이) 정렬을 위해 값-1을 초기 active로
   const initialHourCenter = (valueHourIdx - 1 + hoursList.length) % hoursList.length;
   const initialMinCenter = (valueMinIdx - 1 + MINUTES.length) % MINUTES.length;
 
   const [activeHourIdx, setActiveHourIdx] = useState<number>(initialHourCenter);
   const [activeMinIdx, setActiveMinIdx] = useState<number>(initialMinCenter);
 
-  // 선택 인덱스(렌더/로직 공용) = active + 1
+  // 실제 선택 인덱스 = active + 1
   const selectedHourIdx = (activeHourIdx + 1) % hoursList.length;
   const selectedMinIdx = (activeMinIdx + 1) % MINUTES.length;
 
   const setHourByIndex = (idx: number) => {
-    // idx는 표시 인덱스(0~11 또는 0~23)
     const hour24 = twelveHour ? ((idx + 1) % 12) + (inner.hour >= 12 ? 12 : 0) : idx;
     const next = { hour: hour24 % 24, minute: inner.minute };
     setInner(next);
@@ -87,11 +89,18 @@ export default function TimePicker({
     onChange?.(next);
   };
 
+  function modeSnap(): 'snap' {
+    return 'snap';
+  }
+  function alignCenter(): 'center' {
+    return 'center';
+  }
+
   const common = {
     vertical: true,
     loop: true,
-    mode: 'snap' as const,
-    align: 'center' as const,
+    mode: modeSnap(),
+    align: alignCenter(),
     slides: { perView: 3, spacing: 0 },
     rubberband: false,
     dragSpeed: 0.8,
@@ -131,14 +140,36 @@ export default function TimePicker({
     [wheelStep(24)]
   );
 
-  // 표시 라벨(트리거)
+  useEffect(() => {
+    if (!open) return;
+
+    const handleClick = (e: MouseEvent | TouchEvent) => {
+      const root = rootRef.current;
+      if (!root) return;
+      if (!(e.target instanceof Node)) return;
+      if (!root.contains(e.target)) setOpen(false);
+    };
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setOpen(false);
+    };
+
+    document.addEventListener('mousedown', handleClick);
+    document.addEventListener('touchstart', handleClick);
+    document.addEventListener('keydown', handleKey);
+    return () => {
+      document.removeEventListener('mousedown', handleClick);
+      document.removeEventListener('touchstart', handleClick);
+      document.removeEventListener('keydown', handleKey);
+    };
+  }, [open]);
+
   const label = useMemo(() => {
     const hh = twelveHour ? HOURS12[(inner.hour % 12 || 12) - 1] : pad2(inner.hour);
     return `${hh}:${pad2(inner.minute)}`;
   }, [inner.hour, inner.minute, twelveHour]);
 
   return (
-    <div className={cn('relative inline-block', className)}>
+    <div ref={rootRef} className={cn('relative inline-block', className)}>
       <button
         type='button'
         disabled={disabled}
@@ -157,7 +188,6 @@ export default function TimePicker({
         <Icon name='dropdown' size={1.2} className={open ? 'rotate-180 transition-transform' : ''} ariaHidden />
       </button>
 
-      {/* 패널 */}
       {open && (
         <div
           role='dialog'
@@ -172,7 +202,7 @@ export default function TimePicker({
               <div className='h-[0px] border-t border-gray-200' />
             </div>
 
-            {/* 시간 */}
+            {/* 시 */}
             <div ref={refHour} className='keen-slider h-[12rem] w-[6rem] overflow-hidden rounded-[10px]'>
               {hoursList.map((h) => (
                 <div key={`h-${h}`} className='keen-slider__slide grid h-[4rem] place-items-center'>
