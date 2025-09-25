@@ -17,12 +17,12 @@ function Tips({ title, items, className }: { title: string; items: string[]; cla
   return (
     <section className={cn('flex w-full flex-col gap-[1.2rem] rounded-[12px] bg-gray-50 p-[1.6rem]', className)}>
       <div className='flex items-center gap-[0.6rem]'>
-        <Icon name='info' size={1.6} ariaHidden className='text-gray-600' />
-        <h3 className='subtitle3 text-gray-700'>{title}</h3>
+        <Icon name='caution' size={1.6} ariaHidden className='text-gray-600' />
+        <h3 className='caption3 text-gray-700'>{title}</h3>
       </div>
       <ul className='list-disc space-y-[0.6rem] pl-[1.6rem]'>
         {items.map((t) => (
-          <li key={t} className='body3 text-gray-600'>
+          <li key={t} className='caption4 text-gray-600'>
             {t}
           </li>
         ))}
@@ -56,19 +56,19 @@ export default function EmptyState({
   const tips = tipsOverride ?? c.tips;
 
   return (
-    <div className={cn('flex w-full flex-col items-center gap-[2rem] p-[2.4rem] text-center', className)} role='status'>
+    <div className={cn('w-full flex-col items-center gap-[2rem] p-[2.4rem] text-center', className)} role='status'>
       <div className='select-none'>
         <img src={c.image} alt={illustrationAlt ?? title} className='h-auto w-[24rem] max-w-full' draggable={false} />
       </div>
 
-      <div className='flex flex-col items-center gap-[0.8rem]'>
+      <div className='flex-col items-center gap-[0.8rem]'>
         <h2 className='title3 text-gray-900'>{title}</h2>
-        {descNode ? <p className='body2 text-gray-600'>{descNode}</p> : null}
+        {descNode ? <p className='body5 text-gray-600'>{descNode}</p> : null}
       </div>
 
       {actions ? <div className='flex items-center gap-[0.8rem]'>{actions}</div> : null}
 
-      {tips ? <Tips title={tips.title} items={tips.items} className='mt-[0.4rem] max-w-[44rem]' /> : null}
+      {tips ? <Tips title={tips.title} items={tips.items} className='max-w-[44rem] text-left' /> : null}
     </div>
   );
 }
