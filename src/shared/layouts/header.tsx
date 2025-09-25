@@ -168,7 +168,7 @@ function BellButton({ count, label, onClick }: { count?: number; label: string; 
     <button type='button' aria-label={label} onClick={onClick} className='relative'>
       <Icon name='notification' size={2.4} ariaHidden className='cursor-pointer text-gray-900 hover:text-gray-700' />
       {typeof count === 'number' && count > 0 && (
-        <span className='absolute -top-[0.4rem] -right-[0.4rem] inline-flex h-[1.8rem] min-w-[1.8rem] items-center justify-center rounded-full bg-sky-400 px-[0.4rem] text-[1.0rem] leading-none font-bold text-white ring-[0.2rem] ring-white'>
+        <span className='absolute top-[-0.4rem] right-[-0.4rem] inline-flex h-[1.8rem] min-w-[1.8rem] items-center justify-center rounded-full bg-sky-400 px-[0.4rem] text-[1.0rem] leading-none font-bold text-white ring-[0.2rem] ring-white'>
           {count > 99 ? '99+' : count}
         </span>
       )}

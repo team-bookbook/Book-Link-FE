@@ -7,6 +7,8 @@ import SettingPage from '@pages/setting/setting-page';
 import BoardPage from '@pages/board/board-page';
 import ChatPage from '@pages/chat/chat-page';
 import NotificationPage from '@pages/notification/notification-page';
+import LoginPage from '@pages/login/login-page';
+import SignupPage from '@pages/signup/signup-page';
 import { ROUTES } from '@routes/routes-config';
 
 export const router = createBrowserRouter([
@@ -15,6 +17,8 @@ export const router = createBrowserRouter([
     errorElement: <ErrorPage />,
     children: [
       { path: ROUTES.HOME, element: <HomePage /> },
+      { path: ROUTES.LOGIN, element: <LoginPage /> },
+      { path: ROUTES.SIGNUP, element: <SignupPage /> },
       { path: ROUTES.LIBRARY, element: <LibraryPage /> },
       { path: ROUTES.SETTING, element: <SettingPage /> },
       { path: ROUTES.BOARD, element: <BoardPage /> },
