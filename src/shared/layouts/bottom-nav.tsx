@@ -10,7 +10,7 @@ const BottomNav = () => {
   const isActive = (path: string) => pathname === path;
 
   return (
-    <div className='bg-gray-white shadow-bottom-fixed sticky bottom-0 flex w-full justify-between px-[1.6rem] pt-[1.2rem] pb-[2.7rem]'>
+    <div className='bg-gray-white shadow-bottom-fixed flex-row-between sticky bottom-0 w-full px-[1.6rem] pt-[1.2rem] pb-[2.7rem]'>
       {NAV_ITEMS.map(({ label, path, icon }) => {
         const active = isActive(path);
 

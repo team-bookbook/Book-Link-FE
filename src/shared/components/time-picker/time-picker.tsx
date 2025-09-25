@@ -178,7 +178,7 @@ export default function TimePicker({
           'h-[4.8rem] w-[18rem] px-[0.8rem]',
           'bg-gray-50',
           'rounded-[12px]',
-          'flex items-center justify-between',
+          'flex-row-between',
           disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'
         )}
         aria-haspopup='dialog'
@@ -192,7 +192,7 @@ export default function TimePicker({
         <div
           role='dialog'
           aria-label='시간 선택'
-          className={cn('absolute z-50 mt-[0.8rem] p-[1.2rem]', 'bg-gray-white rounded-[12px] shadow-md')}
+          className={cn('absolute z-[var(--z-overlay)] p-[1.2rem]', 'rounded-[12px] bg-gray-50 shadow-md')}
         >
           <div className='relative flex items-stretch gap-[1.2rem]'>
             <div className='pointer-events-none absolute inset-x-0' style={{ top: 'calc(50% - 2rem)' }}>
