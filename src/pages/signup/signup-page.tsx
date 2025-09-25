@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import Input from '@components/input/input';
 import ProgressBar from '@pages/signup/components/progress-bar';
+import Button from '@components/button/button';
 
 export default function SignupPage() {
   const [name, setName] = useState('');
@@ -72,19 +73,16 @@ export default function SignupPage() {
               />
             </div>
 
-            <button
-              type='button'
+            <Button
               onClick={handleDupCheck}
               disabled={dupBtnDisabled}
-              className={[
-                'h-[56px] shrink-0 rounded-[12px] px-4 text-[15px] font-semibold',
-                'transition-opacity',
-                dupBtnDisabled ? 'cursor-not-allowed opacity-40' : '',
-                'bg-red-50 text-red-500',
-              ].join(' ')}
+              typoStyle='button4'
+              roundStyle='rounded-[12px]'
+              variant='dangerSoft'
+              className='px-[2.4rem] py-[1.8rem]'
             >
               {nickState === 'checking' ? '확인중…' : '중복확인'}
-            </button>
+            </Button>
           </div>
         </div>
       </div>
