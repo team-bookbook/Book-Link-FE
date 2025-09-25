@@ -1,9 +1,10 @@
 import { cn } from '@libs/cn';
+import PolygonImg from '@images/polygon.png';
 
 type Props = {
-  hasLoan: boolean; // 대여한 책이 있는지
-  title?: string; // hasLoan=true 일 때 책 제목
-  dday?: number; // hasLoan=true 일 때 D 값 (0=D-day, 1=D-1 ...)
+  hasLoan: boolean;
+  title?: string;
+  dday?: number;
   className?: string;
   bgClassName?: string;
 };
@@ -27,13 +28,14 @@ export default function HomeBanner({ hasLoan, title, dday, className = '', bgCla
       )}
       aria-label='홈 배너'
     >
+      <img src={PolygonImg} alt='' className='absolute top-0 -left-[0.8rem] w-[10.6rem] select-none' loading='lazy' />
+
       {hasLoan ? (
         <div className='flex-col gap-[0.8rem]'>
           <p>
             <span className='title4 text-primary-900 mr-[0.6rem]'>{title}</span>
             <span className='body5 text-gray-700'>도서 반납까지</span>
           </p>
-
           <div className='flex items-baseline gap-[0.8rem]'>
             <span className='title1 text-gray-900'>{dueText}</span>
             <span className='body5 text-gray-700'>남았어요!</span>
