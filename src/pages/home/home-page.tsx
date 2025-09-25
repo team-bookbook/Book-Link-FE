@@ -1,9 +1,10 @@
-import Faq from '@components/faq/faq';
-import { FAQ_ITEMS } from '@components/faq/constants/faq';
-import IntroduceBanner from '@components/banner/introduce-banner';
-import { INTRODUCE_STEPS } from '@components/banner/constants/introduce';
-import HomeBanner from '@components/banner/home-banner';
+import Faq from '@pages/home/components/faq/faq';
+import { FAQ_ITEMS } from '@pages/home/constants/faq';
+import IntroduceBanner from '@pages/home/components/banner/introduce-banner';
+import { INTRODUCE_STEPS } from '@pages/home/constants/introduce';
+import HomeBanner from '@pages/home/components/banner/home-banner';
 import Divider from '@components/divider';
+import { HOME_SECTIONS } from '@pages/home/constants/sections';
 
 export default function HomePage() {
   return (
@@ -18,8 +19,8 @@ export default function HomePage() {
       <div className='flex-col gap-[1.5rem]'>
         <Divider />
         <div className='flex-col gap-[0.2rem] px-[2rem] py-[1rem]'>
-          <h2 className='title4 text-gray-900'>서비스 이용 방법</h2>
-          <p className='body5 text-gray-600'>간단한 단계로 도서관을 운영하세요!</p>
+          <h2 className='title4 text-gray-900'>{HOME_SECTIONS.howTo.title}</h2>
+          <p className='body5 text-gray-600'>{HOME_SECTIONS.howTo.description}</p>
         </div>
         <div className='flex-col-center gap-[1.5rem] border-gray-100 px-[2rem]'>
           {INTRODUCE_STEPS.map((s) => (
@@ -30,8 +31,8 @@ export default function HomePage() {
       </div>
       <section className='flex-col gap-[1rem] px-[1.5rem]'>
         <div className='flex-col gap-[0.2rem] px-[0.5rem] py-[1rem]'>
-          <h2 className='title4 text-gray-900'>자주 묻는 질문</h2>
-          <p className='body5 text-gray-600'>자주 묻는 질문을 확인해 보세요!</p>
+          <h2 className='title4 text-gray-900'>{HOME_SECTIONS.faq.title}</h2>
+          <p className='body5 text-gray-600'>{HOME_SECTIONS.faq.description}</p>
         </div>
         <Faq items={FAQ_ITEMS} />
       </section>
