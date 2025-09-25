@@ -21,6 +21,7 @@ const HOURS24 = Array.from({ length: 24 }, (_, i) => pad2(i));
 const HOURS12 = Array.from({ length: 12 }, (_, i) => pad2((i + 1) % 12 || 12));
 const MINUTES = Array.from({ length: 60 }, (_, i) => pad2(i));
 
+/** 휠로 한 칸씩 이동시키는 플러그인 */
 const wheelStep =
   (threshold = 20): KeenSliderPlugin =>
   (slider) => {
@@ -47,6 +48,7 @@ export default function TimePicker({
   defaultOpen = false,
   twelveHour = false,
 }: Props) {
+  // 초기값: 현재 시각 or 제어값
   const now = new Date();
   const initial: HMValue = value ?? { hour: now.getHours(), minute: now.getMinutes() };
 
@@ -57,13 +59,23 @@ export default function TimePicker({
   }, [value]);
 
   const hoursList = twelveHour ? HOURS12 : HOURS24;
-  const initialHourIdx = twelveHour ? (inner.hour % 12 || 12) - 1 : inner.hour;
-  const initialMinIdx = inner.minute;
 
-  const [activeHourIdx, setActiveHourIdx] = useState<number>(initialHourIdx);
-  const [activeMinIdx, setActiveMinIdx] = useState<number>(initialMinIdx);
+  // 실제 값 인덱스(표시 기준) — 12h면 0~11, 24h면 0~23
+  const valueHourIdx = twelveHour ? (inner.hour % 12 || 12) - 1 : inner.hour;
+  const valueMinIdx = inner.minute;
+
+  const initialHourCenter = (valueHourIdx - 1 + hoursList.length) % hoursList.length;
+  const initialMinCenter = (valueMinIdx - 1 + MINUTES.length) % MINUTES.length;
+
+  const [activeHourIdx, setActiveHourIdx] = useState<number>(initialHourCenter);
+  const [activeMinIdx, setActiveMinIdx] = useState<number>(initialMinCenter);
+
+  // 선택 인덱스(렌더/로직 공용) = active + 1
+  const selectedHourIdx = (activeHourIdx + 1) % hoursList.length;
+  const selectedMinIdx = (activeMinIdx + 1) % MINUTES.length;
 
   const setHourByIndex = (idx: number) => {
+    // idx는 표시 인덱스(0~11 또는 0~23)
     const hour24 = twelveHour ? ((idx + 1) % 12) + (inner.hour >= 12 ? 12 : 0) : idx;
     const next = { hour: hour24 % 24, minute: inner.minute };
     setInner(next);
@@ -79,6 +91,7 @@ export default function TimePicker({
     vertical: true,
     loop: true,
     mode: 'snap' as const,
+    align: 'center' as const,
     slides: { perView: 3, spacing: 0 },
     rubberband: false,
     dragSpeed: 0.8,
@@ -87,14 +100,15 @@ export default function TimePicker({
   const [refHour] = useKeenSlider<HTMLDivElement>(
     {
       ...common,
-      initial: initialHourIdx,
+      initial: initialHourCenter,
       created(s) {
         setActiveHourIdx(s.track.details.rel);
+        setHourByIndex((s.track.details.rel + 1) % hoursList.length);
       },
       slideChanged(s) {
-        const i = s.track.details.rel;
-        setActiveHourIdx(i);
-        setHourByIndex(i);
+        const rel = s.track.details.rel;
+        setActiveHourIdx(rel);
+        setHourByIndex((rel + 1) % hoursList.length);
       },
     },
     [wheelStep(24)]
@@ -103,19 +117,21 @@ export default function TimePicker({
   const [refMin] = useKeenSlider<HTMLDivElement>(
     {
       ...common,
-      initial: initialMinIdx,
+      initial: initialMinCenter,
       created(s) {
         setActiveMinIdx(s.track.details.rel);
+        setMinuteByIndex((s.track.details.rel + 1) % MINUTES.length);
       },
       slideChanged(s) {
-        const i = s.track.details.rel;
-        setActiveMinIdx(i);
-        setMinuteByIndex(i);
+        const rel = s.track.details.rel;
+        setActiveMinIdx(rel);
+        setMinuteByIndex((rel + 1) % MINUTES.length);
       },
     },
     [wheelStep(24)]
   );
 
+  // 표시 라벨(트리거)
   const label = useMemo(() => {
     const hh = twelveHour ? HOURS12[(inner.hour % 12 || 12) - 1] : pad2(inner.hour);
     return `${hh}:${pad2(inner.minute)}`;
@@ -137,10 +153,11 @@ export default function TimePicker({
         aria-haspopup='dialog'
         aria-expanded={open}
       >
-        <span className={cn('body2', value ? 'text-gray-900' : 'text-gray-500')}>{value ? label : placeholder}</span>
-        <Icon name='arrow' size={1.2} className={open ? 'rotate-180 transition-transform' : ''} ariaHidden />
+        <span className={cn('caption1', value ? 'text-gray-700' : 'text-gray-500')}>{value ? label : placeholder}</span>
+        <Icon name='dropdown' size={1.2} className={open ? 'rotate-180 transition-transform' : ''} ariaHidden />
       </button>
 
+      {/* 패널 */}
       {open && (
         <div
           role='dialog'
@@ -148,61 +165,34 @@ export default function TimePicker({
           className={cn('absolute z-50 mt-[0.8rem] p-[1.2rem]', 'bg-gray-white rounded-[12px] shadow-md')}
         >
           <div className='relative flex items-stretch gap-[1.2rem]'>
-            <div className='pointer-events-none absolute top-1/2 right-0 left-0 h-[0px] border-y border-gray-200' />
+            <div className='pointer-events-none absolute inset-x-0' style={{ top: 'calc(50% - 2rem)' }}>
+              <div className='h-[0px] border-t border-gray-200' />
+            </div>
+            <div className='pointer-events-none absolute inset-x-0' style={{ top: 'calc(50% + 2rem)' }}>
+              <div className='h-[0px] border-t border-gray-200' />
+            </div>
 
+            {/* 시간 */}
             <div ref={refHour} className='keen-slider h-[12rem] w-[6rem] overflow-hidden rounded-[10px]'>
               {hoursList.map((h) => (
                 <div key={`h-${h}`} className='keen-slider__slide grid h-[4rem] place-items-center'>
-                  <span
-                    className={
-                      hoursList[activeHourIdx] === h
-                        ? 'text-[2rem] leading-[2.8rem] font-semibold text-gray-900'
-                        : 'text-[2rem] leading-[2.8rem] text-gray-500'
-                    }
-                  >
+                  <span className={hoursList[selectedHourIdx] === h ? 'title4 text-gray-900' : 'title4 text-gray-500'}>
                     {h}
                   </span>
                 </div>
               ))}
             </div>
 
-            <div className='grid place-items-center text-gray-900'>
-              <span className='text-[2rem] leading-[2.8rem] font-semibold'>:</span>
-            </div>
-
             {/* 분 */}
             <div ref={refMin} className='keen-slider h-[12rem] w-[6rem] overflow-hidden rounded-[10px]'>
               {MINUTES.map((m) => (
                 <div key={`m-${m}`} className='keen-slider__slide grid h-[4rem] place-items-center'>
-                  <span
-                    className={
-                      MINUTES[activeMinIdx] === m
-                        ? 'text-[2rem] leading-[2.8rem] font-semibold text-gray-900'
-                        : 'text-[2rem] leading-[2.8rem] text-gray-500'
-                    }
-                  >
+                  <span className={MINUTES[selectedMinIdx] === m ? 'title4 text-gray-900' : 'title4 text-gray-500'}>
                     {m}
                   </span>
                 </div>
               ))}
             </div>
-          </div>
-
-          <div className='mt-[1.2rem] flex justify-end gap-[0.8rem]'>
-            <button
-              type='button'
-              className='h-[3.6rem] rounded-[10px] bg-gray-50 px-[1.2rem] text-gray-700'
-              onClick={() => setOpen(false)}
-            >
-              닫기
-            </button>
-            <button
-              type='button'
-              className='bg-primary-700 h-[3.6rem] rounded-[10px] px-[1.2rem] text-white'
-              onClick={() => setOpen(false)}
-            >
-              확인
-            </button>
           </div>
         </div>
       )}
