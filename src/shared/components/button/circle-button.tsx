@@ -25,8 +25,31 @@ export default function CircleButton({ name, className = '', onClick, rotate, ic
       ? 'bg-primary-900 text-gray-white'
       : 'bg-gray-white text-gray-900 outline outline-gray-200 outline-offset-[-1px]';
 
+  const scrollToTop = () => {
+    const scroller = typeof document !== 'undefined' ? document.getElementById('content') : null;
+    if (scroller) {
+      scroller.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+    if (typeof window !== 'undefined') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
+  const handleClick: React.MouseEventHandler<HTMLButtonElement> = (e) => {
+    if (name === 'back') {
+      scrollToTop();
+    }
+    if (onClick) onClick(e);
+  };
+
   return (
-    <button type='button' onClick={onClick} className={cn(base, palette, className)} aria-label={ariaLabel}>
+    <button
+      type='button'
+      onClick={handleClick}
+      className={cn(base, palette, className)}
+      aria-label={ariaLabel ?? (name === 'back' ? '맨 위로' : undefined)}
+    >
       {r ? (
         <Icon name={iconName(name)} size={iconSize} rotate={r} ariaHidden />
       ) : (
