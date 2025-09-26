@@ -15,7 +15,7 @@ type Props = {
 
 const iconName = (n: CircleButtonName) => n;
 
-const base = 'flex-row-center rounded-full w-[4rem] h-[4rem] shadow-scroll-fixed';
+const base = 'cursor-pointer flex-row-center rounded-full w-[4rem] h-[4rem] shadow-scroll-fixed';
 
 export default function CircleButton({ name, className = '', onClick, rotate, iconSize = 2.0, ariaLabel }: Props) {
   const r: 90 | 180 | 270 | undefined = name === 'back' ? (rotate ?? 90) : undefined;
