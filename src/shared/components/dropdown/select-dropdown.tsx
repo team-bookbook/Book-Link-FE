@@ -132,9 +132,9 @@ export default function SelectDropdown<T extends string>({
 
   const triggerCommon = 'flex items-center gap-[0.4rem] select-none transition-colors';
 
-  const triggerChip = 'cursor-pointer bg-gray-100 rounded-[5px] px-[0.8rem] py-[0.3rem] text-primary-900 caption6';
+  const triggerChip = 'cursor-pointer bg-gray-100 rounded-[5px] px-[0.8rem] py-[0.3rem] text-primary-900 caption5';
 
-  const triggerTitle = 'cursor-pointer text-gray-900 font-medium body4';
+  const triggerTitle = 'cursor-pointer text-gray-900 body4';
 
   const chevronRotate = open ? 180 : 0;
 
@@ -163,9 +163,9 @@ export default function SelectDropdown<T extends string>({
           tabIndex={-1}
           onKeyDown={onKeyDownMenu}
           className={cn(
-            'absolute z-[100] mt-[0.8rem]',
+            'absolute z-[var(--z-overlay)] mt-[0.8rem]',
             align === 'end' ? 'right-0' : 'left-0',
-            'bg-gray-white rounded-[16px] shadow-[0_0.4rem_1rem_-0.4rem_rgba(0,0,0,0.06)]',
+            'bg-gray-white rounded-[16px] shadow-sm',
             'outline outline-gray-200 backdrop-blur-[0.2rem]',
             menuWidthRem ? '' : 'min-w-[12rem]'
           )}
