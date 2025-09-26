@@ -2,19 +2,19 @@ import { useEffect, useId, useMemo, useRef, useState } from 'react';
 import { cn } from '@libs/cn';
 import Icon from '@components/icon';
 
-type Option = {
-  value: string;
+type Option<T extends string> = {
+  value: T;
   label: string;
   disabled?: boolean;
 };
 
-export type SelectDropdownProps = {
+export type SelectDropdownProps<T extends string> = {
   /** 현재 값 */
-  value: string;
+  value: T;
   /** 항목 목록 */
-  options: readonly Option[];
+  options: readonly Option<T>[];
   /** 선택 변경 */
-  onChange: (next: string) => void;
+  onChange: (next: T) => void;
   /** 트리거 라벨(제목형 UI에 사용) */
   triggerLabel?: string;
   /** 트리거 형태 */
@@ -29,14 +29,7 @@ export type SelectDropdownProps = {
   className?: string;
 };
 
-/**
- * 접근성 & 키보드 네비게이션:
- * - Enter/Space: 열기/선택
- * - ArrowUp/Down: 항목 이동
- * - Esc/Tab: 닫기
- * - 외부 클릭/스크롤: 닫기
- */
-export default function SelectDropdown({
+export default function SelectDropdown<T extends string>({
   value,
   options,
   onChange,
@@ -46,7 +39,7 @@ export default function SelectDropdown({
   menuWidthRem,
   itemHeightRem = 3.2,
   className = '',
-}: SelectDropdownProps) {
+}: SelectDropdownProps<T>) {
   const [open, setOpen] = useState(false);
   const [activeIndex, setActiveIndex] = useState(() =>
     Math.max(
@@ -58,10 +51,8 @@ export default function SelectDropdown({
   const triggerRef = useRef<HTMLButtonElement | null>(null);
   const menuRef = useRef<HTMLDivElement | null>(null);
 
-  // 선택된 라벨
   const selected = useMemo(() => options.find((o) => o.value === value)?.label ?? '', [options, value]);
 
-  // 외부 클릭/스크롤 닫기
   useEffect(() => {
     if (!open) return;
     const onPointer = (e: Event) => {
@@ -79,7 +70,6 @@ export default function SelectDropdown({
     };
   }, [open]);
 
-  // 열릴 때 activeIndex 동기화 + 첫 항목 포커스
   useEffect(() => {
     if (!open) return;
     const idx = options.findIndex((o) => o.value === value);
@@ -89,10 +79,9 @@ export default function SelectDropdown({
   const toggle = () => setOpen((prev) => !prev);
   const close = () => setOpen(false);
 
-  const onSelect = (v: string) => {
+  const onSelect = (v: T) => {
     onChange(v);
     close();
-    // 트리거에 포커스 반환
     triggerRef.current?.focus();
   };
 
@@ -141,17 +130,16 @@ export default function SelectDropdown({
     }
   };
 
-  const triggerCommon = 'inline-flex items-center gap-[0.4rem] select-none transition-colors';
+  const triggerCommon = 'flex items-center gap-[0.4rem] select-none transition-colors';
 
-  const triggerChip = 'bg-gray-100 rounded-[5px] px-[0.8rem] py-[0.3rem] text-primary-900 caption6';
+  const triggerChip = 'cursor-pointer bg-gray-100 rounded-[5px] px-[0.8rem] py-[0.3rem] text-primary-900 caption6';
 
-  const triggerTitle = 'text-gray-900 font-medium body4';
+  const triggerTitle = 'cursor-pointer text-gray-900 font-medium body4';
 
   const chevronRotate = open ? 180 : 0;
 
   return (
     <div className={cn('relative inline-block', className)}>
-      {/* Trigger */}
       <button
         type='button'
         ref={triggerRef}
@@ -178,7 +166,7 @@ export default function SelectDropdown({
             'absolute z-[100] mt-[0.8rem]',
             align === 'end' ? 'right-0' : 'left-0',
             'bg-gray-white rounded-[16px] shadow-[0_0.4rem_1rem_-0.4rem_rgba(0,0,0,0.06)]',
-            'outline outline-1 outline-gray-200 backdrop-blur-[0.2rem]',
+            'outline outline-gray-200 backdrop-blur-[0.2rem]',
             menuWidthRem ? '' : 'min-w-[12rem]'
           )}
           style={menuWidthRem ? { width: `${menuWidthRem}rem` } : undefined}
@@ -197,14 +185,14 @@ export default function SelectDropdown({
                     onMouseEnter={() => setActiveIndex(options.findIndex((o) => o.value === opt.value))}
                     onClick={() => onSelect(opt.value)}
                     className={cn(
-                      'w-full px-[1.6rem] text-left',
-                      `h-[${itemHeightRem}rem]`,
+                      'w-full cursor-pointer px-[1.6rem] text-left',
                       'flex items-center justify-start',
                       'transition-colors',
                       opt.disabled && 'cursor-not-allowed text-gray-400',
                       !opt.disabled && (isSelected ? 'text-gray-900' : 'text-gray-400'),
                       !opt.disabled && isActive && 'bg-gray-50'
                     )}
+                    style={{ height: `${itemHeightRem}rem` }}
                   >
                     <span className={cn('body5', isSelected ? 'text-gray-900' : 'text-gray-400')}>{opt.label}</span>
                   </button>
@@ -218,7 +206,7 @@ export default function SelectDropdown({
   );
 }
 
-function nextEnabledIndex(opts: readonly Option[], start: number, step: 1 | -1): number {
+function nextEnabledIndex<T extends string>(opts: readonly Option<T>[], start: number, step: 1 | -1): number {
   let i = start;
   const min = 0;
   const max = opts.length - 1;
