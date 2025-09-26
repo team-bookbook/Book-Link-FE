@@ -1,7 +1,16 @@
 import { useState } from 'react';
 import LibraryTab, { type LibraryTabKey } from '@pages/library/components/library-tab';
 import { useQueryTab } from '@hooks/use-query-tab';
-import Input from '@components/input/input';
+import SelectDropdown from '@components/dropdown/select-dropdown';
+
+import {
+  LIB_SORT_OPTIONS,
+  BOOK_SORT_OPTIONS,
+  RENT_STATUS_OPTIONS,
+  type LibSort,
+  type BookSort,
+  type RentStatus,
+} from '@components/dropdown/constants/select-options';
 
 export default function LibraryPage() {
   const [tab, setTab] = useQueryTab<LibraryTabKey>('tab', 'books', ['books', 'libraries']);
@@ -15,38 +24,51 @@ export default function LibraryPage() {
 }
 
 function LibraryList() {
-  const [desc, setDesc] = useState('');
-  const max = 200;
+  const [libSort, setLibSort] = useState<LibSort>('recent');
+  const [rentStatus, setRentStatus] = useState<RentStatus>('pending');
 
   return (
-    <div className='flex-col gap-6'>
-      <Input
-        id='lib-desc'
-        label='도서관 메모'
-        multiline
-        placeholder='도서관에 대한 메모를 입력하세요.'
-        value={desc}
-        onChange={(e) => setDesc(e.currentTarget.value)}
-        maxLength={max}
-        hasLength
-        length={desc.length}
-        defaultMessage='최대 200자까지 입력할 수 있어요.'
-      />
+    <div className='flex-col gap-[1.2rem]'>
+      <div className='flex-row-between'>
+        <div className='flex items-center gap-[1.2rem]'>
+          <SelectDropdown
+            triggerLabel={libSort === 'recent' ? '최신순' : libSort === 'distance' ? '거리순' : '인기순'}
+            value={libSort}
+            onChange={setLibSort}
+            options={LIB_SORT_OPTIONS}
+            variant='title'
+            align='start'
+          />
+        </div>
+
+        <SelectDropdown
+          variant='chip'
+          value={rentStatus}
+          onChange={setRentStatus}
+          options={RENT_STATUS_OPTIONS}
+          align='end'
+          menuWidthRem={12}
+        />
+      </div>
     </div>
   );
 }
 
 function BookList() {
-  const [keyword, setKeyword] = useState('');
+  const [bookSort, setBookSort] = useState<BookSort>('recent');
+
   return (
-    <div className='flex-col'>
-      <Input
-        id='book-search'
-        label='도서 검색'
-        placeholder='제목/저자를 입력하세요.'
-        value={keyword}
-        onChange={(e) => setKeyword(e.currentTarget.value)}
-      />
+    <div className='flex-col gap-[1.2rem]'>
+      <div className='flex-row-between'>
+        <SelectDropdown
+          triggerLabel={bookSort === 'recent' ? '최신순' : '인기순'}
+          value={bookSort}
+          onChange={setBookSort}
+          options={BOOK_SORT_OPTIONS}
+          variant='title'
+          align='end'
+        />
+      </div>
     </div>
   );
 }
