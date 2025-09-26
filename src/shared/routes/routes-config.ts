@@ -10,5 +10,7 @@ export const ROUTES = {
   SETTING_EDIT: '/mypage/edit',
   CHAT: '/chat',
   CHAT_ROOM: (id = ':matchId') => `/chat/${id}`,
+  SCAN: '/scan',
+  CART: '/cart',
   NOTIFICATION: '/notification',
 };
