@@ -35,7 +35,7 @@ export default function UnderlineTab({
       role='tablist'
       aria-label='탐색 탭'
       className={cn(
-        'bg-gray-white shadow-top-fixed sticky top-0 z-[var(--z-tabs,40)]',
+        'bg-gray-white shadow-top-fixed sticky top-0 z-[var(--z-header)]',
         HEIGHT_CLASS,
         'relative w-full overflow-hidden px-[2rem]',
         className

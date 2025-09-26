@@ -2,6 +2,8 @@ import { useState } from 'react';
 import LibraryTab, { type LibraryTabKey } from '@pages/library/components/library-tab';
 import { useQueryTab } from '@hooks/use-query-tab';
 import SelectDropdown from '@components/dropdown/select-dropdown';
+import { toast } from '@libs/toast';
+import Button from '@components/button/button';
 
 import {
   LIB_SORT_OPTIONS,
@@ -19,6 +21,17 @@ export default function LibraryPage() {
     <>
       <LibraryTab value={tab} onChange={setTab} />
       {tab === 'libraries' ? <LibraryList /> : <BookList />}
+      <div className='flex-col gap-[1rem]'>
+        <Button type='button' onClick={() => toast.info('이메일을 확인해 주세요.')}>
+          Info
+        </Button>
+        <Button type='button' onClick={() => toast.success('로그인에 성공했습니다.')}>
+          Success
+        </Button>
+        <Button type='button' onClick={() => toast.error('로그인에 실패했습니다.')}>
+          Error
+        </Button>
+      </div>
     </>
   );
 }

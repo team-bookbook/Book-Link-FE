@@ -19,7 +19,7 @@ export default function Button({
   fullWidth = false,
   roundStyle = 'rounded-[12px]',
   loading = false,
-  className = 'px-[1.2rem]',
+  className = 'p-[1.2rem]',
   children,
   onClick,
   disabled,
