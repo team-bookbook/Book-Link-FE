@@ -1,5 +1,5 @@
 import { useEffect, useSyncExternalStore, useId } from 'react';
-import { createRoot } from 'react-dom/client';
+import { createRoot, type Root } from 'react-dom/client';
 import { cn } from '@libs/cn';
 import Icon from '@components/icon';
 
@@ -46,20 +46,22 @@ const store = (() => {
   return { add, remove, subscribe, getSnapshot };
 })();
 
-let mounted = false;
+type RootHost = HTMLElement & { __BOOKLINK_TOAST_ROOT__?: Root };
 
 function ensureHost() {
-  if (mounted) return;
-  const rootEl =
-    document.getElementById('toast-portal') ??
+  const el: RootHost =
+    (document.getElementById('toast-portal') as RootHost) ??
     (() => {
-      const el = document.createElement('div');
-      el.id = 'toast-portal';
-      document.body.appendChild(el);
-      return el;
+      const n = document.createElement('div') as RootHost;
+      n.id = 'toast-portal';
+      document.body.appendChild(n);
+      return n;
     })();
-  createRoot(rootEl).render(<ToastViewport />);
-  mounted = true;
+
+  if (!el.__BOOKLINK_TOAST_ROOT__) {
+    el.__BOOKLINK_TOAST_ROOT__ = createRoot(el);
+  }
+  el.__BOOKLINK_TOAST_ROOT__!.render(<ToastViewport />);
 }
 
 function makeId(): string {

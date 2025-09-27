@@ -43,6 +43,7 @@ export default function Button({
       disabled={disabled}
       onClick={handleClick}
       className={cn(
+        'cursor-pointer',
         BUTTON_TOKENS.base,
         variants[variant],
         fullWidth ? 'w-full' : 'w-auto',
