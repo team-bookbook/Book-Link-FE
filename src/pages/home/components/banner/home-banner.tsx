@@ -28,7 +28,7 @@ export default function HomeBanner({ hasLoan, title, dday, className = '', bgCla
       )}
       aria-label='홈 배너'
     >
-      <img src={PolygonImg} alt='' className='absolute top-0 -left-[0.8rem] w-[10.6rem] select-none' loading='lazy' />
+      <img src={PolygonImg} alt='' className='absolute top-0 left-[-0.8rem] w-[10.6rem] select-none' loading='lazy' />
 
       {hasLoan ? (
         <div className='flex-col gap-[0.8rem]'>
@@ -54,7 +54,7 @@ export default function HomeBanner({ hasLoan, title, dday, className = '', bgCla
         <img
           src={ICON_BOOKS}
           alt=''
-          className='absolute top-[1.2rem] left-[1.2rem] h-[2.5rem] w-[2.5rem] -rotate-[22deg]'
+          className='absolute top-[1.2rem] left-[1.2rem] h-[2.5rem] w-[2.5rem] rotate-[-22deg]'
           loading='lazy'
         />
         <img

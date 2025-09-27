@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import NotFound from '@images/404.svg';
+import Button from '@components/button/button';
 
 export default function ErrorPage() {
   const nav = useNavigate();
@@ -13,13 +14,9 @@ export default function ErrorPage() {
         <p className='title3 text-center text-gray-900'>존재하지 않는 페이지입니다.</p>
       </div>
 
-      <button
-        type='button'
-        onClick={() => nav('/')}
-        className='text-gray-white bg-primary-700 active:bg-primary-800 button3 w-full cursor-pointer rounded-[12px] py-[1.2rem]'
-      >
+      <Button fullWidth={true} onClick={() => nav('/')}>
         메인으로 돌아가기
-      </button>
+      </Button>
     </div>
   );
 }

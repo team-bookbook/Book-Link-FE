@@ -58,6 +58,7 @@
   --z-overlay: 6;
   --z-bottom-nav: 7;
   --z-bottom-sheet: 8;
+  --z-modal: 9;
 
   /* Radius / Shadow */
   --radius-md: 12px;

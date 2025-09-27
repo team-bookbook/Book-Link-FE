@@ -65,7 +65,6 @@ export default function Layout() {
         return null;
       })();
 
-  // 바텀시트 겹침/노출 제어 (전체 폭 기준)
   const { visible: floatVisible, bottomStyle } = useFloatingButtonGuard();
 
   return (
@@ -92,12 +91,11 @@ export default function Layout() {
       {floatingBtn && (
         <div
           className={cn(
-            'pointer-events-none fixed inset-x-0 z-[110] transition-opacity duration-200',
+            'pointer-events-none fixed inset-x-0 z-[var(--z-bottom-nav)] transition-opacity duration-200',
             floatVisible ? 'opacity-100' : 'opacity-0'
           )}
           style={bottomStyle}
         >
-          {/* 컨테이너 폭을 바텀내브와 동일하게 중앙 정렬 */}
           <div className='relative left-1/2 w-full max-w-[43rem] -translate-x-1/2'>
             <div className='pointer-events-auto absolute right-[1.6rem]'>
               {floatingBtn.name === 'back' ? (
