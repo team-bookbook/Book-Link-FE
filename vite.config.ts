@@ -26,6 +26,7 @@ export default defineConfig({
       '@routes': path.resolve(__dirname, 'src/shared/routes'),
       '@images': path.resolve(__dirname, 'src/shared/assets/images'),
       '@icons': path.resolve(__dirname, 'src/shared/assets/icons'),
+      '@types': path.resolve(__dirname, 'src/shared/types'),
       '@': path.resolve(__dirname, 'src'),
     },
   },

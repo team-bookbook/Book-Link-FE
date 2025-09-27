@@ -37,6 +37,7 @@
       "@layouts/*": ["./src/shared/layouts/*"],
       "@images/*": ["./src/shared/assets/images/*"],
       "@icons/*": ["./src/shared/assets/icons/*"],
+      "@types/*": ["./src/shared/types/*"],
       "@/*": ["./src/*"]
     }
   },
