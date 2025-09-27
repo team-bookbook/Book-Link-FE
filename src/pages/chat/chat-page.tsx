@@ -2,9 +2,10 @@ import { useState } from 'react';
 import Button from '@components/button/button';
 import useBottomSheet from '@components/bottom-sheet/hooks/use-bottom-sheet';
 import SelectBottomSheet from '@components/bottom-sheet/select-bottom-sheet';
-import CommentBottomSheet, { type CommentItem } from '@components/bottom-sheet/comment-bottom-sheet';
+import CommentBottomSheet, { type CommentItem, type ReplyItem } from '@components/bottom-sheet/comment-bottom-sheet';
 
 export default function ChatPage() {
+  // 카테고리 선택 시트
   const selectSheet = useBottomSheet();
   const [category, setCategory] = useState<string | null>('cat-a');
 
@@ -14,6 +15,7 @@ export default function ChatPage() {
     { value: 'cat-c', label: '카테고리 C' },
   ] as const;
 
+  // 댓글 시트
   const commentSheet = useBottomSheet();
   const [comments, setComments] = useState<CommentItem[]>([
     {
@@ -22,7 +24,7 @@ export default function ChatPage() {
       dateText: '2025.09.22',
       content: '댓글 내용이 여기에 들어갑니다.',
       likeCount: 9,
-      replyCount: 9,
+      replyCount: 9, // 서버 카운트 예시(펼치면 onLoadReplies로 로딩)
       liked: false,
     },
     {
@@ -63,13 +65,25 @@ export default function ChatPage() {
     },
   ]);
 
-  const toggleLike = (id: number) =>
+  // 댓글/답글 좋아요 토글
+  const toggleLike = (kind: 'comment' | 'reply', id: number, parentId?: number) =>
     setComments((prev) =>
-      prev.map((c) =>
-        c.id === id ? { ...c, liked: !c.liked, likeCount: c.liked ? c.likeCount - 1 : c.likeCount + 1 } : c
-      )
+      prev.map((c) => {
+        if (kind === 'comment') {
+          if (c.id !== id) return c;
+          const nextLiked = !c.liked;
+          return { ...c, liked: nextLiked, likeCount: c.likeCount + (nextLiked ? 1 : -1) };
+        }
+        // reply
+        if (c.id !== parentId) return c;
+        const replies = (c.replies ?? []).map((r) =>
+          r.id === id ? { ...r, liked: !r.liked, likeCount: r.likeCount + (r.liked ? -1 : 1) } : r
+        );
+        return { ...c, replies };
+      })
     );
 
+  // 새 댓글 추가
   const addComment = (text: string) =>
     setComments((prev) => [
       {
@@ -83,6 +97,54 @@ export default function ChatPage() {
       },
       ...prev,
     ]);
+
+  // 새 답글 추가
+  const addReply = (parentId: number, text: string) =>
+    setComments((prev) =>
+      prev.map((c) => {
+        if (c.id !== parentId) return c;
+        const next: ReplyItem = {
+          id: Date.now(),
+          author: '나',
+          dateText: new Date().toISOString().slice(0, 10).replaceAll('-', '.'),
+          content: text,
+          likeCount: 0,
+          liked: false,
+        };
+        const replies = [next, ...(c.replies ?? [])];
+        return { ...c, replies, replyCount: c.replyCount + 1 };
+      })
+    );
+
+  // 답글 펼칠 때 원격 로딩이 필요하다면 여기서 fetch
+  // 데모: 아직 replies가 없을 때만 mock으로 채워줌
+  const loadReplies = async (parentId: number) => {
+    setComments((prev) =>
+      prev.map((c) => {
+        if (c.id !== parentId) return c;
+        if (c.replies && c.replies.length > 0) return c; // 이미 있음
+        const mock: ReplyItem[] = [
+          {
+            id: Number(`${parentId}01`),
+            author: '답글러',
+            dateText: '2025.09.22',
+            content: '샘플 답글입니다.',
+            likeCount: 0,
+            liked: false,
+          },
+          {
+            id: Number(`${parentId}02`),
+            author: '또다른 답글러',
+            dateText: '2025.09.22',
+            content: '두 번째 샘플 답글!',
+            likeCount: 1,
+            liked: true,
+          },
+        ];
+        return { ...c, replies: mock };
+      })
+    );
+  };
 
   return (
     <>
@@ -112,10 +174,13 @@ export default function ChatPage() {
       <CommentBottomSheet
         open={commentSheet.isOpen}
         onClose={commentSheet.close}
+        title='댓글'
         comments={comments}
         onToggleLike={toggleLike}
         onReplyClick={(id) => console.log('reply to', id)}
-        onSend={(text) => addComment(text)}
+        onSend={addComment}
+        onSendReply={addReply}
+        onLoadReplies={loadReplies}
       />
     </>
   );

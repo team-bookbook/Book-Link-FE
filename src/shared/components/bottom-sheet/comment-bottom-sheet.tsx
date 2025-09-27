@@ -3,17 +3,33 @@ import BottomSheet from '@components/bottom-sheet/bottom-sheet';
 import { cn } from '@libs/cn';
 import Icon from '@components/icon';
 
-export type CommentItem = {
-  id: number; // ← string → number
+export type ReplyItem = {
+  id: number;
   avatarUrl?: string;
   author: string;
   dateText: string;
   content: string;
   likeCount: number;
-  replyCount: number;
   liked?: boolean;
   disabled?: boolean;
 };
+
+export type CommentItem = {
+  id: number;
+  avatarUrl?: string;
+  author: string;
+  dateText: string;
+  content: string;
+  likeCount: number;
+  /** 전체 답글 개수(서버 카운트) */
+  replyCount: number;
+  /** 이미 로드된 답글 목록(옵션) */
+  replies?: ReplyItem[];
+  liked?: boolean;
+  disabled?: boolean;
+};
+
+type ToggleLikeKind = 'comment' | 'reply';
 
 type Props = {
   open: boolean;
@@ -22,9 +38,16 @@ type Props = {
 
   comments: readonly CommentItem[];
 
-  onToggleLike?: (id: number) => void; // ← number
-  onReplyClick?: (id: number) => void; // ← number
+  /** 좋아요 토글(댓글/답글 공용) */
+  onToggleLike?: (kind: ToggleLikeKind, id: number, parentId?: number) => void;
+  /** 답글 버튼 클릭(필요 시 스크롤 이동 등) */
+  onReplyClick?: (parentId: number) => void;
+  /** 새 댓글 등록 */
   onSend?: (text: string) => void;
+  /** 새 답글 등록 */
+  onSendReply?: (parentId: number, text: string) => void;
+  /** 답글 펼칠 때 원격 로딩이 필요하면 제공 */
+  onLoadReplies?: (parentId: number) => Promise<ReplyItem[] | void> | void;
 
   indicatorStroke?: boolean;
   emptyText?: string;
@@ -33,87 +56,172 @@ type Props = {
 export default function CommentBottomSheet({
   open,
   onClose,
+  title,
   comments,
   onToggleLike,
   onReplyClick,
   onSend,
+  onSendReply,
+  onLoadReplies,
   indicatorStroke = true,
   emptyText = '첫 댓글을 남겨보세요.',
 }: Props) {
   const [text, setText] = useState('');
+  const [openReplies, setOpenReplies] = useState<Record<number, boolean>>({});
+  const [replyTargetId, setReplyTargetId] = useState<number | null>(null);
+
   const canSend = useMemo(() => text.trim().length > 0, [text]);
 
-  const handleSend = () => {
+  const handleSend = async () => {
     if (!canSend) return;
-    onSend?.(text.trim());
+    const payload = text.trim();
+    if (replyTargetId != null) {
+      onSendReply?.(replyTargetId, payload);
+    } else {
+      onSend?.(payload);
+    }
     setText('');
+    setReplyTargetId(null);
+  };
+
+  const toggleReplies = async (parentId: number) => {
+    const next = !openReplies[parentId];
+    setOpenReplies((m) => ({ ...m, [parentId]: next }));
+    if (next) {
+      await onLoadReplies?.(parentId);
+    }
   };
 
   return (
     <BottomSheet isOpen={open} onClose={onClose} indicatorStroke={indicatorStroke}>
       <div className='max-h-[80vh] min-h-[30vh] flex-col'>
+        {title && (
+          <div className='py-[0.4rem]'>
+            <h2 className='title6 text-center text-gray-900'>{title}</h2>
+          </div>
+        )}
+
         <div className='flex-1 overflow-y-auto'>
           {comments.length === 0 ? (
             <div className='body5 py-[2.4rem] text-center text-gray-500'>{emptyText}</div>
           ) : (
             <ul className='divide-y divide-gray-100'>
-              {comments.map((c) => (
-                <li key={c.id} className='px-[1.6rem] py-[1.6rem]'>
-                  <div className='flex items-start gap-[1.2rem]'>
-                    {c.avatarUrl ? (
-                      <img src={c.avatarUrl} alt='' className='h-[4rem] w-[4rem] rounded-full object-cover' />
-                    ) : (
-                      <div className='h-[4rem] w-[4rem] rounded-full bg-gray-100' aria-hidden />
-                    )}
+              {comments.map((c) => {
+                const isRepliesOpen = !!openReplies[c.id];
 
-                    <div className='min-w-0 flex-1'>
-                      <div className='flex items-center gap-[0.8rem]'>
-                        <p className='body4 font-semibold text-gray-900'>{c.author}</p>
-                        <p className='caption4 text-gray-600'>{c.dateText}</p>
+                return (
+                  <li key={c.id} className='px-[1.6rem] py-[1.6rem]'>
+                    <div className='flex items-start gap-[1.2rem]'>
+                      {c.avatarUrl ? (
+                        <img src={c.avatarUrl} alt='' className='h-[4rem] w-[4rem] rounded-full object-cover' />
+                      ) : (
+                        <div className='h-[4rem] w-[4rem] rounded-full bg-gray-100' aria-hidden />
+                      )}
+
+                      <div className='min-w-0 flex-1'>
+                        <div className='flex items-center gap-[0.8rem]'>
+                          <p className='body4 font-semibold text-gray-900'>{c.author}</p>
+                          <p className='caption4 text-gray-600'>{c.dateText}</p>
+                        </div>
+                        <p className='body5 mt-[0.4rem] break-words text-gray-700'>{c.content}</p>
+                        <div className='mt-[0.8rem] flex items-center gap-[0.8rem]'>
+                          <span className='caption4 inline-flex items-center gap-[0.4rem] text-gray-700'>
+                            <Icon name='comment' width={1.6} height={1.6} ariaHidden />
+                            {c.replyCount}
+                          </span>
+
+                          <button
+                            type='button'
+                            onClick={() => {
+                              setReplyTargetId(c.id);
+                              onReplyClick?.(c.id);
+                            }}
+                            className='caption4 rounded-[2px] bg-gray-100 px-[0.7rem] py-[0.2rem] text-gray-700 active:opacity-80'
+                          >
+                            답글 달기
+                          </button>
+                        </div>
+                        {c.replyCount > 0 && (
+                          <button
+                            type='button'
+                            onClick={() => toggleReplies(c.id)}
+                            className='caption4 mt-[0.6rem] text-gray-700 active:opacity-80'
+                          >
+                            {openReplies[c.id]
+                              ? '답글 접기'
+                              : `— 답글 ${Math.max(c.replyCount - (c.replies?.length ?? 0), 0) || c.replyCount}개 더 보기`}
+                          </button>
+                        )}
+                        {isRepliesOpen && (c.replies?.length ?? 0) > 0 && (
+                          <ul className='mt-[1.2rem] space-y-[0.8rem]'>
+                            {c.replies!.map((r) => (
+                              <li key={r.id} className='flex items-start gap-[0.8rem] pl-[3.6rem]'>
+                                {r.avatarUrl ? (
+                                  <img
+                                    src={r.avatarUrl}
+                                    alt=''
+                                    className='h-[2.2rem] w-[2.2rem] rounded-full object-cover'
+                                  />
+                                ) : (
+                                  <div className='h-[2.2rem] w-[2.2rem] rounded-full bg-gray-100' aria-hidden />
+                                )}
+                                <div className='min-w-0 flex-1'>
+                                  <div className='flex items-center gap-[0.6rem]'>
+                                    <p className='caption3 font-semibold text-gray-900'>{r.author}</p>
+                                    <p className='caption5 text-gray-600'>{r.dateText}</p>
+                                  </div>
+                                  <p className='caption3 mt-[0.2rem] break-words text-gray-700'>{r.content}</p>
+                                </div>
+                                <div className='flex flex-col items-center gap-[0.2rem] select-none'>
+                                  <button
+                                    type='button'
+                                    aria-pressed={!!r.liked}
+                                    onClick={() => onToggleLike?.('reply', r.id, c.id)}
+                                    disabled={r.disabled}
+                                    className={cn('p-[0.2rem] active:opacity-80', r.disabled && 'opacity-50')}
+                                  >
+                                    <Icon
+                                      className='text-system-error'
+                                      name={r.liked ? 'heart-fill' : 'heart'}
+                                      size={1.6}
+                                      ariaHidden
+                                    />
+                                  </button>
+                                  <span className='caption5 text-gray-800'>{r.likeCount}</span>
+                                </div>
+                              </li>
+                            ))}
+                          </ul>
+                        )}
                       </div>
 
-                      <p className='body5 mt-[0.4rem] break-words text-gray-700'>{c.content}</p>
-
-                      <div className='mt-[0.8rem] flex items-center gap-[0.8rem]'>
-                        <span className='caption4 inline-flex items-center gap-[0.4rem] text-gray-700'>
-                          <Icon name='comment' width={1.6} height={1.6} ariaHidden />
-                          {c.replyCount}
-                        </span>
-
+                      {/* like (comment) */}
+                      <div className='flex flex-col items-center gap-[0.4rem] select-none'>
                         <button
                           type='button'
-                          onClick={() => onReplyClick?.(c.id)}
-                          className='caption4 rounded-[2px] bg-gray-100 px-[0.7rem] py-[0.2rem] text-gray-700 active:opacity-80'
+                          aria-pressed={!!c.liked}
+                          onClick={() => onToggleLike?.('comment', c.id)}
+                          disabled={c.disabled}
+                          className={cn('p-[0.2rem] active:opacity-80', c.disabled && 'cursor-not-allowed opacity-50')}
                         >
-                          답글 달기
+                          <Icon
+                            className='text-system-error'
+                            name={c.liked ? 'heart-fill' : 'heart'}
+                            size={2}
+                            ariaHidden
+                          />
                         </button>
+                        <span className='caption4 text-gray-800'>{c.likeCount}</span>
                       </div>
                     </div>
-
-                    <div className='flex flex-col items-center gap-[0.4rem] select-none'>
-                      <button
-                        type='button'
-                        aria-pressed={!!c.liked}
-                        onClick={() => onToggleLike?.(c.id)}
-                        disabled={c.disabled}
-                        className={cn('p-[0.2rem] active:opacity-80', c.disabled && 'cursor-not-allowed opacity-50')}
-                      >
-                        <Icon
-                          className='text-system-error'
-                          name={c.liked ? 'heart-fill' : 'heart'}
-                          size={2}
-                          ariaHidden
-                        />
-                      </button>
-                      <span className='caption4 text-gray-800'>{c.likeCount}</span>
-                    </div>
-                  </div>
-                </li>
-              ))}
+                  </li>
+                );
+              })}
             </ul>
           )}
         </div>
 
+        {/* Input dock */}
         <div className='bg-gray-white sticky bottom-0 z-[1]'>
           <div className='px-[1.6rem] py-[1rem]'>
             <div className='flex h-[4.8rem] w-full items-center justify-between rounded-[30px] bg-[#FAFAFA] px-[1.6rem]'>
@@ -126,17 +234,28 @@ export default function CommentBottomSheet({
                     handleSend();
                   }
                 }}
-                placeholder='댓글을 입력하세요.'
+                placeholder={replyTargetId ? '답글을 입력하세요.' : '댓글을 입력하세요.'}
                 className='body4 w-full bg-transparent text-gray-900 outline-none placeholder:text-gray-600'
               />
+
+              {replyTargetId != null && (
+                <button
+                  type='button'
+                  onClick={() => setReplyTargetId(null)}
+                  className='caption4 mr-[0.8rem] rounded-[14px] bg-gray-100 px-[0.8rem] py-[0.4rem] text-gray-700 active:opacity-80'
+                >
+                  취소
+                </button>
+              )}
+
               <button
                 type='button'
-                aria-label='댓글 전송'
+                aria-label='전송'
                 onClick={handleSend}
                 disabled={!canSend}
                 className={cn(
-                  'flex-row-center bg-secondary-900 h-[3.2rem] w-[3.2rem] rounded-full active:opacity-90',
-                  !canSend && 'cursor-not-allowed opacity-60'
+                  'flex-row-center h-[3.2rem] w-[3.2rem] rounded-full active:opacity-90',
+                  canSend ? 'bg-secondary-900' : 'bg-secondary-900 cursor-not-allowed opacity-60'
                 )}
               >
                 <Icon name='send' size={2} className='text-gray-white' ariaHidden />
