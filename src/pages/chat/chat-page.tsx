@@ -31,7 +31,6 @@ export default function ChatPage() {
         options={categories}
         value={category}
         onChange={(next) => setCategory(next)}
-        activeBgClassName='bg-secondary-50'
       />
     </>
   );

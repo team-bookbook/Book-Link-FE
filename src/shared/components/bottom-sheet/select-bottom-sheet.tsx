@@ -15,13 +15,13 @@ type Props = {
   onClose: () => void;
   /** 시트 상단 타이틀 */
   title?: string;
-  /** 옵션 목록 (2개 이상 가능) */
+  /** 옵션 목록 */
   options: readonly Option[];
   /** 현재 선택 값 */
   value: string | null;
   /** 선택 변경 */
   onChange: (next: string) => void;
-  /** 강조(선택) 배경 색상 클래스 오버라이드가 필요할 때 */
+  /** 강조 배경 색상 클래스 오버라이드가 필요할 때 */
   activeBgClassName?: string;
 };
 
@@ -43,8 +43,8 @@ export default function SelectBottomSheet({
   };
 
   return (
-    <BottomSheet isOpen={open} onClose={onClose} indicatorStroke>
-      <div className='flex-col gap-[1.2rem] py-[1rem]'>
+    <BottomSheet isOpen={open} onClose={onClose} indicatorStroke={false}>
+      <div className='flex-col gap-[1.2rem] pb-[1rem]'>
         {title && (
           <h2 className='caption1 text-center text-gray-900' aria-live='polite'>
             {title}
