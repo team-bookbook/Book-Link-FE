@@ -56,7 +56,6 @@ type Props = {
 export default function CommentBottomSheet({
   open,
   onClose,
-  title,
   comments,
   onToggleLike,
   onReplyClick,
@@ -95,12 +94,6 @@ export default function CommentBottomSheet({
   return (
     <BottomSheet isOpen={open} onClose={onClose} indicatorStroke={indicatorStroke}>
       <div className='max-h-[80vh] min-h-[30vh] flex-col'>
-        {title && (
-          <div className='py-[0.4rem]'>
-            <h2 className='title6 text-center text-gray-900'>{title}</h2>
-          </div>
-        )}
-
         <div className='flex-1 overflow-y-auto'>
           {comments.length === 0 ? (
             <div className='body5 py-[2.4rem] text-center text-gray-500'>{emptyText}</div>
