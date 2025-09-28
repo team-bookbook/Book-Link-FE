@@ -18,14 +18,8 @@ import {
 import { TOAST_MESSAGE } from '@constants/toast-messages';
 import { MODAL_TITLE } from '@constants/modal-presets';
 
-import useBottomSheet from '@components/bottom-sheet/hooks/use-bottom-sheet';
-import BottomSheet from '@components/bottom-sheet/bottom-sheet';
-
 export default function LibraryPage() {
   const [tab, setTab] = useQueryTab<LibraryTabKey>('tab', 'books', ['books', 'libraries']);
-
-  const { isOpen, open, close } = useBottomSheet();
-  const [category, setCategory] = useState<string>('카테고리');
 
   const onLogoutConfirm = async () => {
     const res = await modal.confirm({
@@ -55,20 +49,11 @@ export default function LibraryPage() {
     else toast.error('인증이 취소되었습니다.');
   };
 
-  // 바텀시트 카테고리 선택
-  const categories: readonly string[] = ['카테고리 A', '카테고리 B', '카테고리 C'];
-
-  const onPick = (c: string) => {
-    setCategory(c);
-    close();
-  };
-
   return (
     <>
       <LibraryTab value={tab} onChange={setTab} />
       {tab === 'libraries' ? <LibraryList /> : <BookList />}
 
-      {/* 데모 버튼들 */}
       <div className='mt-[2rem] flex flex-col gap-[1rem]'>
         <div className='flex items-center gap-[0.8rem]'>
           <Button type='button' variant='outline' onClick={() => toast.info(TOAST_MESSAGE.EMAIL_CHECK)}>
@@ -93,41 +78,7 @@ export default function LibraryPage() {
             모달: 비밀번호 입력
           </Button>
         </div>
-
-        {/* 바텀시트 트리거 */}
-        <div className='flex items-center gap-[0.8rem]'>
-          <Button type='button' variant='outline' onClick={open}>
-            바텀시트 열기
-          </Button>
-          <span className='body5 text-gray-700'>선택된 카테고리: {category}</span>
-        </div>
       </div>
-
-      {/* 바텀시트: 인디케이터 + 선택 리스트 (children로 원하는 UI 넣어서 사용) */}
-      <BottomSheet isOpen={isOpen} onClose={close} indicatorStroke>
-        <div className='px-[2rem] pb-[2rem]'>
-          <h2 className='title6 py-[1rem] text-center'>타이틀</h2>
-
-          <div className='mt-[0.8rem] overflow-hidden rounded-[12px]'>
-            {categories.map((c) => {
-              const active = c === category;
-              return (
-                <button
-                  key={c}
-                  type='button'
-                  onClick={() => onPick(c)}
-                  className={[
-                    'w-full px-[2rem] py-[2rem] text-left',
-                    active ? 'bg-primary-50 text-gray-900' : 'bg-gray-white text-gray-900',
-                  ].join(' ')}
-                >
-                  <span className='title6'>{c}</span>
-                </button>
-              );
-            })}
-          </div>
-        </div>
-      </BottomSheet>
     </>
   );
 }
