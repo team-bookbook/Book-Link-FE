@@ -27,7 +27,8 @@ export default function StepEmail() {
     }
     setSending(true);
     try {
-      await sendEmailCode(data.email);
+      const res = await sendEmailCode(data.email);
+      alert(`인증코드: ${res.code}`);
       to('emailCode');
     } finally {
       setSending(false);

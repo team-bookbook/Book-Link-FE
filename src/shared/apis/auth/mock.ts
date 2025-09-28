@@ -1,41 +1,63 @@
+// src/shared/apis/auth/mock.ts  (프로젝트 경로에 맞게)
 type CheckNicknameRes = { available: boolean };
 type SendEmailCodeRes = { ok: boolean; code: string };
 type VerifyEmailCodeRes = { verified: boolean };
 type SubmitSignupRes = { ok: boolean; userId: string };
 
-const EMAIL_CODE_TTL_MS = 5 * 60 * 1000;
+type EmailStoreValue = { code: string; expiresAt: number };
+type EmailStore = Record<string, EmailStoreValue>;
 
-const emailStore: Record<string, { code: string; expiresAt: number }> = {};
+declare global {
+  interface Window {
+    __booklinkEmailStore?: EmailStore;
+  }
+}
+
+const EMAIL_CODE_TTL_MS = 5 * 60 * 1000;
 
 function delay(ms: number) {
   return new Promise<void>((resolve) => setTimeout(resolve, ms));
 }
 
+// 전역 공유 저장소: 경로가 달라도 항상 한 군데만 씀
+function getStore(): EmailStore {
+  if (!window.__booklinkEmailStore) window.__booklinkEmailStore = {};
+  return window.__booklinkEmailStore;
+}
+function norm(email: string) {
+  return email.trim().toLowerCase();
+}
+
 export async function checkNickname(nickname: string): Promise<CheckNicknameRes> {
-  await delay(400);
+  await delay(200);
   return { available: nickname !== '중복' };
 }
 
 export async function sendEmailCode(email: string): Promise<SendEmailCodeRes> {
-  await delay(500);
+  await delay(200);
   const code = Math.floor(100000 + Math.random() * 900000).toString(); // 6자리
-  emailStore[email] = { code, expiresAt: Date.now() + EMAIL_CODE_TTL_MS };
+  getStore()[norm(email)] = { code, expiresAt: Date.now() + EMAIL_CODE_TTL_MS };
+
+  // 개발 편의: 바로 볼 수 있도록 저장(원하면 alert로 띄우세요)
+  try {
+    localStorage.setItem('last_email', norm(email));
+    localStorage.setItem('last_email_code', code);
+  } catch {}
   return { ok: true, code };
 }
 
 export async function verifyEmailCode(email: string, code: string): Promise<VerifyEmailCodeRes> {
-  await delay(350);
-  const saved = emailStore[email];
-  if (!saved) return { verified: false };
-  const ok = saved.code === code && Date.now() < saved.expiresAt;
-  return { verified: ok };
+  await delay(150);
+  const saved = getStore()[norm(email)];
+  const verified = !!saved && saved.code === code && Date.now() < saved.expiresAt;
+  return { verified };
 }
 
 export async function submitSignup(payload: unknown): Promise<SubmitSignupRes> {
-  await delay(600);
-  const usersRaw = window.localStorage.getItem('mock_users') ?? '[]';
+  await delay(200);
+  const usersRaw = localStorage.getItem('mock_users') ?? '[]';
   const users = JSON.parse(usersRaw) as unknown[];
   users.push(payload);
-  window.localStorage.setItem('mock_users', JSON.stringify(users));
+  localStorage.setItem('mock_users', JSON.stringify(users));
   return { ok: true, userId: `u_${Date.now().toString(36)}` };
 }

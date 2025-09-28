@@ -20,9 +20,19 @@ export default function StepEmailCode() {
   const showError = touched && !codeValid;
 
   useEffect(() => {
-    // 스텝 이동 시 컨텍스트 값과 동기화
+    const email = (localStorage.getItem('last_email') ?? '').trim();
+    const saved = localStorage.getItem('last_email_code') ?? '';
+    if (email && saved && email === data.email.trim().toLowerCase()) {
+      setCode(saved);
+    }
+  }, [data.email]);
+
+  useEffect(() => {
     setData({ emailCode: code });
   }, [code, setData]);
+  useEffect(() => {
+    setVerified(false);
+  }, [code]);
 
   const onVerify = async () => {
     if (!codeValid) {
@@ -38,13 +48,14 @@ export default function StepEmailCode() {
         return;
       }
       setVerified(true);
-      setTimeout(() => {
-        goNext();
-      }, 500);
     } finally {
       setVerifying(false);
     }
   };
+
+  const ctaLabel = verified ? '다음' : '인증하기';
+  const onCta = verified ? goNext : onVerify;
+  const ctaDisabled = verified ? false : !codeValid || verifying;
 
   return (
     <div className='min-h-dvh flex-col gap-[2.5rem] bg-white text-gray-900'>
@@ -52,13 +63,12 @@ export default function StepEmailCode() {
         <h1 className='title3 text-gray-900'>이메일로 전송된 인증번호를 입력해 주세요.</h1>
 
         <div className='flex-col gap-[2.4rem]'>
-          {/* 이메일 고정 표시 (수정/재전송은 정책에 따라 별도 처리) */}
           <div className='flex items-end gap-3'>
             <div className='flex-1'>
               <Input id='email' label='이메일' value={data.email} disabled={true} isError={false} />
             </div>
             <Button
-              disabled={true}
+              disabled
               typoStyle='button4'
               roundStyle='rounded-[12px]'
               variant='dangerSoft'
@@ -77,10 +87,10 @@ export default function StepEmailCode() {
             onBlur={() => setTouched(true)}
             maxLength={6}
             isError={showError}
+            disabled={verified}
             validationMessage={showError ? '6자리 인증번호를 입력해 주세요.' : undefined}
           />
 
-          {/* 성공 배너 (시안의 회색 카드) */}
           {verified && (
             <div className='flex items-center gap-[0.8rem] rounded-[12px] bg-gray-800/10 px-[1.2rem] py-[1.0rem]'>
               <Icon name='info' width='1.8rem' height='1.8rem' className='text-gray-800' ariaHidden />
@@ -91,8 +101,8 @@ export default function StepEmailCode() {
       </div>
 
       <ButtonFrame>
-        <Button fullWidth={true} className='py-[1.2rem]' onClick={onVerify} disabled={!codeValid || verifying}>
-          인증하기
+        <Button fullWidth className='py-[1.2rem]' onClick={onCta} disabled={ctaDisabled}>
+          {ctaLabel}
         </Button>
       </ButtonFrame>
     </div>
