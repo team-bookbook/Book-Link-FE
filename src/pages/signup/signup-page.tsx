@@ -5,8 +5,10 @@ import StepNameNick from '@pages/signup/components/step-name-nick';
 import StepEmail from '@pages/signup/components/step-email';
 import StepEmailCode from '@pages/signup/components/step-email-code';
 import StepAddress from '@pages/signup/components/step-address';
+import StepPhone from '@pages/signup/components/step-phone';
+import StepPassword from '@pages/signup/components/step-password';
 
-const STEPS = ['nameNick', 'email', 'emailCode', 'address' /* 'phone', 'password', 'complete' */] as const;
+const STEPS = ['nameNick', 'email', 'emailCode', 'address', 'phone', 'password' /* 'complete' */] as const;
 
 export default function SignupFunnelPage() {
   return (
@@ -24,6 +26,12 @@ export default function SignupFunnelPage() {
         </StepView>
         <StepView when='address'>
           <StepAddress />
+        </StepView>
+        <StepView when='phone'>
+          <StepPhone />
+        </StepView>
+        <StepView when='password'>
+          <StepPassword />
         </StepView>
       </Funnel>
     </SignupDataProvider>
