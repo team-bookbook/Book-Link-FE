@@ -37,4 +37,5 @@ export type CommentProps = {
   onLoadReplies?: (parentId: number) => Promise<ReplyItem[] | void> | void;
   indicatorStroke?: boolean;
   emptyText?: string;
+  title?: string;
 };

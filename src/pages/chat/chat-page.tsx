@@ -2,10 +2,10 @@ import { useState } from 'react';
 import Button from '@components/button/button';
 import useBottomSheet from '@components/bottom-sheet/hooks/use-bottom-sheet';
 import SelectBottomSheet from '@components/bottom-sheet/select-bottom-sheet';
-import CommentBottomSheet, { type CommentItem, type ReplyItem } from '@components/bottom-sheet/comment-bottom-sheet';
+import CommentBottomSheet from '@components/bottom-sheet/comment-bottom-sheet';
+import { type CommentItem, type ReplyItem } from '@components/bottom-sheet/types/comment';
 
 export default function ChatPage() {
-  // 카테고리 선택 시트
   const selectSheet = useBottomSheet();
   const [category, setCategory] = useState<string | null>('cat-a');
 
@@ -15,7 +15,6 @@ export default function ChatPage() {
     { value: 'cat-c', label: '카테고리 C' },
   ] as const;
 
-  // 댓글 시트
   const commentSheet = useBottomSheet();
   const [comments, setComments] = useState<CommentItem[]>([
     {
@@ -24,7 +23,7 @@ export default function ChatPage() {
       dateText: '2025.09.22',
       content: '댓글 내용이 여기에 들어갑니다.',
       likeCount: 9,
-      replyCount: 9, // 서버 카운트 예시(펼치면 onLoadReplies로 로딩)
+      replyCount: 9,
       liked: false,
     },
     {
@@ -116,13 +115,11 @@ export default function ChatPage() {
       })
     );
 
-  // 답글 펼칠 때 원격 로딩이 필요하다면 여기서 fetch
-  // 데모: 아직 replies가 없을 때만 mock으로 채워줌
   const loadReplies = async (parentId: number) => {
     setComments((prev) =>
       prev.map((c) => {
         if (c.id !== parentId) return c;
-        if (c.replies && c.replies.length > 0) return c; // 이미 있음
+        if (c.replies && c.replies.length > 0) return c;
         const mock: ReplyItem[] = [
           {
             id: Number(`${parentId}01`),
@@ -160,7 +157,6 @@ export default function ChatPage() {
         </Button>
       </div>
 
-      {/* 카테고리 선택 바텀시트 */}
       <SelectBottomSheet
         open={selectSheet.isOpen}
         onClose={selectSheet.close}
@@ -170,7 +166,6 @@ export default function ChatPage() {
         onChange={(next) => setCategory(next)}
       />
 
-      {/* 댓글 바텀시트 */}
       <CommentBottomSheet
         open={commentSheet.isOpen}
         onClose={commentSheet.close}
