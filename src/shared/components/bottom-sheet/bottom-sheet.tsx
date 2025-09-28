@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { cn } from '@libs/cn';
 import Icon from '@components/icon';
 import useOutsideClick from '@components/bottom-sheet/hooks/use-outside-click';
@@ -7,12 +7,12 @@ export type BottomSheetProps = {
   isOpen: boolean;
   onClose: () => void;
   children: React.ReactNode;
-  /** 인디케이터 영역 하단 스트로크 표시 여부 */
   indicatorStroke?: boolean;
-  /** 오버레이 클릭으로 닫기 허용 여부 */
   dismissOnOverlay?: boolean;
-  /** 시트 폭 최대값(rem). 기본 43rem, 가운데 정렬 */
   maxWidthRem?: number;
+  draggable?: boolean;
+  dragHandleOnly?: boolean;
+  dragCloseThresholdPx?: number;
 };
 
 export default function BottomSheet({
@@ -22,12 +22,14 @@ export default function BottomSheet({
   indicatorStroke = false,
   dismissOnOverlay = true,
   maxWidthRem = 43,
+  draggable = false,
+  dragHandleOnly = false,
+  dragCloseThresholdPx = 120,
 }: BottomSheetProps) {
   const sheetRef = useRef<HTMLDivElement | null>(null);
+  const handleRef = useRef<HTMLDivElement | null>(null);
 
-  useOutsideClick(sheetRef, () => {
-    if (isOpen) onClose();
-  });
+  const [vvh, setVvh] = useState<number>(typeof window !== 'undefined' ? window.innerHeight : 0);
 
   useEffect(() => {
     const prev = document.body.style.overflow;
@@ -37,9 +39,95 @@ export default function BottomSheet({
     };
   }, [isOpen]);
 
+  useEffect(() => {
+    const updateVvh = () => {
+      const h = window.visualViewport?.height ?? window.innerHeight;
+      setVvh(h);
+      document.documentElement.style.setProperty('--vvh', `${h}px`);
+    };
+    updateVvh();
+    window.visualViewport?.addEventListener('resize', updateVvh);
+    window.addEventListener('orientationchange', updateVvh);
+    return () => {
+      window.visualViewport?.removeEventListener('resize', updateVvh);
+      window.removeEventListener('orientationchange', updateVvh);
+    };
+  }, []);
+
+  useOutsideClick(sheetRef, () => {
+    if (!dismissOnOverlay) return;
+    if (isOpen) onClose();
+  });
+
   const onKeyDown: React.KeyboardEventHandler<HTMLDivElement> = (e) => {
     if (e.key === 'Escape') onClose();
   };
+
+  const startY = useRef(0);
+  const currentY = useRef(0);
+  const animatingBack = useRef(false);
+
+  const setTranslate = (y: number) => {
+    if (!sheetRef.current) return;
+    sheetRef.current.style.transform = `translateY(${y}px)`;
+  };
+
+  const resetTranslate = () => {
+    animatingBack.current = true;
+    if (!sheetRef.current) return;
+    sheetRef.current.style.transition = 'transform 200ms ease-out';
+    sheetRef.current.style.transform = 'translateY(0px)';
+    const done = () => {
+      animatingBack.current = false;
+      if (sheetRef.current) sheetRef.current.style.transition = '';
+      sheetRef.current?.removeEventListener('transitionend', done);
+    };
+    sheetRef.current?.addEventListener('transitionend', done);
+  };
+
+  useEffect(() => {
+    if (!draggable || !isOpen) return;
+
+    const target = dragHandleOnly ? handleRef.current : sheetRef.current;
+    if (!target) return;
+
+    const onPointerDown = (e: PointerEvent) => {
+      const scroller = sheetRef.current?.querySelector('[data-sheet-scroller]');
+      if (scroller instanceof HTMLElement && scroller.scrollTop > 0) return;
+
+      startY.current = e.clientY;
+      currentY.current = 0;
+      if (e.target instanceof Element) {
+        e.target.setPointerCapture?.(e.pointerId);
+      }
+    };
+
+    const onPointerMove = (e: PointerEvent) => {
+      if (startY.current === 0 || animatingBack.current) return;
+      const dy = e.clientY - startY.current;
+      currentY.current = Math.max(dy, 0);
+      setTranslate(currentY.current);
+    };
+
+    const onPointerUp = () => {
+      if (startY.current === 0) return;
+      const shouldClose = currentY.current > dragCloseThresholdPx;
+      startY.current = 0;
+      currentY.current = 0;
+      if (shouldClose) onClose();
+      else resetTranslate();
+    };
+
+    target.addEventListener('pointerdown', onPointerDown);
+    window.addEventListener('pointermove', onPointerMove);
+    window.addEventListener('pointerup', onPointerUp);
+
+    return () => {
+      target.removeEventListener('pointerdown', onPointerDown);
+      window.removeEventListener('pointermove', onPointerMove);
+      window.removeEventListener('pointerup', onPointerUp);
+    };
+  }, [draggable, dragHandleOnly, isOpen, onClose, dragCloseThresholdPx]);
 
   return (
     <div
@@ -67,13 +155,26 @@ export default function BottomSheet({
           'bg-gray-white rounded-t-[12px] shadow-md',
           isOpen ? 'translate-y-0' : 'translate-y-full'
         )}
-        style={{ maxWidth: `${maxWidthRem}rem` }}
+        style={{
+          maxWidth: `${maxWidthRem}rem`,
+          maxHeight: `min(80vh, var(--vvh, ${vvh}px))`,
+          paddingBottom: 'max(env(safe-area-inset-bottom), 0px)',
+        }}
       >
-        <div className={cn('flex-row-center', indicatorStroke && 'border-b border-gray-100')}>
+        <div
+          ref={handleRef}
+          className={cn(
+            'flex-row-center touch-none select-none',
+            indicatorStroke && 'border-b border-gray-100',
+            draggable ? 'cursor-grab active:cursor-grabbing' : ''
+          )}
+        >
           <Icon name='indicator' width={4} className='text-gray-400' ariaHidden />
         </div>
 
-        <div className='w-full'>{children}</div>
+        <div className='w-full' data-sheet-scroller>
+          {children}
+        </div>
       </div>
     </div>
   );
