@@ -82,7 +82,7 @@ export default function Header({
       className={clsx(
         'bg-gray-white sticky top-0 z-[var(--z-header)]',
         safeTop && 'pt-[env(safe-area-inset-top)]',
-        isSetting ? ' ' : 'shadow-top-fixed',
+        !isSetting && 'shadow-top-fixed',
         className
       )}
     >

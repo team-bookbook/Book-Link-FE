@@ -2,22 +2,22 @@ import Icon from '@components/icon';
 
 export default function SettingPage() {
   return (
-    <div className='min-h-dvh bg-gray-50 text-gray-900'>
-      <div className='mx-auto w-full pb-[3rem]'>
-        <section className='bg-gray-white mb-[1.6rem] rounded-b-[16px] p-[1.6rem]'>
+    <div className='bg-gray-50 text-gray-900'>
+      <div className='mx-auto w-full flex-col gap-[1rem] pb-[3rem]'>
+        <section className='bg-gray-white rounded-b-[16px] px-[2rem] py-[2.4rem]'>
           <div className='flex items-center gap-[1.2rem]'>
-            <Icon name='cat-profile' size={6} className='text-gray-500' ariaHidden />
+            <Icon name='cat-profile' size={6} className='text-gray-200' ariaHidden />
             <div className='min-w-0 flex-1'>
               <p className='title5'>북북</p>
-              <button type='button' className='mt-[0.4rem] inline-flex items-center gap-[0.4rem] text-gray-500'>
-                <span className='caption2'>내 정보 수정</span>
+              <button type='button' className='flex cursor-pointer items-center gap-[0.4rem] text-gray-500'>
+                <span className='caption3'>내 정보 수정</span>
                 <Icon name='dropdown' rotate={270} size={1.6} className='text-gray-400' ariaHidden />
               </button>
             </div>
           </div>
         </section>
 
-        <section className='bg-gray-white mb-[1.6rem] overflow-hidden rounded-[16px]'>
+        <section className='bg-gray-white overflow-hidden rounded-[16px] py-[1rem]'>
           <ListItem icon='point' label='포인트 내역 조회' withDivider />
           <ListItem icon='my-docs' label='개인정보 처리방침' withDivider />
           <ListItem icon='my-docs' label='이용약관' />
@@ -39,17 +39,16 @@ type ItemProps = {
 
 function ListItem({ icon, label, withDivider }: ItemProps) {
   return (
-    <div
-      className={[
-        'flex items-center justify-between px-[1.6rem] py-[1.6rem]',
-        withDivider ? 'border-b border-gray-100' : '',
-      ].join(' ')}
-    >
-      <div className='flex items-center gap-[1.2rem]'>
-        <Icon name={icon} size={2.0} className='text-gray-800' ariaHidden />
-        <span className='body4'>{label}</span>
+    <>
+      <div className='flex cursor-pointer items-center justify-between px-[2rem] py-[2rem]'>
+        <div className='flex items-center gap-[0.6rem] text-gray-900'>
+          <Icon name={icon} size={2.0} ariaHidden />
+          <span className='title6'>{label}</span>
+        </div>
+        <Icon name='arrow' rotate={180} size={1.6} className='text-gray-900' ariaHidden />
       </div>
-      <Icon name='arrow' rotate={180} size={1.6} className='text-gray-400' ariaHidden />
-    </div>
+
+      {withDivider && <div aria-hidden className='mx-[2rem] h-[0.1rem] bg-gray-100' />}
+    </>
   );
 }
