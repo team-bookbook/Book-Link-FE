@@ -1,44 +1,56 @@
-// src/pages/onboarding/OnboardingPage.tsx
 import { useEffect, useRef, useState } from 'react';
 import Button from '@components/button/button';
 import ButtonFrame from '@components/button/button-frame';
-import Icon from '@components/icon';
 import { ONBOARDING_PAGES, type OnboardingSlide, type SlideId } from '@pages/onboarding/constants/onboarding-text';
 
 const STORAGE_KEY = 'onboarding_seen';
 
-function isSlideId(value: string, all: ReadonlyArray<OnboardingSlide>): value is SlideId {
-  return all.some((p) => p.id === value);
+function isSlideId(v: string, pages: ReadonlyArray<OnboardingSlide>): v is SlideId {
+  return pages.some((p) => p.id === v);
 }
 
 export default function OnboardingPage() {
   const pages: ReadonlyArray<OnboardingSlide> = ONBOARDING_PAGES;
+
   const [currentId, setCurrentId] = useState<SlideId>(pages[0].id);
+  const [settledId, setSettledId] = useState<SlideId>(pages[0].id);
 
   const scrollerRef = useRef<HTMLDivElement | null>(null);
   const refMap = useRef<Map<SlideId, HTMLDivElement | null>>(new Map());
-
   const setSlideRef = (id: SlideId) => (el: HTMLDivElement | null) => {
     refMap.current.set(id, el);
   };
+
+  const startIndexRef = useRef<number>(0);
+  const userScrollRef = useRef<boolean>(false);
+  const scrollEndTimer = useRef<number | null>(null);
+  const programmaticRef = useRef<boolean>(false);
 
   useEffect(() => {
     const scroller = scrollerRef.current;
     if (!scroller) return;
 
-    const observer = new IntersectionObserver(
+    const io = new IntersectionObserver(
       (entries) => {
+        if (programmaticRef.current) return;
+
         let bestId: SlideId | null = null;
         let bestScore = -1;
-        entries.forEach((e) => {
+        for (const e of entries) {
           const idAttr = e.target.getAttribute('data-id') ?? '';
+          if (!isSlideId(idAttr, pages)) continue;
           const score = e.intersectionRatio;
-          if (score > bestScore && isSlideId(idAttr, pages)) {
+          if (score > bestScore) {
             bestId = idAttr;
             bestScore = score;
           }
-        });
-        if (bestId) setCurrentId(bestId);
+        }
+        if (bestId) {
+          setCurrentId(bestId);
+          if (!userScrollRef.current && bestScore >= 0.8) {
+            setSettledId(bestId);
+          }
+        }
       },
       { root: scroller, threshold: Array.from({ length: 11 }, (_, i) => i / 10) }
     );
@@ -46,31 +58,32 @@ export default function OnboardingPage() {
     refMap.current.forEach((el, id) => {
       if (el) {
         el.setAttribute('data-id', id);
-        observer.observe(el);
+        io.observe(el);
       }
     });
 
-    return () => observer.disconnect();
+    return () => io.disconnect();
   }, [pages]);
 
-  function getIndex(id: SlideId): number {
-    return pages.findIndex((p: OnboardingSlide) => p.id === id);
-  }
-
-  const currentIndex = getIndex(currentId);
-  const isLast = currentIndex === pages.length - 1;
+  const getIndex = (id: SlideId) => pages.findIndex((p) => p.id === id);
+  const settledIndex = getIndex(settledId);
+  const isLast = settledIndex === pages.length - 1;
 
   const goTo = (id: SlideId) => {
     const scroller = scrollerRef.current;
     const target = refMap.current.get(id);
     if (!scroller || !target) return;
+    programmaticRef.current = true;
     scroller.scrollTo({ left: target.offsetLeft, behavior: 'smooth' });
+    setSettledId(id);
+    window.setTimeout(() => {
+      programmaticRef.current = false;
+    }, 200);
   };
 
   const onNext = () => {
     if (!isLast) {
-      const next = pages[currentIndex + 1];
-      goTo(next.id);
+      goTo(pages[settledIndex + 1].id);
       return;
     }
     try {
@@ -79,72 +92,108 @@ export default function OnboardingPage() {
     window.location.assign('/login');
   };
 
+  const onPointerDown = () => {
+    userScrollRef.current = true;
+    startIndexRef.current = settledIndex;
+  };
+
+  const onPointerUp = () => {
+    if (!userScrollRef.current) return;
+    userScrollRef.current = false;
+    snapToOnePage();
+  };
+
+  const snapToOnePage = () => {
+    const scroller = scrollerRef.current;
+    if (!scroller) return;
+
+    const left = scroller.scrollLeft;
+    const start = startIndexRef.current;
+
+    const candIdxs: number[] = [];
+    if (start - 1 >= 0) candIdxs.push(start - 1);
+    candIdxs.push(start);
+    if (start + 1 <= pages.length - 1) candIdxs.push(start + 1);
+
+    let bestIdx = start;
+    let bestDist = Number.POSITIVE_INFINITY;
+
+    for (const idx of candIdxs) {
+      const id = pages[idx].id;
+      const el = refMap.current.get(id);
+      if (!el) continue;
+      const dist = Math.abs(el.offsetLeft - left);
+      if (dist < bestDist) {
+        bestDist = dist;
+        bestIdx = idx;
+      }
+    }
+
+    const target = pages[bestIdx];
+    goTo(target.id);
+  };
+
+  const onScroll = () => {
+    if (programmaticRef.current || !userScrollRef.current) return;
+    if (scrollEndTimer.current !== null) window.clearTimeout(scrollEndTimer.current);
+    scrollEndTimer.current = window.setTimeout(() => {
+      snapToOnePage();
+      scrollEndTimer.current = null;
+    }, 80);
+  };
+
+  const curSlide = pages[settledIndex];
+
   return (
-    <div className='min-h-dvh bg-white text-gray-900'>
-      <header className='flex items-center justify-between px-[1.6rem] pt-[1.2rem]'>
-        <button
-          type='button'
-          onClick={() => window.history.back()}
-          className='rounded-[12px] p-[0.8rem]'
-          aria-label='뒤로'
+    <div className='h-dvh pb-[7rem]'>
+      <div className='flex-col-between mx-auto h-full w-full px-[2rem] py-[5rem]'>
+        <div className='flex-col-center gap-[1rem]'>
+          <h2 className='title3 text-center whitespace-pre-line text-gray-900'>{curSlide.title}</h2>
+          <p className='body4 text-center text-gray-500'>{curSlide.subtitle}</p>
+        </div>
+
+        <section
+          ref={scrollerRef}
+          className='scrollbar-hide flex snap-x snap-mandatory gap-[1.6rem] overflow-x-auto scroll-smooth'
+          aria-roledescription='carousel'
+          aria-label='온보딩 이미지'
+          onPointerDown={onPointerDown}
+          onPointerUp={onPointerUp}
+          onPointerCancel={onPointerUp}
+          onScroll={onScroll}
         >
-          <Icon name='chevron-left' width='2.0rem' height='2.0rem' />
-        </button>
-        <button type='button' onClick={() => window.location.assign('/login')} className='button4 text-primary-700'>
-          로그인
-        </button>
-      </header>
+          {pages.map((slide) => (
+            <article
+              key={slide.id}
+              ref={setSlideRef(slide.id)}
+              data-id={slide.id}
+              className='w-full shrink-0 snap-center [scroll-snap-stop:always]'
+              aria-label={slide.id}
+            >
+              <img src={slide.image} alt='' className='block h-[35.2rem] w-full rounded-[20px] object-cover' />
+            </article>
+          ))}
+        </section>
 
-      <div className='mt-[0.8rem] h-[0.6rem] w-full bg-gray-200'>
-        <div
-          className='bg-system-success h-[0.6rem] transition-[width] duration-300'
-          style={{ width: `${((currentIndex + 1) / pages.length) * 100}%` }}
-          aria-hidden
-        />
+        <nav className='flex-row-center gap-[0.6rem] pb-[1.2rem]' aria-label='페이지 선택'>
+          {pages.map((s) => {
+            const active = s.id === settledId;
+            return (
+              <button
+                key={s.id}
+                type='button'
+                onClick={() => goTo(s.id)}
+                className={[
+                  'h-[0.6rem] rounded-full transition-all',
+                  active ? 'bg-secondary-900 w-[1.6rem]' : 'w-[0.6rem] bg-gray-300',
+                ].join(' ')}
+                aria-current={active ? 'true' : undefined}
+                aria-label={`페이지 ${getIndex(s.id) + 1}`}
+              />
+            );
+          })}
+        </nav>
       </div>
-
-      <section
-        ref={scrollerRef}
-        className='mt-[2.4rem] flex snap-x snap-mandatory overflow-x-auto scroll-smooth px-[2rem] pb-[1.6rem] [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden'
-        aria-roledescription='carousel'
-        aria-label='온보딩'
-      >
-        {pages.map((slide: OnboardingSlide) => (
-          <article
-            key={slide.id}
-            ref={setSlideRef(slide.id)}
-            data-id={slide.id}
-            className='mr-[1.6rem] w-[calc(100%-0.4rem)] shrink-0 snap-center'
-            aria-label={slide.title.replace(/\n/gu, ' ')}
-          >
-            <h2 className='title3 whitespace-pre-line text-gray-900'>{slide.title}</h2>
-            <p className='body4 mt-[0.6rem] text-gray-500'>{slide.subtitle}</p>
-
-            <div className='mt-[2.0rem] rounded-[20px] bg-gray-50 p-[1.2rem]'>
-              <img src={slide.image} alt='' className='mx-auto block h-auto w-[28rem] rounded-[20px]' />
-            </div>
-          </article>
-        ))}
-      </section>
-
-      <nav className='mt-[0.8rem] flex items-center justify-center gap-[0.6rem]' aria-label='페이지 선택'>
-        {pages.map((s: OnboardingSlide) => {
-          const active = s.id === currentId;
-          return (
-            <button
-              key={s.id}
-              type='button'
-              onClick={() => goTo(s.id)}
-              className={[
-                'h-[0.6rem] rounded-[999px] transition-all',
-                active ? 'bg-primary-700 w-[1.6rem]' : 'w-[0.6rem] bg-gray-300',
-              ].join(' ')}
-              aria-current={active ? 'true' : undefined}
-              aria-label={`페이지 ${getIndex(s.id) + 1}`}
-            />
-          );
-        })}
-      </nav>
 
       <ButtonFrame>
         <Button fullWidth className='py-[1.2rem]' onClick={onNext}>

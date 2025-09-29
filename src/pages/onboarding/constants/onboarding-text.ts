@@ -28,7 +28,7 @@ export const ONBOARDING_PAGES: OnboardingSlide[] = [
   {
     id: 'due',
     title: '자주 까먹는 반납 일자,\n언제든 확인할 수 있어요!',
-    subtitle: 'D-1에 똑! 일정 맞춰 반납하면 신뢰가 쑥쑥.',
+    subtitle: 'D-1에 똑! 일정 맞춰 반납하면 신뢰가 쌓여요.',
     image: imgDday,
   },
   {
