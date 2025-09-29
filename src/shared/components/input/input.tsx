@@ -1,7 +1,7 @@
 import { iconColorMap, inputClassMap } from '@components/input/styles/input-varients';
 import { cn } from '@libs/cn';
 import Icon from '@components/icon';
-import React, { useId, useState, forwardRef } from 'react';
+import React, { useId, useState } from 'react';
 import { defineInputState } from '@components/input/utils/input-state';
 
 type BaseProps = {
@@ -13,34 +13,27 @@ type BaseProps = {
   defaultMessage?: string;
   validationMessage?: string;
   className?: string;
-  /** 글자수 카운터 표시 시 현재 길이 */
   length?: number;
-  /** 좌측 아이콘 이름 (예: 'name') */
   startIcon?: string;
-  /** 우측 고정 아이콘(비밀번호 토글 이외) */
   endIcon?: string;
-  /** 비밀번호 보기 토글 사용 여부 */
   passwordToggle?: boolean;
-  /** 비밀번호 토글 상태 변경 콜백 */
   onPasswordToggleChange?: (show: boolean) => void;
   onBlur?: (e: React.FocusEvent<HTMLInputElement> | React.FocusEvent<HTMLTextAreaElement>) => void;
 };
 
-/** 단일 라인 인풋 전용 props */
 type InputLineProps = BaseProps &
-  Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onBlur' | 'children' | 'ref'> & {
+  Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onBlur' | 'children'> & {
     multiline?: false;
   };
 
-/** 멀티라인(텍스트에어리어) 전용 props */
 type TextAreaProps = BaseProps &
-  Omit<React.TextareaHTMLAttributes<HTMLTextAreaElement>, 'onBlur' | 'children' | 'ref'> & {
+  Omit<React.TextareaHTMLAttributes<HTMLTextAreaElement>, 'onBlur' | 'children'> & {
     multiline: true;
   };
 
 type InputProps = InputLineProps | TextAreaProps;
 
-const Input = forwardRef<HTMLInputElement | HTMLTextAreaElement, InputProps>(function Input(props, ref) {
+export default function Input(props: InputProps) {
   const autoId = useId();
   const [isFocused, setIsFocused] = useState(false);
   const [showPw, setShowPw] = useState(false);
@@ -59,9 +52,13 @@ const Input = forwardRef<HTMLInputElement | HTMLTextAreaElement, InputProps>(fun
     onBlur,
     passwordToggle = false,
     onPasswordToggleChange,
+    multiline,
+    length,
+    id: idProp,
+    ...rest
   } = props;
 
-  const id = 'id' in props && props.id ? props.id : autoId;
+  const id = idProp ?? autoId;
 
   const inputState = defineInputState(isError, isFocused, isValid);
   const messageToShow = validationMessage ?? defaultMessage;
@@ -81,9 +78,8 @@ const Input = forwardRef<HTMLInputElement | HTMLTextAreaElement, InputProps>(fun
   };
 
   const commonFieldClass = 'w-full bg-transparent text-gray-900 outline-none placeholder:text-gray-500';
-
-  const hasRightAddon = (!('multiline' in props) || props.multiline === false) && (passwordToggle || !!endIcon);
-
+  const isLine = !multiline;
+  const hasRightAddon = isLine && (passwordToggle || !!endIcon);
   const leftPadding = startIcon ? 'pl-[3.6rem]' : 'pl-[1.6rem]';
   const rightPadding = hasRightAddon ? 'pr-[3.6rem]' : 'pr-[1.6rem]';
 
@@ -98,7 +94,7 @@ const Input = forwardRef<HTMLInputElement | HTMLTextAreaElement, InputProps>(fun
       <div
         className={cn(
           'caption1 relative w-full rounded-[12px] bg-gray-50',
-          props.multiline ? 'min-h-[20rem]' : 'flex h-[5.6rem] items-center',
+          isLine ? 'flex h-[5.6rem] items-center' : 'min-h-[20rem]',
           borderClass,
           className
         )}
@@ -109,11 +105,27 @@ const Input = forwardRef<HTMLInputElement | HTMLTextAreaElement, InputProps>(fun
           </span>
         )}
 
-        {props.multiline ? (
-          <textarea
+        {isLine ? (
+          <input
+            {...(rest as React.InputHTMLAttributes<HTMLInputElement>)}
             id={id}
-            ref={ref as React.Ref<HTMLTextAreaElement>}
-            maxLength={props.maxLength ?? maxLength}
+            type={
+              passwordToggle
+                ? showPw
+                  ? 'text'
+                  : 'password'
+                : ((rest as React.InputHTMLAttributes<HTMLInputElement>).type ?? 'text')
+            }
+            maxLength={maxLength}
+            className={cn(commonFieldClass, 'h-full rounded-[12px] py-[1.6rem]', leftPadding, rightPadding)}
+            onFocus={() => setIsFocused(true)}
+            onBlur={handleBlur}
+          />
+        ) : (
+          <textarea
+            {...(rest as React.TextareaHTMLAttributes<HTMLTextAreaElement>)}
+            id={id}
+            maxLength={maxLength}
             className={cn(
               commonFieldClass,
               'h-[20rem] resize-none rounded-[12px] py-[1.6rem] break-words whitespace-pre-wrap',
@@ -122,22 +134,10 @@ const Input = forwardRef<HTMLInputElement | HTMLTextAreaElement, InputProps>(fun
             )}
             onFocus={() => setIsFocused(true)}
             onBlur={handleBlur}
-            {...(props as TextAreaProps)}
-          />
-        ) : (
-          <input
-            id={id}
-            ref={ref as React.Ref<HTMLInputElement>}
-            type={passwordToggle ? (showPw ? 'text' : 'password') : (props.type ?? 'text')}
-            maxLength={props.maxLength ?? maxLength}
-            className={cn(commonFieldClass, 'h-full rounded-[12px] py-[1.6rem]', leftPadding, rightPadding)}
-            onFocus={() => setIsFocused(true)}
-            onBlur={handleBlur}
-            {...(props as InputLineProps)}
           />
         )}
 
-        {!props.multiline && (
+        {isLine && (
           <span className='absolute top-1/2 right-[1.2rem] -translate-y-1/2'>
             {passwordToggle ? (
               <button
@@ -147,7 +147,7 @@ const Input = forwardRef<HTMLInputElement | HTMLTextAreaElement, InputProps>(fun
                 className='rounded-md p-1 active:opacity-70'
               >
                 <Icon
-                  name={showPw ? 'pw-show-on' : 'pw-show-off'}
+                  name={showPw ? 'pw-show-off' : 'pw-show-on'}
                   width={2}
                   height={2}
                   className={iconColorClass}
@@ -163,16 +163,14 @@ const Input = forwardRef<HTMLInputElement | HTMLTextAreaElement, InputProps>(fun
 
       {messageToShow && (
         <div className='flex w-full justify-between'>
-          <p className={cn('caption3 text-gray-600', !props.multiline && iconColorClass)}>{messageToShow}</p>
+          <p className={cn('caption3 text-gray-600', isLine && iconColorClass)}>{messageToShow}</p>
           {hasLength && (
             <p className='caption3 text-gray-600'>
-              {(props as { length?: number }).length ?? 0}/{props.maxLength ?? maxLength}
+              {typeof length === 'number' ? length : 0}/{maxLength}
             </p>
           )}
         </div>
       )}
     </div>
   );
-});
-
-export default Input;
+}
