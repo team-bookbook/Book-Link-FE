@@ -40,7 +40,7 @@ export default function StepAddress() {
         <h1 className='title3 text-gray-900'>주소를 입력해 주세요.</h1>
 
         <div className='flex-col gap-[2.4rem]'>
-          <div className='flex items-start gap-3'>
+          <div className='flex items-start gap-[0.8rem]'>
             <div className='flex-1'>
               <Input
                 id='addr1'

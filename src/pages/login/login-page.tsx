@@ -2,7 +2,6 @@ import { useState } from 'react';
 import Input from '@components/input/input';
 import Button from '@components/button/button';
 import ButtonFrame from '@components/button/button-frame';
-import Icon from '@components/icon';
 import KakaoLoginButton from '@pages/login/components/kakao-login-button';
 import GoogleLoginButton from '@pages/login/components/google-login-button';
 
@@ -35,6 +34,7 @@ export default function LoginPage() {
             placeholder='비밀번호를 입력해 주세요.'
             type={showPw ? 'text' : 'password'}
             value={pw}
+            passwordToggle
             onChange={(e) => setPw(e.currentTarget.value)}
             autoComplete='current-password'
           />

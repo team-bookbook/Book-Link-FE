@@ -41,7 +41,7 @@ export default function StepEmail() {
         <h1 className='title3 text-gray-900'>이메일 인증을 위해 이메일을 입력해 주세요.</h1>
 
         <div className='flex-col gap-[3rem]'>
-          <div className='flex items-end gap-3'>
+          <div className='flex items-start gap-[0.8rem]'>
             <div className='flex-1'>
               <Input
                 id='email'
@@ -62,7 +62,7 @@ export default function StepEmail() {
               typoStyle='button4'
               roundStyle='rounded-[12px]'
               variant='dangerSoft'
-              className='px-[2.4rem] py-[1.8rem]'
+              className='mt-[3rem] px-[2.4rem] py-[1.8rem]'
             >
               {sending ? '전송중…' : '인증하기'}
             </Button>

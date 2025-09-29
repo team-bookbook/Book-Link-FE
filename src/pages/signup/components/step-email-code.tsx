@@ -63,7 +63,7 @@ export default function StepEmailCode() {
         <h1 className='title3 text-gray-900'>이메일로 전송된 인증번호를 입력해 주세요.</h1>
 
         <div className='flex-col gap-[2.4rem]'>
-          <div className='flex items-end gap-3'>
+          <div className='flex items-start gap-[0.8rem]'>
             <div className='flex-1'>
               <Input id='email' label='이메일' value={data.email} disabled={true} isError={false} />
             </div>
