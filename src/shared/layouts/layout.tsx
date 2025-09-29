@@ -30,6 +30,7 @@ export default function Layout() {
       isUnder(pathname, ROUTES.SIGNUP) ||
       isUnder(pathname, ROUTES.NOTIFICATION) ||
       isUnder(pathname, ROUTES.LIBRARY_CREATE) ||
+      isUnder(pathname, ROUTES.BOOK_CREATE) ||
       isOnboarding,
     [pathname, isOnboarding]
   );
