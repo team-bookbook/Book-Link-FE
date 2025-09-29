@@ -62,7 +62,7 @@ export default function StepNameNick() {
             validationMessage={nameError ? '이름을 입력해 주세요.' : undefined}
           />
 
-          <div className={cn('flex gap-3', showNickMessage ? 'items-center' : 'items-end')}>
+          <div className={cn('flex gap-[0.8rem]', showNickMessage ? 'items-start' : 'items-end')}>
             <div className='flex-1'>
               <Input
                 id='nickname'
@@ -94,7 +94,7 @@ export default function StepNameNick() {
               typoStyle='button4'
               roundStyle='rounded-[12px]'
               variant='dangerSoft'
-              className='px-[2.4rem] py-[1.8rem]'
+              className='mt-[3rem] px-[2.4rem] py-[1.8rem]'
             >
               {nickState === 'checking' ? '확인중…' : nickState === 'valid' ? '사용가능' : '중복확인'}
             </Button>

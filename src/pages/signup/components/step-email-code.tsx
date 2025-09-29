@@ -72,7 +72,7 @@ export default function StepEmailCode() {
               typoStyle='button4'
               roundStyle='rounded-[12px]'
               variant='dangerSoft'
-              className='px-[2.4rem] py-[1.8rem]'
+              className='mt-[3rem] px-[2.4rem] py-[1.8rem]'
             >
               인증하기
             </Button>

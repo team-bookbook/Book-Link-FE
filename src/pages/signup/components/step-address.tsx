@@ -40,7 +40,7 @@ export default function StepAddress() {
         <h1 className='title3 text-gray-900'>주소를 입력해 주세요.</h1>
 
         <div className='flex-col gap-[2.4rem]'>
-          <div className='flex items-end gap-3'>
+          <div className='flex items-start gap-3'>
             <div className='flex-1'>
               <Input
                 id='addr1'
@@ -58,7 +58,7 @@ export default function StepAddress() {
               typoStyle='button4'
               roundStyle='rounded-[12px]'
               variant='primary'
-              className='px-[2.4rem] py-[1.8rem]'
+              className='mt-[3rem] px-[2.4rem] py-[1.8rem]'
             >
               주소검색
             </Button>
