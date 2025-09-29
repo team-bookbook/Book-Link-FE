@@ -23,7 +23,9 @@ export default function StepAddress() {
         const chosen = d.address || d.roadAddress || d.jibunAddress || '';
         setData({ zip: d.zonecode, addr1: chosen });
       });
-    } catch {}
+    } catch {
+      /* */
+    }
   };
 
   const onNext = () => {

@@ -2,10 +2,10 @@ import { useEffect, useState } from 'react';
 import Input from '@components/input/input';
 import Button from '@components/button/button';
 import ButtonFrame from '@components/button/button-frame';
-import Icon from '@components/icon';
 import { useFunnel } from '@libs/funnel';
 import { useSignupData } from '@pages/signup/signup-data-context';
 import { verifyEmailCode } from '@apis/auth';
+import { toast } from '@libs/toast';
 
 export default function StepEmailCode() {
   const { data, setData } = useSignupData();
@@ -30,6 +30,7 @@ export default function StepEmailCode() {
   useEffect(() => {
     setData({ emailCode: code });
   }, [code, setData]);
+
   useEffect(() => {
     setVerified(false);
   }, [code]);
@@ -45,9 +46,11 @@ export default function StepEmailCode() {
       if (!res.verified) {
         setVerified(false);
         setTouched(true);
+        toast.error('인증번호가 올바르지 않습니다. 다시 확인해 주세요.');
         return;
       }
       setVerified(true);
+      toast.success('인증번호가 등록되었습니다.', 7);
     } finally {
       setVerifying(false);
     }
@@ -58,14 +61,14 @@ export default function StepEmailCode() {
   const ctaDisabled = verified ? false : !codeValid || verifying;
 
   return (
-    <div className='min-h-dvh flex-col gap-[2.5rem] bg-white text-gray-900'>
+    <div className='bg-gray-white min-h-dvh flex-col gap-[2.5rem] text-gray-900'>
       <div className='flex-col gap-[3.5rem] px-[2rem] py-[2rem]'>
         <h1 className='title3 text-gray-900'>이메일로 전송된 인증번호를 입력해 주세요.</h1>
 
         <div className='flex-col gap-[2.4rem]'>
           <div className='flex items-start gap-[0.8rem]'>
             <div className='flex-1'>
-              <Input id='email' label='이메일' value={data.email} disabled={true} isError={false} />
+              <Input id='email' label='이메일' value={data.email} disabled isError={false} />
             </div>
             <Button
               disabled
@@ -90,13 +93,6 @@ export default function StepEmailCode() {
             disabled={verified}
             validationMessage={showError ? '6자리 인증번호를 입력해 주세요.' : undefined}
           />
-
-          {verified && (
-            <div className='flex items-center gap-[0.8rem] rounded-[12px] bg-gray-800/10 px-[1.2rem] py-[1.0rem]'>
-              <Icon name='info' width='1.8rem' height='1.8rem' className='text-gray-800' ariaHidden />
-              <p className='caption2 text-gray-800'>인증번호가 등록되었습니다.</p>
-            </div>
-          )}
         </div>
       </div>
 

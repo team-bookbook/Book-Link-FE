@@ -12,15 +12,29 @@ type ToastItem = {
   durationMs: number;
 };
 
+type Snapshot = {
+  list: ReadonlyArray<ToastItem>;
+  bottomRem: number;
+};
+
+const DEFAULT_MS = 3000;
+
 const store = (() => {
   let list: ToastItem[] = [];
+  let bottomRem = 2; // 기본 2rem
+  let snapshot: Snapshot = { list, bottomRem };
   const listeners = new Set<() => void>();
   const timers: Record<string, number> = {};
+
+  const updateSnapshot = () => {
+    snapshot = { list, bottomRem };
+  };
 
   const emit = () => listeners.forEach((fn) => fn());
 
   const add = (item: ToastItem) => {
     list = [...list, item];
+    updateSnapshot();
     emit();
     const tid = window.setTimeout(() => remove(item.id), item.durationMs);
     timers[item.id] = tid;
@@ -33,7 +47,16 @@ const store = (() => {
       window.clearTimeout(tid);
       delete timers[id];
     }
+    updateSnapshot();
     emit();
+  };
+
+  const setBottom = (rem?: number) => {
+    if (typeof rem === 'number' && Number.isFinite(rem) && rem >= 0) {
+      bottomRem = rem;
+      updateSnapshot();
+      emit();
+    }
   };
 
   const subscribe = (fn: () => void) => {
@@ -41,9 +64,9 @@ const store = (() => {
     return () => listeners.delete(fn);
   };
 
-  const getSnapshot = () => list;
+  const getSnapshot = () => snapshot;
 
-  return { add, remove, subscribe, getSnapshot };
+  return { add, remove, setBottom, subscribe, getSnapshot };
 })();
 
 type RootHost = HTMLElement & { __BOOKLINK_TOAST_ROOT__?: Root };
@@ -60,8 +83,9 @@ function ensureHost() {
 
   if (!el.__BOOKLINK_TOAST_ROOT__) {
     el.__BOOKLINK_TOAST_ROOT__ = createRoot(el);
+    // 최초 1회만 렌더
+    el.__BOOKLINK_TOAST_ROOT__!.render(<ToastViewport />);
   }
-  el.__BOOKLINK_TOAST_ROOT__!.render(<ToastViewport />);
 }
 
 function makeId(): string {
@@ -70,40 +94,37 @@ function makeId(): string {
   return `t_${Date.now()}_${rnd}`;
 }
 
-const DEFAULT_MS = 3000;
-
-function show(kind: ToastKind, message: string, durationMs?: number) {
+function show(kind: ToastKind, message: string, bottomRemArg?: number) {
   ensureHost();
-  const id = makeId();
-  store.add({ id, kind, message, durationMs: durationMs ?? DEFAULT_MS });
-  return id;
+  store.setBottom(bottomRemArg);
+  store.add({ id: makeId(), kind, message, durationMs: DEFAULT_MS });
 }
 
 export const toast = {
-  info: (msg: string, ms?: number) => show('info', msg, ms),
-  success: (msg: string, ms?: number) => show('success', msg, ms),
-  error: (msg: string, ms?: number) => show('error', msg, ms),
+  info: (msg: string, bottomRem?: number) => show('info', msg, bottomRem),
+  success: (msg: string, bottomRem?: number) => show('success', msg, bottomRem),
+  error: (msg: string, bottomRem?: number) => show('error', msg, bottomRem),
 };
 
-function useToasts(): ToastItem[] {
+function useToasts(): Snapshot {
   return useSyncExternalStore(store.subscribe, store.getSnapshot, store.getSnapshot);
 }
 
 function ToastViewport() {
-  const toasts = useToasts();
+  const { list, bottomRem } = useToasts();
   const liveId = useId();
+
   useEffect(() => {}, []);
+
   return (
     <div
       id={liveId}
       aria-live='polite'
       aria-atomic='false'
-      className={cn(
-        'pointer-events-none fixed inset-x-0 bottom-[2rem] z-[var(--z-modal)]',
-        'flex-col-center gap-[1.2rem]'
-      )}
+      className={cn('pointer-events-none fixed inset-x-0 z-[var(--z-modal)]', 'flex-col-center gap-[1.2rem]')}
+      style={{ bottom: `${bottomRem}rem` }}
     >
-      {toasts.map((t) => (
+      {list.map((t) => (
         <ToastCard key={t.id} toast={t} />
       ))}
     </div>
