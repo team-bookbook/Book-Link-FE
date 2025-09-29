@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import PillTab from '@components/tab/pill-tab';
 import ChatCard from '@pages/chat/components/chat-card';
+import { useNavigate } from 'react-router-dom';
 
 const TABS = [
   { key: 'all', label: '전체' },
@@ -10,12 +11,13 @@ const TABS = [
 
 export default function ChatListPage() {
   const [tab, setTab] = useState('all');
+  const navigate = useNavigate();
 
   return (
     <div className='min-h-dvh bg-white text-gray-900'>
       <PillTab items={TABS} value={tab} onChange={setTab} className='pt-[1.2rem]' />
 
-      <div className='flex flex-col gap-[1.2rem] px-[2rem] pb-[2rem]'>
+      <div className='flex-col gap-[1.2rem] px-[2rem] pb-[2rem]'>
         {(tab === 'all' || tab === 'direct') && (
           <>
             <ChatCard
@@ -23,6 +25,7 @@ export default function ChatListPage() {
               subtitle='Subtitle'
               preview='안녕하세요. 책 거래하실 건가요? 지금 다른 분께도 연락이 와서요'
               unread={4}
+              onClick={() => navigate('/chat/1')}
               badge='대여 상태'
             />
             <ChatCard
@@ -30,6 +33,7 @@ export default function ChatListPage() {
               subtitle='Subtitle'
               preview='안녕하세요. 책 거래하실 건가요? 지금 다른 분께도 연락이 와서요'
               muted
+              onClick={() => navigate('/chat/1')}
               badge='대여 상태'
             />
           </>
@@ -42,6 +46,7 @@ export default function ChatListPage() {
               subtitle='Subtitle'
               preview='안녕하세요. 책 거래하실 건가요? 지금 다른 분께도 연락이 와서요'
               unread={4}
+              onClick={() => navigate('/chat/1')}
               avatarNumber={8}
             />
             <ChatCard
@@ -49,6 +54,7 @@ export default function ChatListPage() {
               subtitle='Subtitle'
               preview='안녕하세요. 책 거래하실 건가요? 지금 다른 분께도 연락이 와서요'
               unread={4}
+              onClick={() => navigate('/chat/1')}
               avatarNumber={8}
             />
             <ChatCard
@@ -56,6 +62,7 @@ export default function ChatListPage() {
               subtitle='Subtitle'
               preview='안녕하세요. 책 거래하실 건가요? 지금 다른 분께도 연락이 와서요'
               unread={4}
+              onClick={() => navigate('/chat/1')}
               avatarNumber={10}
             />
           </>
@@ -67,6 +74,7 @@ export default function ChatListPage() {
             subtitle='Subtitle'
             preview='안녕하세요. 책 거래하실 건가요? 지금 다른 분께도 연락이 와서요'
             unread={4}
+            onClick={() => navigate('/chat/1')}
             badge='대여 상태'
           />
         )}
