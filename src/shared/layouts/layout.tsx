@@ -29,6 +29,7 @@ export default function Layout() {
       isUnder(pathname, ROUTES.LOGIN) ||
       isUnder(pathname, ROUTES.SIGNUP) ||
       isUnder(pathname, ROUTES.NOTIFICATION) ||
+      isUnder(pathname, ROUTES.LIBRARY_CREATE) ||
       isOnboarding,
     [pathname, isOnboarding]
   );
@@ -74,10 +75,7 @@ export default function Layout() {
     >
       {showHeader && headerProps && <Header {...headerProps} />}
 
-      <main
-        id='content'
-        className={cn('scrollbar-hide flex-1 overflow-x-hidden', isAuthOrOnboarding && 'h-dvh overflow-hidden')}
-      >
+      <main id='content' className={cn('scrollbar-hide h-full flex-1 overflow-x-hidden')}>
         <div className='mx-auto w-full'>
           <Outlet />
         </div>

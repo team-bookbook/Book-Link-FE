@@ -4,6 +4,7 @@ export const ROUTES = {
   LOGIN: '/login',
   SIGNUP: '/signup',
   LIBRARY: '/library',
+  LIBRARY_CREATE: '/library-create',
   BOARD: '/board',
   ONBOARDING: '/onboarding',
   SETTING: '/mypage',
