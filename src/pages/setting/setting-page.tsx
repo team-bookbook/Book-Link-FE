@@ -3,8 +3,8 @@ import Icon from '@components/icon';
 export default function SettingPage() {
   return (
     <div className='min-h-dvh bg-gray-50 text-gray-900'>
-      <div className='mx-auto w-full px-[2rem] pt-[2rem] pb-[3rem]'>
-        <section className='bg-gray-white mb-[1.6rem] rounded-[16px] p-[1.6rem]'>
+      <div className='mx-auto w-full pb-[3rem]'>
+        <section className='bg-gray-white mb-[1.6rem] rounded-b-[16px] p-[1.6rem]'>
           <div className='flex items-center gap-[1.2rem]'>
             <Icon name='cat-profile' size={6} className='text-gray-500' ariaHidden />
             <div className='min-w-0 flex-1'>
