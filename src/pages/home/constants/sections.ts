@@ -3,6 +3,12 @@ export type SectionCopy = {
   description: string;
 };
 
+export type SectionTitles = {
+  loan: string;
+  reservation: string;
+  group: string;
+};
+
 export const HOME_SECTIONS: {
   howTo: SectionCopy;
   faq: SectionCopy;
@@ -15,4 +21,10 @@ export const HOME_SECTIONS: {
     title: '자주 묻는 질문',
     description: '자주 묻는 질문을 확인해 보세요!',
   },
+};
+
+export const HOME_SECTION_TITLES: SectionTitles = {
+  loan: '대여 현황',
+  reservation: '예약 내역',
+  group: '내가 속한 모임',
 };
