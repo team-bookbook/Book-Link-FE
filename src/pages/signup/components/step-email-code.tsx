@@ -50,7 +50,7 @@ export default function StepEmailCode() {
         return;
       }
       setVerified(true);
-      toast.success('인증번호가 등록되었습니다.', 7);
+      toast.success('인증에 성공했습니다!', 7);
     } finally {
       setVerifying(false);
     }

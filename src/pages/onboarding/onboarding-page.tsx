@@ -11,7 +11,7 @@ function isSlideId(v: string, pages: ReadonlyArray<OnboardingSlide>): v is Slide
 export default function OnboardingPage() {
   const pages: ReadonlyArray<OnboardingSlide> = ONBOARDING_PAGES;
   const navigate = useNavigate();
-  const [currentId, setCurrentId] = useState<SlideId>(pages[0].id);
+
   const [settledId, setSettledId] = useState<SlideId>(pages[0].id);
 
   const scrollerRef = useRef<HTMLDivElement | null>(null);
@@ -44,11 +44,8 @@ export default function OnboardingPage() {
             bestScore = score;
           }
         }
-        if (bestId) {
-          setCurrentId(bestId);
-          if (!userScrollRef.current && bestScore >= 0.8) {
-            setSettledId(bestId);
-          }
+        if (bestId && !userScrollRef.current && bestScore >= 0.8) {
+          setSettledId(bestId);
         }
       },
       { root: scroller, threshold: Array.from({ length: 11 }, (_, i) => i / 10) }
@@ -116,8 +113,7 @@ export default function OnboardingPage() {
       }
     }
 
-    const target = pages[bestIdx];
-    goTo(target.id);
+    goTo(pages[bestIdx].id);
   };
 
   const onScroll = () => {
@@ -135,8 +131,8 @@ export default function OnboardingPage() {
     <div className='h-dvh pb-[7rem]'>
       <div className='flex-col-between mx-auto h-full w-full px-[2rem] py-[5rem]'>
         <div className='flex-col-center gap-[1rem]'>
-          <h2 className='title3 text-center whitespace-pre-line text-gray-900'>{curSlide.title}</h2>
-          <p className='body4 text-center text-gray-500'>{curSlide.subtitle}</p>
+          <h2 className='title4 text-center whitespace-pre-line text-gray-900'>{curSlide.title}</h2>
+          <p className='body5 text-center text-gray-500'>{curSlide.subtitle}</p>
         </div>
 
         <section

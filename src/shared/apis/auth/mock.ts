@@ -1,4 +1,3 @@
-// src/shared/apis/auth/mock.ts  (프로젝트 경로에 맞게)
 type CheckNicknameRes = { available: boolean };
 type SendEmailCodeRes = { ok: boolean; code: string };
 type VerifyEmailCodeRes = { verified: boolean };
@@ -19,7 +18,6 @@ function delay(ms: number) {
   return new Promise<void>((resolve) => setTimeout(resolve, ms));
 }
 
-// 전역 공유 저장소: 경로가 달라도 항상 한 군데만 씀
 function getStore(): EmailStore {
   if (!window.__booklinkEmailStore) window.__booklinkEmailStore = {};
   return window.__booklinkEmailStore;
@@ -35,14 +33,15 @@ export async function checkNickname(nickname: string): Promise<CheckNicknameRes>
 
 export async function sendEmailCode(email: string): Promise<SendEmailCodeRes> {
   await delay(200);
-  const code = Math.floor(100000 + Math.random() * 900000).toString(); // 6자리
+  const code = Math.floor(100000 + Math.random() * 900000).toString();
   getStore()[norm(email)] = { code, expiresAt: Date.now() + EMAIL_CODE_TTL_MS };
 
-  // 개발 편의: 바로 볼 수 있도록 저장(원하면 alert로 띄우세요)
   try {
     localStorage.setItem('last_email', norm(email));
     localStorage.setItem('last_email_code', code);
-  } catch {}
+  } catch {
+    /* */
+  }
   return { ok: true, code };
 }
 

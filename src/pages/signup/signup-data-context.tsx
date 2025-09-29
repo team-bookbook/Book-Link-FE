@@ -67,7 +67,9 @@ export function SignupDataProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     try {
       window.localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-    } catch {}
+    } catch {
+      /* */
+    }
   }, [data]);
 
   const value = useMemo<Ctx>(() => ({ data, setData, reset }), [data]);

@@ -12,7 +12,9 @@ export default function StepComplete() {
       window.localStorage.removeItem('signup_draft');
       window.localStorage.removeItem('last_email');
       window.localStorage.removeItem('last_email_code');
-    } catch {}
+    } catch {
+      /* */
+    }
     reset();
     window.location.assign('/onboarding');
   };
