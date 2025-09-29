@@ -1,8 +1,9 @@
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import clsx from 'clsx';
 import Icon from '@components/icon';
 import SearchBar from '@components/search-bar';
 import { ROUTES } from '@routes/routes-config';
+import { useMemo } from 'react';
 
 type LeftKind = 'none' | 'back' | 'logo' | 'close';
 type ActionId = 'search' | 'cart' | 'share' | 'kebab' | 'bell' | 'close' | 'logout';
@@ -43,6 +44,9 @@ const ACTION_LABEL: Record<ActionId, string> = {
   logout: '로그아웃',
 };
 
+function isUnder(pathname: string, root: string) {
+  return pathname === root || pathname.startsWith(root + '/');
+}
 export default function Header({
   left = 'none',
   title,
@@ -57,6 +61,8 @@ export default function Header({
   className,
 }: HeaderProps) {
   const nav = useNavigate();
+  const { pathname } = useLocation();
+  const isSetting = useMemo(() => isUnder(pathname, ROUTES.SETTING), [pathname]);
 
   const handleAction = (id: ActionId) => {
     if (id === 'bell') {
@@ -74,8 +80,9 @@ export default function Header({
     <header
       role='banner'
       className={clsx(
-        'shadow-top-fixed bg-gray-white sticky top-0 z-[var(--z-header)]',
+        'bg-gray-white sticky top-0 z-[var(--z-header)]',
         safeTop && 'pt-[env(safe-area-inset-top)]',
+        !isSetting && 'shadow-top-fixed',
         className
       )}
     >
