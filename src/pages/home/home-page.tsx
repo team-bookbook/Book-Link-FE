@@ -12,6 +12,7 @@ import { INTRODUCE_STEPS } from './constants/introduce';
 import { FAQ_ITEMS } from './constants/faq';
 import Faq from './components/faq/faq';
 import { ROUTES } from '@routes/routes-config';
+import TopMessageBanner from './components/banner/top-message-banner';
 
 export default function HomePage() {
   const navigate = useNavigate();
@@ -124,11 +125,14 @@ export default function HomePage() {
   );
 
   return (
-    <div className='flex-col gap-[3rem] bg-gray-50 py-[2.5rem]'>
-      {renderUserGreeting()}
-      <Divider />
-      {renderCurrentPoint()}
-      {hasData ? renderDataSections() : renderIntroduceSections()}
-    </div>
+    <>
+      <TopMessageBanner />
+      <div className='flex-col gap-[3rem] bg-gray-50 py-[2.5rem]'>
+        {renderUserGreeting()}
+        <Divider />
+        {renderCurrentPoint()}
+        {hasData ? renderDataSections() : renderIntroduceSections()}
+      </div>
+    </>
   );
 }

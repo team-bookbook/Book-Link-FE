@@ -1,12 +1,11 @@
+import Icon from '@components/icon';
 import type { IBookCard } from '@pages/home/types/home.types';
-
-const ICON_ALT_LOGO = new URL('@icons/logo-alt.svg', import.meta.url).href;
 
 interface BookCardProps extends IBookCard {
   size?: 'large' | 'small';
 }
 
-export default function BookCard({ id, index, imgurl, title, author, size = 'small' }: BookCardProps) {
+export default function BookCard({ id, index, imgurl, title, author, expDate, size = 'small' }: BookCardProps) {
   console.log(id, index);
 
   const sizeClasses = {
@@ -17,6 +16,7 @@ export default function BookCard({ id, index, imgurl, title, author, size = 'sma
         'flex-row-center relative h-[10rem] overflow-hidden rounded-tl-[1rem] rounded-tr-[1rem] bg-gray-100',
       titleClass: 'caption3',
       authorClass: 'caption5',
+      iconSize: 3.8,
     },
     large: {
       container:
@@ -25,6 +25,7 @@ export default function BookCard({ id, index, imgurl, title, author, size = 'sma
         'flex-row-center relative h-[12rem] overflow-hidden rounded-tl-[1rem] rounded-tr-[1rem] bg-gray-100',
       titleClass: 'caption1',
       authorClass: 'caption3',
+      iconSize: 4.5,
     },
   };
 
@@ -36,10 +37,12 @@ export default function BookCard({ id, index, imgurl, title, author, size = 'sma
         {imgurl ? (
           <img src={imgurl} alt={title} className='h-full w-full object-cover object-center' />
         ) : (
-          <img src={ICON_ALT_LOGO} alt='default_image' className='absolute h-[3.8rem] w-[3.8rem]' loading='lazy' />
+          <Icon name='logo-alt' className='' size={currentSize.iconSize} />
         )}
-        <div className='flex-row-center caption5 absolute right-[0.45rem] bottom-[0.45rem] h-[1.7rem] w-[3.5rem] rounded-[0.2rem] bg-gray-50 text-gray-600'>
-          D-3
+        <div
+          className={`flex-row-center caption5 absolute right-[0.45rem] bottom-[0.45rem] h-[1.7rem] w-[3.5rem] rounded-[0.2rem] bg-gray-50 ${expDate <= 3 ? 'text-system-error' : 'text-gray-600'}`}
+        >
+          D-{expDate}
         </div>
       </div>
       <div className='flex-col gap-[0.6rem] px-[1rem]'>

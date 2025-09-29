@@ -1,14 +1,20 @@
 import { useState, useEffect } from 'react';
 import type { IBookCard, IGroupCard, IHomeData } from '../types/home.types';
+const sampleImages = [
+  'https://picsum.photos/200/300?random=1',
+  'https://picsum.photos/200/300?random=2',
+  'https://picsum.photos/200/300?random=3',
+  'https://picsum.photos/200/300?random=4',
+];
 
 export const generateDummyBooks = (count: number = 7): IBookCard[] => {
   return Array.from({ length: count }, (_, index) => ({
-    imgurl: '',
+    imgurl: Math.random() > 0.3 ? sampleImages[Math.floor(Math.random() * sampleImages.length)] : '',
     index: index,
     id: index + 1,
     title: `책 제목 ${index + 1}`,
     author: `작가명 ${index + 1}`,
-    expDate: '22.12.31',
+    expDate: Math.floor(Math.random() * 10) + 1,
   }));
 };
 
@@ -19,7 +25,7 @@ export const generateDummyGroups = (count: number = 3): IGroupCard[] => {
     leaderName: '그룹장',
     memberCount: Math.floor(Math.random() * 10) + 5,
     description: '그룹에 대한 설명이 여기에 들어갑니다. 그룹에 대한 설명이 여기에 들어갑니다.',
-    imgurl: '',
+    imgurl: Math.random() > 0.3 ? sampleImages[Math.floor(Math.random() * sampleImages.length)] : '',
   }));
 };
 

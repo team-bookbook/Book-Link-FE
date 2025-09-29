@@ -37,6 +37,7 @@ export default function IntroduceBanner({ id, title, stepText, variant, imageAlt
   return (
     <article
       id={id}
+      data-introduce-banner
       className={cn(
         'w-full',
         variantBg(variant),

@@ -4,7 +4,7 @@ export type IBookCard = {
   index: number;
   title: string;
   author: string;
-  expDate: string;
+  expDate: number;
 };
 
 export type IGroupCard = {
