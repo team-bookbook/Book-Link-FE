@@ -24,12 +24,12 @@ export default function Layout() {
   const navigate = useNavigate();
 
   const isOnboarding = useMemo(() => isUnder(pathname, ROUTES.ONBOARDING), [pathname]);
+  const isChat = useMemo(() => isUnder(pathname, ROUTES.CHAT), [pathname]);
   const isAuthOrOnboarding = useMemo(
     () =>
       isUnder(pathname, ROUTES.LOGIN) ||
       isUnder(pathname, ROUTES.SIGNUP) ||
       isUnder(pathname, ROUTES.NOTIFICATION) ||
-      isUnder(pathname, ROUTES.CHAT) ||
       isOnboarding,
     [pathname, isOnboarding]
   );
@@ -79,7 +79,7 @@ export default function Layout() {
         <div className='mx-auto w-full'>
           <Outlet />
         </div>
-        {!isAuthOrOnboarding && <Footer />}
+        {!isAuthOrOnboarding && !isChat && <Footer />}
       </main>
 
       {!isAuthOrOnboarding && <BottomNav />}
