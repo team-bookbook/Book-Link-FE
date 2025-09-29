@@ -23,7 +23,7 @@ export default function ButtonFrame({ children, equalize = true, className }: Bu
   return (
     <div
       className={cn(
-        'shadow-bottom-fixed fixed bottom-0 z-[var(--z-bottom-nav)] w-full max-w-[43rem] bg-white',
+        'shadow-bottom-fixed bg-gray-white fixed bottom-0 z-[var(--z-bottom-nav)] w-full max-w-[43rem]',
         'p-[1.6rem]',
         className
       )}

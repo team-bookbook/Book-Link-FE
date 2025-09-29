@@ -43,7 +43,7 @@ export default function StepPhone() {
   };
 
   return (
-    <div className='min-h-dvh flex-col gap-[2.5rem] bg-white text-gray-900'>
+    <div className='bg-gray-white min-h-dvh flex-col gap-[2.5rem] text-gray-900'>
       <div className='flex-col gap-[3.5rem] px-[2rem] py-[2rem]'>
         <h1 className='title3 text-gray-900'>전화번호를 입력해 주세요.</h1>
         <Input
