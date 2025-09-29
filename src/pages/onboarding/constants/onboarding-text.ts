@@ -6,7 +6,7 @@ import imgExplore from '@images/onboarding-4.svg';
 export type SlideId = 'find-share' | 'alerts' | 'due' | 'explore';
 
 export type OnboardingSlide = {
-  id: 'find-share' | 'alerts' | 'due' | 'explore';
+  id: SlideId;
   title: string;
   subtitle: string;
   image: string;
