@@ -10,6 +10,8 @@ import NotificationPage from '@pages/notification/notification-page';
 import LoginPage from '@pages/login/login-page';
 import SignupPage from '@pages/signup/signup-page';
 import OnboardingPage from '@pages/onboarding/onboarding-page';
+import LibraryCreatePage from '@pages/library/library-create-page';
+import BookCreatePage from '@pages/library/book-create-page';
 import { ROUTES } from '@routes/routes-config';
 
 export const router = createBrowserRouter([
@@ -25,6 +27,8 @@ export const router = createBrowserRouter([
       { path: ROUTES.BOARD, element: <BoardPage /> },
       { path: ROUTES.CHAT, element: <ChatPage /> },
       { path: ROUTES.ONBOARDING, element: <OnboardingPage /> },
+      { path: ROUTES.LIBRARY_CREATE, element: <LibraryCreatePage /> },
+      { path: ROUTES.BOOK_CREATE, element: <BookCreatePage /> },
       { path: ROUTES.NOTIFICATION, element: <NotificationPage /> },
     ],
   },

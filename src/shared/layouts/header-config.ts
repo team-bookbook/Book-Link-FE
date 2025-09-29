@@ -79,6 +79,18 @@ const chatDetailRule: Rule = (path) => {
     : undefined;
 };
 
+// 도서관 등록
+const libraryCreateRule: Rule = (path) =>
+  ROUTES.LIBRARY_CREATE && matchPath({ path: ROUTES.LIBRARY_CREATE, end: true }, path)
+    ? { left: 'back', title: '도서관 등록' }
+    : undefined;
+
+// 도서 등록
+const bookCreateRule: Rule = (path) =>
+  ROUTES.BOOK_CREATE && matchPath({ path: ROUTES.BOOK_CREATE, end: true }, path)
+    ? { left: 'back', title: '도서 등록' }
+    : undefined;
+
 // 기본
 const fallbackRule = (): HeaderProps => ({
   left: 'back',
@@ -99,6 +111,8 @@ const RULES: ReadonlyArray<Rule> = [
   notiRole,
   loginRule,
   signupRule,
+  libraryCreateRule,
+  bookCreateRule,
 ];
 
 export function getHeaderForRoute(pathname: string, search: string): HeaderProps {

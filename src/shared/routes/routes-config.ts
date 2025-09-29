@@ -4,6 +4,8 @@ export const ROUTES = {
   LOGIN: '/login',
   SIGNUP: '/signup',
   LIBRARY: '/library',
+  LIBRARY_CREATE: '/library-create',
+  BOOK_CREATE: '/book-create',
   BOARD: '/board',
   ONBOARDING: '/onboarding',
   SETTING: '/mypage',
