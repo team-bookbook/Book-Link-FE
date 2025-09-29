@@ -10,6 +10,9 @@ import NotificationPage from '@pages/notification/notification-page';
 import LoginPage from '@pages/login/login-page';
 import SignupPage from '@pages/signup/signup-page';
 import { ROUTES } from '@routes/routes-config';
+import MyLoanPage from '@pages/home/my-loan-page';
+import MyReservationPage from '@pages/home/my-reservation-page';
+import MyGroupPage from '@pages/home/my-group-page';
 
 export const router = createBrowserRouter([
   {
@@ -24,6 +27,9 @@ export const router = createBrowserRouter([
       { path: ROUTES.BOARD, element: <BoardPage /> },
       { path: ROUTES.CHAT, element: <ChatPage /> },
       { path: ROUTES.NOTIFICATION, element: <NotificationPage /> },
+      { path: ROUTES.MY_RESERVATION, element: <MyReservationPage /> },
+      { path: ROUTES.MY_LOAN, element: <MyLoanPage /> },
+      { path: ROUTES.MY_GROUP, element: <MyGroupPage /> },
     ],
   },
 ]);

@@ -79,6 +79,24 @@ const chatDetailRule: Rule = (path) => {
     : undefined;
 };
 
+// 나의 예약 내역
+const myReservation: Rule = (path) =>
+  ROUTES.NOTIFICATION && matchPath({ path: ROUTES.MY_RESERVATION, end: true }, path)
+    ? { left: 'back', title: '예약 내역' }
+    : undefined;
+
+// 나의 대여 현황
+const myLoan: Rule = (path) =>
+  ROUTES.NOTIFICATION && matchPath({ path: ROUTES.MY_LOAN, end: true }, path)
+    ? { left: 'back', title: '대여 현황' }
+    : undefined;
+
+// 나의 모임
+const myGroup: Rule = (path) =>
+  ROUTES.NOTIFICATION && matchPath({ path: ROUTES.MY_GROUP, end: true }, path)
+    ? { left: 'back', title: '나의 모임' }
+    : undefined;
+
 // 기본
 const fallbackRule = (): HeaderProps => ({
   left: 'back',
@@ -99,6 +117,9 @@ const RULES: ReadonlyArray<Rule> = [
   notiRole,
   loginRule,
   signupRule,
+  myReservation,
+  myLoan,
+  myGroup,
 ];
 
 export function getHeaderForRoute(pathname: string, search: string): HeaderProps {

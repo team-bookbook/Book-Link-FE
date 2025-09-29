@@ -13,4 +13,7 @@ export const ROUTES = {
   SCAN: '/scan',
   CART: '/cart',
   NOTIFICATION: '/notification',
+  MY_RESERVATION: '/mypage/reservation',
+  MY_LOAN: '/mypage/loan',
+  MY_GROUP: '/mypage/group',
 };

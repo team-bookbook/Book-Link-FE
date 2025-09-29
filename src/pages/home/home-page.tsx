@@ -1,4 +1,5 @@
 import 'keen-slider/keen-slider.min.css';
+import { useNavigate } from 'react-router-dom';
 import { useHomeData } from './hooks/use-home-data';
 import HomeBanner from './components/banner/home-banner';
 import HomeReservation from './components/section/home-reservation';
@@ -10,18 +11,21 @@ import { HOME_SECTION_TITLES, HOME_SECTIONS } from './constants/sections';
 import { INTRODUCE_STEPS } from './constants/introduce';
 import { FAQ_ITEMS } from './constants/faq';
 import Faq from './components/faq/faq';
+import { ROUTES } from '@routes/routes-config';
 
 export default function HomePage() {
+  const navigate = useNavigate();
+
   const handleLoanViewAll = () => {
-    console.log('Navigate to loan list page');
+    navigate(ROUTES.MY_LOAN);
   };
 
   const handleReservationViewAll = () => {
-    console.log('Navigate to reservation list page');
+    navigate(ROUTES.MY_RESERVATION);
   };
 
   const handleGroupViewAll = () => {
-    console.log('Navigate to group list page');
+    navigate(ROUTES.MY_GROUP);
   };
 
   const { loanData, reservationData, groupData, isLoadingLoans, isLoadingReservations, isLoadingGroups, error } =
@@ -69,15 +73,15 @@ export default function HomePage() {
     <>
       <HomeReservation
         title={HOME_SECTION_TITLES.reservation}
-        data={loanData}
-        isLoading={isLoadingLoans}
-        onLinkClick={handleLoanViewAll}
-      />
-      <HomeLoan
-        title={HOME_SECTION_TITLES.loan}
         data={reservationData}
         isLoading={isLoadingReservations}
         onLinkClick={handleReservationViewAll}
+      />
+      <HomeLoan
+        title={HOME_SECTION_TITLES.loan}
+        data={loanData}
+        isLoading={isLoadingLoans}
+        onLinkClick={handleLoanViewAll}
       />
       <HomeGroup
         title={HOME_SECTION_TITLES.group}
@@ -91,7 +95,6 @@ export default function HomePage() {
   const renderIntroduceSections = () => (
     <>
       <div className='flex-col gap-[1.5rem]'>
-        <Divider />
         <div className='flex-col gap-[0.2rem] px-[2rem] py-[1rem]'>
           <h2 className='title4 text-gray-900'>{HOME_SECTIONS.howTo.title}</h2>
           <p className='body5 text-gray-600'>{HOME_SECTIONS.howTo.description}</p>
@@ -123,6 +126,7 @@ export default function HomePage() {
   return (
     <div className='flex-col gap-[3rem] bg-gray-50 py-[2.5rem]'>
       {renderUserGreeting()}
+      <Divider />
       {renderCurrentPoint()}
       {hasData ? renderDataSections() : renderIntroduceSections()}
     </div>

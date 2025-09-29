@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import type { IBookCard, IGroupCard, IHomeData } from '../types/home.types';
 
-const generateDummyBooks = (count: number = 7): IBookCard[] => {
+export const generateDummyBooks = (count: number = 7): IBookCard[] => {
   return Array.from({ length: count }, (_, index) => ({
     imgurl: '',
     index: index,
@@ -12,7 +12,7 @@ const generateDummyBooks = (count: number = 7): IBookCard[] => {
   }));
 };
 
-const generateDummyGroups = (count: number = 3): IGroupCard[] => {
+export const generateDummyGroups = (count: number = 3): IGroupCard[] => {
   return Array.from({ length: count }, (_, index) => ({
     id: index + 1,
     groupName: `독서 모임 ${index + 1}`,
@@ -24,17 +24,17 @@ const generateDummyGroups = (count: number = 3): IGroupCard[] => {
 };
 
 const fetchLoanData = async (): Promise<IBookCard[]> => {
-  await new Promise((resolve) => setTimeout(resolve, 1000));
+  // await new Promise((resolve) => setTimeout(resolve, 1000));
   return generateDummyBooks(5);
 };
 
 const fetchReservationData = async (): Promise<IBookCard[]> => {
-  await new Promise((resolve) => setTimeout(resolve, 1200));
+  // await new Promise((resolve) => setTimeout(resolve, 1200));
   return generateDummyBooks(5);
 };
 
 const fetchGroupData = async (): Promise<IGroupCard[]> => {
-  await new Promise((resolve) => setTimeout(resolve, 800));
+  // await new Promise((resolve) => setTimeout(resolve, 800));
   return generateDummyGroups(3);
 };
 
