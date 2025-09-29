@@ -26,19 +26,21 @@ type BaseProps = {
   onBlur?: (e: React.FocusEvent<HTMLInputElement> | React.FocusEvent<HTMLTextAreaElement>) => void;
 };
 
-/** 단일 라인 인풋 전용 props */
 type InputLineProps = BaseProps &
   Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onBlur' | 'children' | 'ref'> & {
     multiline?: false;
   };
 
-/** 멀티라인(텍스트에어리어) 전용 props */
 type TextAreaProps = BaseProps &
   Omit<React.TextareaHTMLAttributes<HTMLTextAreaElement>, 'onBlur' | 'children' | 'ref'> & {
     multiline: true;
   };
 
 type InputProps = InputLineProps | TextAreaProps;
+
+function isLineProps(p: InputProps): p is InputLineProps {
+  return !('multiline' in p) || p.multiline === false;
+}
 
 const Input = forwardRef<HTMLInputElement | HTMLTextAreaElement, InputProps>(function Input(props, ref) {
   const autoId = useId();
@@ -81,9 +83,7 @@ const Input = forwardRef<HTMLInputElement | HTMLTextAreaElement, InputProps>(fun
   };
 
   const commonFieldClass = 'w-full bg-transparent text-gray-900 outline-none placeholder:text-gray-500';
-
-  const hasRightAddon = (!('multiline' in props) || props.multiline === false) && (passwordToggle || !!endIcon);
-
+  const hasRightAddon = isLineProps(props) && (passwordToggle || !!endIcon);
   const leftPadding = startIcon ? 'pl-[3.6rem]' : 'pl-[1.6rem]';
   const rightPadding = hasRightAddon ? 'pr-[3.6rem]' : 'pr-[1.6rem]';
 
@@ -98,7 +98,7 @@ const Input = forwardRef<HTMLInputElement | HTMLTextAreaElement, InputProps>(fun
       <div
         className={cn(
           'caption1 relative w-full rounded-[12px] bg-gray-50',
-          props.multiline ? 'min-h-[20rem]' : 'flex h-[5.6rem] items-center',
+          'multiline' in props && props.multiline ? 'min-h-[20rem]' : 'flex h-[5.6rem] items-center',
           borderClass,
           className
         )}
@@ -109,7 +109,25 @@ const Input = forwardRef<HTMLInputElement | HTMLTextAreaElement, InputProps>(fun
           </span>
         )}
 
-        {props.multiline ? (
+        {isLineProps(props) ? (
+          (() => {
+            const { type: _ignoredType, maxLength: maxLenProp, ...rest } = props;
+            const resolvedType = passwordToggle ? (showPw ? 'text' : 'password') : (props.type ?? 'text');
+
+            return (
+              <input
+                id={id}
+                ref={ref as React.Ref<HTMLInputElement>}
+                {...rest}
+                type={resolvedType}
+                maxLength={maxLenProp ?? maxLength}
+                className={cn(commonFieldClass, 'h-full rounded-[12px] py-[1.6rem]', leftPadding, rightPadding)}
+                onFocus={() => setIsFocused(true)}
+                onBlur={handleBlur}
+              />
+            );
+          })()
+        ) : (
           <textarea
             id={id}
             ref={ref as React.Ref<HTMLTextAreaElement>}
@@ -122,22 +140,11 @@ const Input = forwardRef<HTMLInputElement | HTMLTextAreaElement, InputProps>(fun
             )}
             onFocus={() => setIsFocused(true)}
             onBlur={handleBlur}
-            {...(props as TextAreaProps)}
-          />
-        ) : (
-          <input
-            id={id}
-            ref={ref as React.Ref<HTMLInputElement>}
-            type={passwordToggle ? (showPw ? 'text' : 'password') : (props.type ?? 'text')}
-            maxLength={props.maxLength ?? maxLength}
-            className={cn(commonFieldClass, 'h-full rounded-[12px] py-[1.6rem]', leftPadding, rightPadding)}
-            onFocus={() => setIsFocused(true)}
-            onBlur={handleBlur}
-            {...(props as InputLineProps)}
+            {...props}
           />
         )}
 
-        {!props.multiline && (
+        {isLineProps(props) && (
           <span className='absolute top-1/2 right-[1.2rem] -translate-y-1/2'>
             {passwordToggle ? (
               <button
@@ -163,10 +170,10 @@ const Input = forwardRef<HTMLInputElement | HTMLTextAreaElement, InputProps>(fun
 
       {messageToShow && (
         <div className='flex w-full justify-between'>
-          <p className={cn('caption3 text-gray-600', !props.multiline && iconColorClass)}>{messageToShow}</p>
+          <p className={cn('caption3 text-gray-600', isLineProps(props) && iconColorClass)}>{messageToShow}</p>
           {hasLength && (
             <p className='caption3 text-gray-600'>
-              {(props as { length?: number }).length ?? 0}/{props.maxLength ?? maxLength}
+              {'length' in props && typeof props.length === 'number' ? props.length : 0}/{props.maxLength ?? maxLength}
             </p>
           )}
         </div>

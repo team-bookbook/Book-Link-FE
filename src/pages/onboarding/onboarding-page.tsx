@@ -1,9 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import Button from '@components/button/button';
 import ButtonFrame from '@components/button/button-frame';
+import { useNavigate } from 'react-router-dom';
 import { ONBOARDING_PAGES, type OnboardingSlide, type SlideId } from '@pages/onboarding/constants/onboarding-text';
-
-const STORAGE_KEY = 'onboarding_seen';
 
 function isSlideId(v: string, pages: ReadonlyArray<OnboardingSlide>): v is SlideId {
   return pages.some((p) => p.id === v);
@@ -11,7 +10,7 @@ function isSlideId(v: string, pages: ReadonlyArray<OnboardingSlide>): v is Slide
 
 export default function OnboardingPage() {
   const pages: ReadonlyArray<OnboardingSlide> = ONBOARDING_PAGES;
-
+  const navigate = useNavigate();
   const [currentId, setCurrentId] = useState<SlideId>(pages[0].id);
   const [settledId, setSettledId] = useState<SlideId>(pages[0].id);
 
@@ -67,7 +66,6 @@ export default function OnboardingPage() {
 
   const getIndex = (id: SlideId) => pages.findIndex((p) => p.id === id);
   const settledIndex = getIndex(settledId);
-  const isLast = settledIndex === pages.length - 1;
 
   const goTo = (id: SlideId) => {
     const scroller = scrollerRef.current;
@@ -79,17 +77,6 @@ export default function OnboardingPage() {
     window.setTimeout(() => {
       programmaticRef.current = false;
     }, 200);
-  };
-
-  const onNext = () => {
-    if (!isLast) {
-      goTo(pages[settledIndex + 1].id);
-      return;
-    }
-    try {
-      localStorage.setItem(STORAGE_KEY, '1');
-    } catch {}
-    window.location.assign('/login');
   };
 
   const onPointerDown = () => {
@@ -196,8 +183,8 @@ export default function OnboardingPage() {
       </div>
 
       <ButtonFrame>
-        <Button fullWidth className='py-[1.2rem]' onClick={onNext}>
-          {isLast ? '로그인하기' : '로그인하기'}
+        <Button fullWidth className='py-[1.2rem]' onClick={() => navigate('/login')}>
+          로그인하기
         </Button>
       </ButtonFrame>
     </div>
