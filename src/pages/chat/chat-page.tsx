@@ -22,7 +22,7 @@ export default function ChatListPage() {
           <>
             <ChatCard
               title='사용자명'
-              subtitle='Subtitle'
+              subtitle='모순 외 1건'
               preview='안녕하세요. 책 거래하실 건가요? 지금 다른 분께도 연락이 와서요'
               unread={4}
               onClick={() => navigate('/chat/1')}
@@ -30,7 +30,7 @@ export default function ChatListPage() {
             />
             <ChatCard
               title='사용자명'
-              subtitle='Subtitle'
+              subtitle='노르웨이의 숲'
               preview='안녕하세요. 책 거래하실 건가요? 지금 다른 분께도 연락이 와서요'
               muted
               onClick={() => navigate('/chat/1')}
@@ -43,7 +43,6 @@ export default function ChatListPage() {
           <>
             <ChatCard
               title='모임명'
-              subtitle='Subtitle'
               preview='안녕하세요. 책 거래하실 건가요? 지금 다른 분께도 연락이 와서요'
               unread={4}
               onClick={() => navigate('/chat/1')}
@@ -51,7 +50,6 @@ export default function ChatListPage() {
             />
             <ChatCard
               title='모임명'
-              subtitle='Subtitle'
               preview='안녕하세요. 책 거래하실 건가요? 지금 다른 분께도 연락이 와서요'
               unread={4}
               onClick={() => navigate('/chat/1')}
@@ -59,7 +57,6 @@ export default function ChatListPage() {
             />
             <ChatCard
               title='모임명'
-              subtitle='Subtitle'
               preview='안녕하세요. 책 거래하실 건가요? 지금 다른 분께도 연락이 와서요'
               unread={4}
               onClick={() => navigate('/chat/1')}
@@ -71,7 +68,7 @@ export default function ChatListPage() {
         {(tab === 'all' || tab === 'direct') && (
           <ChatCard
             title='사용자명'
-            subtitle='Subtitle'
+            subtitle='책 제목'
             preview='안녕하세요. 책 거래하실 건가요? 지금 다른 분께도 연락이 와서요'
             unread={4}
             onClick={() => navigate('/chat/1')}

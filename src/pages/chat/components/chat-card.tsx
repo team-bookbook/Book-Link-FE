@@ -6,7 +6,7 @@ type Props = {
   preview: string;
   unread?: number;
   muted?: boolean;
-  /** “대여 상태” 같은 라벨이 필요할 때 */
+  /** 대여 상태 라벨이 필요할 때 */
   badge?: string;
   /** 그룹일 때 아바타 안에 표시할 숫자(없으면 일반 사용자) */
   avatarNumber?: number;
@@ -50,9 +50,7 @@ export default function ChatCard({
         <div className='flex items-center justify-between gap-[0.8rem]'>
           <p className='title6 truncate text-gray-900'>{title}</p>
           {badge ? (
-            <span className='caption3 shrink-0 rounded-[6px] bg-gray-100 px-[0.8rem] py-[0.4rem] text-gray-700'>
-              {badge}
-            </span>
+            <span className='caption5 shrink-0 rounded-[2px] bg-gray-100 px-[0.7rem] text-gray-600'>{badge}</span>
           ) : null}
         </div>
 
@@ -61,8 +59,8 @@ export default function ChatCard({
         <div className='mt-[0.2rem] flex items-center gap-[0.8rem]'>
           <p className='caption2 flex-1 truncate text-gray-600'>{preview}</p>
           {unread > 0 ? (
-            <span className='grid h-[1.6rem] min-w-[1.6rem] place-items-center rounded-full bg-[#FF5656] px-[0.4rem]'>
-              <span className='caption3 text-white'>{unread}</span>
+            <span className='bg-system-error flex-row-center h-[1.5rem] w-[1.5rem] rounded-full'>
+              <span className='caption5 text-gray-white pr-[0.1rem]'>{unread}</span>
             </span>
           ) : null}
         </div>
