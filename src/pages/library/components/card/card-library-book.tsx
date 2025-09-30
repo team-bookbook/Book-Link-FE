@@ -1,15 +1,13 @@
 import Icon from '@components/icon';
-import { toast } from '@libs/toast';
 import type { ILibraryBook, BookStatus } from '../../types/library.types';
-import { modal } from '@libs/modal';
-import { MODAL_TITLE } from '@constants/modal-presets';
+import { useNavigate } from 'react-router-dom';
+import { ROUTES } from '@routes/routes-config';
+import { useCart } from '../../hooks/useCart';
 
 interface CardLibraryBookProps {
   book: ILibraryBook;
   isCart?: boolean;
 }
-
-const CART_STORAGE_KEY = 'library-cart';
 
 const getStatusInfo = (status: BookStatus) => {
   switch (status) {
@@ -24,72 +22,31 @@ const getStatusInfo = (status: BookStatus) => {
   }
 };
 
-interface CartData {
-  library: string;
-  books: ILibraryBook[];
-}
-
-const getCartData = (): CartData | null => {
-  try {
-    const data = sessionStorage.getItem(CART_STORAGE_KEY);
-    return data ? JSON.parse(data) : null;
-  } catch {
-    return null;
-  }
-};
-
-const saveCartData = (data: CartData) => {
-  sessionStorage.setItem(CART_STORAGE_KEY, JSON.stringify(data));
-};
-
-const addToCart = async (book: ILibraryBook): Promise<boolean> => {
-  const currentCart = getCartData();
-
-  if (!currentCart) {
-    saveCartData({ library: book.library, books: [book] });
-    toast.success('장바구니에 담았습니다.');
-    return true;
-  }
-
-  if (currentCart.library !== book.library) {
-    const res = await modal.confirm({
-      title: MODAL_TITLE.CART_REPLACE,
-      confirmVariant: 'danger',
-    });
-    if (res.ok) {
-      saveCartData({ library: book.library, books: [book] });
-      toast.info('기존 도서를 비우고 담았어요.');
-    }
-    return true;
-  }
-
-  if (currentCart.books.some((b) => b.id === book.id)) {
-    toast.info('이미 장바구니에 있는 도서에요.');
-    return true;
-  }
-
-  currentCart.books.push(book);
-  saveCartData(currentCart);
-  toast.success('장바구니에 담았습니다.');
-  return true;
-};
-
 export default function CardLibraryBook({ book, isCart = true }: CardLibraryBookProps) {
   const statusInfo = getStatusInfo(book.status);
+  const navigate = useNavigate();
+  const { addToCart } = useCart();
 
   const handleCartClick = async (e: React.MouseEvent) => {
     e.stopPropagation();
     await addToCart(book);
   };
 
+  const handleCardClick = () => {
+    navigate(ROUTES.BOOK_DETAIL(book.id.toString()));
+  };
+
   return (
-    <div className='flex-items-center relative min-h-[13.8rem] w-full cursor-pointer gap-[1rem] rounded-[1rem] bg-gray-50 px-[1.4rem]'>
+    <div
+      onClick={handleCardClick}
+      className='flex-items-center relative min-h-[13.8rem] w-full cursor-pointer gap-[1rem] rounded-[1rem] bg-gray-50 px-[1.4rem]'
+    >
       <div
         className={`caption5 flex-row-center px-[0.7rem] ${statusInfo.color} absolute top-[2rem] right-[1.5rem] min-h-[1.7rem] min-w-[4.8rem] rounded-[0.2rem] bg-gray-100`}
       >
         {statusInfo.text}
       </div>
-      <div className='relative h-[10rem] w-[10rem] overflow-hidden bg-green-50'>
+      <div className='relative h-[10rem] w-[10rem] overflow-hidden bg-gray-50'>
         {isCart && (
           <button
             onClick={handleCartClick}
@@ -104,7 +61,7 @@ export default function CardLibraryBook({ book, isCart = true }: CardLibraryBook
           <img src={book.imgUrl} alt={book.title} className='h-full w-full object-cover' />
         ) : (
           <div className='flex h-full w-full items-center justify-center bg-gray-200'>
-            <Icon name='logo-alt' size={2.4} className='text-gray-400' />
+            <Icon name='logo-alt' size={3.6} className='text-gray-400' />
           </div>
         )}
       </div>
