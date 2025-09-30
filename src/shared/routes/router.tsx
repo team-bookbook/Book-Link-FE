@@ -20,7 +20,7 @@ const BookCreatePage = lazy(() => import('@pages/library/book-create-page'));
 const ReservationPage = lazy(() => import('@pages/home/reservation-page'));
 const GroupPage = lazy(() => import('@pages/home/group-page'));
 const RentalPage = lazy(() => import('@pages/home/rental-page'));
-const CartPage = lazy(() => import('@pages/library/library-cart-page'));
+const CartPage = lazy(() => import('@pages/library/cart-page'));
 
 export const router = createBrowserRouter([
   {
