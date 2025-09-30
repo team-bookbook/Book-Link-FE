@@ -1,19 +1,22 @@
 import { createBrowserRouter } from 'react-router-dom';
-import Layout from '@layouts/layout';
-import ErrorPage from '@pages/error/error-page';
-import HomePage from '@pages/home/home-page';
-import LibraryPage from '@pages/library/library-page';
-import SettingPage from '@pages/setting/setting-page';
-import BoardPage from '@pages/board/board-page';
-import ChatPage from '@pages/chat/chat-page';
-import ChatDetailPage from '@pages/chat/chat-detail-page';
-import NotificationPage from '@pages/notification/notification-page';
-import LoginPage from '@pages/login/login-page';
-import SignupPage from '@pages/signup/signup-page';
-import OnboardingPage from '@pages/onboarding/onboarding-page';
-import LibraryCreatePage from '@pages/library/library-create-page';
-import BookCreatePage from '@pages/library/book-create-page';
+import { lazy } from 'react';
 import { ROUTES } from '@routes/routes-config';
+
+const Layout = lazy(() => import('@layouts/layout'));
+const ErrorPage = lazy(() => import('@pages/error/error-page'));
+
+const HomePage = lazy(() => import('@pages/home/home-page'));
+const LibraryPage = lazy(() => import('@pages/library/library-page'));
+const SettingPage = lazy(() => import('@pages/setting/setting-page'));
+const BoardPage = lazy(() => import('@pages/board/board-page'));
+const ChatPage = lazy(() => import('@pages/chat/chat-page'));
+const ChatDetailPage = lazy(() => import('@pages/chat/chat-detail-page'));
+const NotificationPage = lazy(() => import('@pages/notification/notification-page'));
+const LoginPage = lazy(() => import('@pages/login/login-page'));
+const SignupPage = lazy(() => import('@pages/signup/signup-page'));
+const OnboardingPage = lazy(() => import('@pages/onboarding/onboarding-page'));
+const LibraryCreatePage = lazy(() => import('@pages/library/library-create-page'));
+const BookCreatePage = lazy(() => import('@pages/library/book-create-page'));
 
 export const router = createBrowserRouter([
   {
@@ -21,17 +24,17 @@ export const router = createBrowserRouter([
     errorElement: <ErrorPage />,
     children: [
       { path: ROUTES.HOME, element: <HomePage /> },
-      { path: ROUTES.LOGIN, element: <LoginPage /> },
-      { path: ROUTES.SIGNUP, element: <SignupPage /> },
       { path: ROUTES.LIBRARY, element: <LibraryPage /> },
       { path: ROUTES.SETTING, element: <SettingPage /> },
       { path: ROUTES.BOARD, element: <BoardPage /> },
       { path: ROUTES.CHAT, element: <ChatPage /> },
       { path: ROUTES.CHAT_ROOM(':id'), element: <ChatDetailPage /> },
+      { path: ROUTES.NOTIFICATION, element: <NotificationPage /> },
+      { path: ROUTES.LOGIN, element: <LoginPage /> },
+      { path: ROUTES.SIGNUP, element: <SignupPage /> },
       { path: ROUTES.ONBOARDING, element: <OnboardingPage /> },
       { path: ROUTES.LIBRARY_CREATE, element: <LibraryCreatePage /> },
       { path: ROUTES.BOOK_CREATE, element: <BookCreatePage /> },
-      { path: ROUTES.NOTIFICATION, element: <NotificationPage /> },
     ],
   },
 ]);
