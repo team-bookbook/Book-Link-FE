@@ -1,25 +1,65 @@
 import Icon from '@components/icon';
+import type { ILibraryBook, BookStatus } from '../../types/library.types';
 
-export default function CardLibraryBook() {
+interface CardLibraryBookProps {
+  book: ILibraryBook;
+}
+
+const getStatusInfo = (status: BookStatus) => {
+  switch (status) {
+    case 'rented':
+      return { text: '대여 중', color: 'text-system-error' };
+    case 'reserved':
+      return { text: '예약 중', color: 'text-gray-600' };
+    case 'available':
+      return { text: '대여가능', color: 'text-gray-600' };
+    default:
+      return { text: '대여가능', color: 'text-gray-600' };
+  }
+};
+
+export default function CardLibraryBook({ book }: CardLibraryBookProps) {
+  const statusInfo = getStatusInfo(book.status);
+
   return (
-    <div className='flex-items-center min-h-[13.8rem] w-full gap-[1rem] rounded-[1rem] bg-gray-50 px-[1.4rem]'>
-      <div className='min-h-[10rem] min-w-[10rem] bg-green-50'></div>
+    <div className='flex-items-center relative min-h-[13.8rem] w-full cursor-pointer gap-[1rem] rounded-[1rem] bg-gray-50 px-[1.4rem]'>
+      <div
+        className={`caption5 flex-row-center px-[0.7rem] ${statusInfo.color} absolute top-[2rem] right-[1.5rem] min-h-[1.7rem] min-w-[4.8rem] rounded-[0.2rem] bg-gray-100`}
+      >
+        {statusInfo.text}
+      </div>
+      <div className='relative h-[10rem] w-[10rem] overflow-hidden bg-green-50'>
+        <div className='flex-row-center absolute right-[0.5rem] bottom-[0.5rem] z-1 min-h-[3.2rem] min-w-[3.2rem] rounded-[0.8rem] bg-gray-50'>
+          <Icon name='cart-bag' size={2} className='text-gray-800'></Icon>
+        </div>
+        {book.imgUrl ? (
+          <img src={book.imgUrl} alt={book.title} className='h-full w-full object-cover' />
+        ) : (
+          <div className='flex h-full w-full items-center justify-center bg-gray-200'>
+            <Icon name='logo-alt' size={2.4} className='text-gray-400' />
+          </div>
+        )}
+      </div>
       <div className='flex-col gap-[2.2rem]'>
         <div className='flex-col gap-[0.2rem]'>
-          <h1 className='title6'>IQ84</h1>
+          <h1 className='title6'>{book.title}</h1>
           <div className='flex gap-[1rem]'>
-            <h2 className='caption5'>무라카미 하루키</h2>
+            <h2 className='caption5 text-gray-600'>{book.author}</h2>
             <span className='flex'>
               <Icon name='cat' size={1.6} className='text-primary-700' />
-              <h2 className='caption5'>OO 도서관</h2>
+              <h2 className='caption5 text-gray-600'>{book.library}</h2>
             </span>
           </div>
         </div>
         <div className='flex-col gap-[0.3rem]'>
           <p className='flex-row-center caption5 max-w-[7.4rem] rounded-[0.2rem] bg-gray-100 text-gray-600'>
-            2025.09.21
+            {book.dueDate}
           </p>
-          <h3 className='caption5 text-gray-600'>최대 반납기한 30일 | 보증금 500p</h3>
+          <h3 className='caption5 flex gap-[0.5rem] text-gray-600'>
+            <span>최대 반납기한 {book.maxDays}일</span>
+            <span>|</span>
+            <span>보증금 {book.deposit}p</span>
+          </h3>
         </div>
       </div>
     </div>

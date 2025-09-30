@@ -1,12 +1,25 @@
 import { BOOK_SORT_OPTIONS, type BookSort } from '@components/dropdown/constants/select-options';
 import SelectDropdown from '@components/dropdown/select-dropdown';
 import Icon from '@components/icon';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import CardLibraryBook from '../card/card-library-book';
+import { useLibraryData } from '../../hooks/useLibraryData';
 
 export default function BookList() {
   const [bookSort, setBookSort] = useState<BookSort>('recent');
-  <div></div>;
+  const { books, isLoading } = useLibraryData();
+
+  const sortedBooks = useMemo(() => {
+    if (!books.length) return [];
+
+    return [...books].sort((a, b) => {
+      if (bookSort === 'recent') {
+        return new Date(b.dueDate).getTime() - new Date(a.dueDate).getTime();
+      } else {
+        return a.title.localeCompare(b.title);
+      }
+    });
+  }, [books, bookSort]);
 
   const BookListOptions = () => {
     return (
@@ -32,7 +45,13 @@ export default function BookList() {
     <div className='flex-col gap-[0.4rem] pt-[0.4rem]'>
       {BookListOptions()}
       <div className='flex-col gap-[1rem] px-[2rem]'>
-        <CardLibraryBook />
+        {isLoading ? (
+          <div className='text-center'>로딩 중...</div>
+        ) : sortedBooks.length > 0 ? (
+          sortedBooks.map((book) => <CardLibraryBook key={book.id} book={book} />)
+        ) : (
+          <div className='text-center text-gray-500'>대출할 수 있는 책이 없습니다.</div>
+        )}
       </div>
     </div>
   );
