@@ -1,10 +1,17 @@
-import { Link } from 'react-router-dom';
-
+import { ROUTES } from '@routes/routes-config';
+import { useMemo } from 'react';
+import { cn } from '@libs/cn';
+import { Link, useLocation } from 'react-router-dom';
 import Icon from '@components/icon';
-
+function isUnder(pathname: string, root: string) {
+  return pathname === root || pathname.startsWith(root + '/');
+}
 export default function Footer() {
+  const { pathname } = useLocation();
+  const isSetting = useMemo(() => isUnder(pathname, ROUTES.SETTING), [pathname]);
+
   return (
-    <footer className='flex-col-items-start gap-[2.5rem] px-[2.5rem] py-[4rem]'>
+    <footer className={cn('flex-col-items-start gap-[2.5rem] px-[2.5rem] py-[4rem]', isSetting && 'bg-gray-50')}>
       <div className='flex-col gap-[0.8rem]'>
         <Icon className='text-[#B5B5B5]' name='footer' width={16.5} height={4.5} />
         <p className='caption5 text-gray-500'>booklink@gmail.com</p>

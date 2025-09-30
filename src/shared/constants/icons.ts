@@ -27,6 +27,8 @@ export const ICONS = [
   'logo-header',
   'logout',
   'more',
+  'my-comment',
+  'my-docs',
   'notification',
   'plus',
   'point',

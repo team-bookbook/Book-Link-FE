@@ -6,9 +6,13 @@ import LibraryPage from '@pages/library/library-page';
 import SettingPage from '@pages/setting/setting-page';
 import BoardPage from '@pages/board/board-page';
 import ChatPage from '@pages/chat/chat-page';
+import ChatDetailPage from '@pages/chat/chat-detail-page';
 import NotificationPage from '@pages/notification/notification-page';
 import LoginPage from '@pages/login/login-page';
 import SignupPage from '@pages/signup/signup-page';
+import OnboardingPage from '@pages/onboarding/onboarding-page';
+import LibraryCreatePage from '@pages/library/library-create-page';
+import BookCreatePage from '@pages/library/book-create-page';
 import { ROUTES } from '@routes/routes-config';
 import MyLoanPage from '@pages/home/my-loan-page';
 import MyReservationPage from '@pages/home/my-reservation-page';
@@ -26,6 +30,10 @@ export const router = createBrowserRouter([
       { path: ROUTES.SETTING, element: <SettingPage /> },
       { path: ROUTES.BOARD, element: <BoardPage /> },
       { path: ROUTES.CHAT, element: <ChatPage /> },
+      { path: ROUTES.CHAT_ROOM(':id'), element: <ChatDetailPage /> },
+      { path: ROUTES.ONBOARDING, element: <OnboardingPage /> },
+      { path: ROUTES.LIBRARY_CREATE, element: <LibraryCreatePage /> },
+      { path: ROUTES.BOOK_CREATE, element: <BookCreatePage /> },
       { path: ROUTES.NOTIFICATION, element: <NotificationPage /> },
       { path: ROUTES.MY_RESERVATION, element: <MyReservationPage /> },
       { path: ROUTES.MY_LOAN, element: <MyLoanPage /> },

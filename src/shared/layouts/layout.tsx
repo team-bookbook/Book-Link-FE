@@ -23,15 +23,25 @@ export default function Layout() {
   const { pathname, search } = useLocation();
   const navigate = useNavigate();
 
-  const headerProps = useMemo(() => getHeaderForRoute(pathname, search), [pathname, search]);
-
+  const isOnboarding = useMemo(() => isUnder(pathname, ROUTES.ONBOARDING), [pathname]);
+  const isChat = useMemo(() => isUnder(pathname, ROUTES.CHAT), [pathname]);
   const isAuthOrOnboarding = useMemo(
     () =>
       isUnder(pathname, ROUTES.LOGIN) ||
       isUnder(pathname, ROUTES.SIGNUP) ||
       isUnder(pathname, ROUTES.NOTIFICATION) ||
-      isUnder(pathname, ROUTES.ONBOARDING),
-    [pathname]
+      isUnder(pathname, ROUTES.LIBRARY_CREATE) ||
+      isUnder(pathname, ROUTES.BOOK_CREATE) ||
+      isOnboarding,
+    [pathname, isOnboarding]
+  );
+
+  // 헤더는 온보딩에서만 숨김
+  const showHeader = !isOnboarding;
+
+  const headerProps = useMemo(
+    () => (showHeader ? getHeaderForRoute(pathname, search) : null),
+    [pathname, search, showHeader]
   );
 
   const currentTab = useMemo(() => {
@@ -43,23 +53,14 @@ export default function Layout() {
     ? null
     : (() => {
         if (isUnder(pathname, ROUTES.HOME)) {
-          return {
-            name: 'back',
-            onClick: () => window.scrollTo({ top: 0, behavior: 'smooth' }),
-          };
+          return { name: 'back', onClick: () => window.scrollTo({ top: 0, behavior: 'smooth' }) };
         }
         if (isUnder(pathname, ROUTES.LIBRARY)) {
           if (currentTab === 'library') {
-            return {
-              name: 'scan',
-              onClick: () => navigate(ROUTES.SCAN),
-            };
+            return { name: 'scan', onClick: () => navigate(ROUTES.SCAN) };
           }
           if (currentTab === 'book') {
-            return {
-              name: 'cart',
-              onClick: () => navigate(ROUTES.CART),
-            };
+            return { name: 'cart', onClick: () => navigate(ROUTES.CART) };
           }
         }
         return null;
@@ -74,16 +75,13 @@ export default function Layout() {
         isAuthOrOnboarding ? 'h-dvh overflow-hidden' : 'h-full'
       )}
     >
-      <Header {...headerProps} />
+      {showHeader && headerProps && <Header {...headerProps} />}
 
-      <main
-        id='content'
-        className={cn('scrollbar-hide flex-1 overflow-x-hidden', isAuthOrOnboarding && 'h-dvh overflow-hidden')}
-      >
+      <main id='content' className={cn('scrollbar-hide h-full flex-1 overflow-x-hidden')}>
         <div className='mx-auto w-full'>
           <Outlet />
         </div>
-        {!isAuthOrOnboarding && <Footer />}
+        {!isAuthOrOnboarding && !isChat && <Footer />}
       </main>
 
       {!isAuthOrOnboarding && <BottomNav />}

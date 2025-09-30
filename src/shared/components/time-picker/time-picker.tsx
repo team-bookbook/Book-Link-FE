@@ -50,7 +50,6 @@ export default function TimePicker({
 }: Props) {
   const rootRef = useRef<HTMLDivElement | null>(null);
 
-  // 초기값
   const now = new Date();
   const initial: HMValue = value ?? { hour: now.getHours(), minute: now.getMinutes() };
 
@@ -62,18 +61,15 @@ export default function TimePicker({
 
   const hoursList = twelveHour ? HOURS12 : HOURS24;
 
-  // 표시 인덱스
   const valueHourIdx = twelveHour ? (inner.hour % 12 || 12) - 1 : inner.hour;
   const valueMinIdx = inner.minute;
 
-  // 중앙 선택(아이템 사이) 정렬을 위해 값-1을 초기 active로
   const initialHourCenter = (valueHourIdx - 1 + hoursList.length) % hoursList.length;
   const initialMinCenter = (valueMinIdx - 1 + MINUTES.length) % MINUTES.length;
 
   const [activeHourIdx, setActiveHourIdx] = useState<number>(initialHourCenter);
   const [activeMinIdx, setActiveMinIdx] = useState<number>(initialMinCenter);
 
-  // 실제 선택 인덱스 = active + 1
   const selectedHourIdx = (activeHourIdx + 1) % hoursList.length;
   const selectedMinIdx = (activeMinIdx + 1) % MINUTES.length;
 
@@ -175,7 +171,7 @@ export default function TimePicker({
         disabled={disabled}
         onClick={() => setOpen((o) => !o)}
         className={cn(
-          'h-[4.8rem] w-[18rem] px-[0.8rem]',
+          'h-[4.8rem] w-full px-[0.8rem]',
           'bg-gray-50',
           'rounded-[12px]',
           'flex-row-between',
@@ -202,7 +198,6 @@ export default function TimePicker({
               <div className='h-[0px] border-t border-gray-200' />
             </div>
 
-            {/* 시 */}
             <div ref={refHour} className='keen-slider h-[12rem] w-[6rem] overflow-hidden rounded-[10px]'>
               {hoursList.map((h) => (
                 <div key={`h-${h}`} className='keen-slider__slide grid h-[4rem] place-items-center'>
