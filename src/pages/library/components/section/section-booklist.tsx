@@ -25,7 +25,7 @@ export default function BookList() {
     return (
       <div className='flex-row-between px-[1.5rem]'>
         <div className='flex-row-center min-h-[4.8rem] cursor-pointer gap-[0.2rem]'>
-          <Icon name='cat' size={2.4} className='text-primary-700' />
+          <Icon name='location' size={2.4} className='text-primary-700' />
           <span className='caption1'>서울시 용산구</span>
           <Icon name='dropdown' size={1.2} ariaHidden />
         </div>

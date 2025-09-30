@@ -21,6 +21,7 @@ export const ICONS = [
   'join',
   'kakao',
   'library',
+  'location',
   'lock',
   'logo-header',
   'logout',

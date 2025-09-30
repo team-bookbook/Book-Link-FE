@@ -46,7 +46,7 @@ export default function Layout() {
 
   const currentTab = useMemo(() => {
     const params = new URLSearchParams(search);
-    return params.get('tab') ?? 'library';
+    return params.get('tab') ?? 'books';
   }, [search]);
 
   const floatingBtn: FloatingBtn = isAuthOrOnboarding
@@ -56,10 +56,10 @@ export default function Layout() {
           return { name: 'back', onClick: () => window.scrollTo({ top: 0, behavior: 'smooth' }) };
         }
         if (isUnder(pathname, ROUTES.LIBRARY)) {
-          if (currentTab === 'library') {
+          if (currentTab === 'libraries') {
             return { name: 'scan', onClick: () => navigate(ROUTES.SCAN) };
           }
-          if (currentTab === 'book') {
+          if (currentTab === 'books') {
             return { name: 'cart', onClick: () => navigate(ROUTES.CART) };
           }
         }

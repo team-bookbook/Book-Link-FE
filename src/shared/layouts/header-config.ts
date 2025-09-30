@@ -91,6 +91,12 @@ const bookCreateRule: Rule = (path) =>
     ? { left: 'back', title: '도서 등록' }
     : undefined;
 
+// 장바구니
+const cartRule: Rule = (path) =>
+  ROUTES.BOOK_CREATE && matchPath({ path: ROUTES.CART, end: true }, path)
+    ? { left: 'back', title: '장바구니' }
+    : undefined;
+
 // 기본
 const fallbackRule = (): HeaderProps => ({
   left: 'back',
@@ -113,6 +119,7 @@ const RULES: ReadonlyArray<Rule> = [
   signupRule,
   libraryCreateRule,
   bookCreateRule,
+  cartRule,
 ];
 
 export function getHeaderForRoute(pathname: string, search: string): HeaderProps {

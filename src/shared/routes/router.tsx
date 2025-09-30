@@ -14,6 +14,7 @@ import OnboardingPage from '@pages/onboarding/onboarding-page';
 import LibraryCreatePage from '@pages/library/library-create-page';
 import BookCreatePage from '@pages/library/book-create-page';
 import { ROUTES } from '@routes/routes-config';
+import CartPage from '@pages/library/library-cart-page';
 
 export const router = createBrowserRouter([
   {
@@ -32,6 +33,7 @@ export const router = createBrowserRouter([
       { path: ROUTES.LIBRARY_CREATE, element: <LibraryCreatePage /> },
       { path: ROUTES.BOOK_CREATE, element: <BookCreatePage /> },
       { path: ROUTES.NOTIFICATION, element: <NotificationPage /> },
+      { path: ROUTES.CART, element: <CartPage /> },
     ],
   },
 ]);
