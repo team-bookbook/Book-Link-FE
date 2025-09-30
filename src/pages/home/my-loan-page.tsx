@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import type { IBookCard } from './types/home.types';
-import { generateDummyBooks } from './hooks/use-home-data';
+import { generateDummyBooks } from './hooks/useHomeData';
 import BookCard from './components/card/book-card';
 
 export default function MyLoanPage() {

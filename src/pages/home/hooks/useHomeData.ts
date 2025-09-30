@@ -7,13 +7,55 @@ const sampleImages = [
   'https://picsum.photos/200/300?random=4',
 ];
 
+const bookTitles = [
+  'IQ84',
+  '노르웨이의 숲',
+  '1984',
+  '어린왕자',
+  '해리포터와 마법사의 돌',
+  '데미안',
+  '카라마조프 가의 형제들',
+  '위대한 개츠비',
+  '살인자의 기억법',
+  '82년생 김지영',
+  '코스모스',
+  '사피엔스',
+];
+
+const authors = [
+  '무라카미 하루키',
+  '조지 오웰',
+  '생텍쥐페리',
+  'J.K. 롤링',
+  '헤르만 헤세',
+  '도스토예프스키',
+  'F. 스콧 피츠제럴드',
+  '김영하',
+  '조남주',
+  '칼 세이건',
+  '유발 하라리',
+];
+
+const groupNames = [
+  '책과 함께하는 월요일',
+  '소설 읽기 모임',
+  '청춘 독서클럽',
+  '함께 읽는 고전',
+  '문학 토론방',
+  '북카페 모임',
+  '심야 독서회',
+  '주말 책모임',
+  '인문학 살롱',
+  '베스트셀러 클럽',
+];
+
 export const generateDummyBooks = (count: number = 7): IBookCard[] => {
   return Array.from({ length: count }, (_, index) => ({
     imgurl: Math.random() > 0.3 ? sampleImages[Math.floor(Math.random() * sampleImages.length)] : '',
     index: index,
     id: index + 1,
-    title: `책 제목 ${index + 1}`,
-    author: `작가명 ${index + 1}`,
+    title: bookTitles[Math.floor(Math.random() * bookTitles.length)],
+    author: authors[Math.floor(Math.random() * authors.length)],
     expDate: Math.floor(Math.random() * 10) + 1,
   }));
 };
@@ -21,10 +63,11 @@ export const generateDummyBooks = (count: number = 7): IBookCard[] => {
 export const generateDummyGroups = (count: number = 3): IGroupCard[] => {
   return Array.from({ length: count }, (_, index) => ({
     id: index + 1,
-    groupName: `독서 모임 ${index + 1}`,
+    groupName: groupNames[Math.floor(Math.random() * groupNames.length)],
     leaderName: '그룹장',
     memberCount: Math.floor(Math.random() * 10) + 5,
-    description: '그룹에 대한 설명이 여기에 들어갑니다. 그룹에 대한 설명이 여기에 들어갑니다.',
+    description:
+      '그룹에 대한 설명이 여기에 들어갑니다. 그룹에 대한 설명이 여기에 들어갑니다. 그룹에 대한 설명이 여기에 들어갑니다',
     imgurl: Math.random() > 0.3 ? sampleImages[Math.floor(Math.random() * sampleImages.length)] : '',
   }));
 };
