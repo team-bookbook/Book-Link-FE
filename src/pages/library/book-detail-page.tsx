@@ -2,8 +2,8 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import Divider from '@components/divider';
 import Icon from '@components/icon';
-import { useCart } from './hooks/useCart';
-import type { IBookDetail } from './types/library.types';
+import { useCart } from '@pages/library/hooks/useCart';
+import type { IBookDetail } from '@pages/library/types/library.types';
 import Button from '@components/button/button';
 
 export default function BookDetailPage() {

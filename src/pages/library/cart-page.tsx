@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import EmptyState from '@components/empty/empty-state';
-import CardLibraryBook from './components/card/card-library-book';
+import CardLibraryBook from '@pages/library/components/card/card-library-book';
 import Input from '@components/input/input';
-import type { ILibraryBook } from './types/library.types';
+import type { ILibraryBook } from '@pages/library/types/library.types';
 import Divider from '@components/divider';
 import Button from '@components/button/button';
 import { useNavigate } from 'react-router-dom';

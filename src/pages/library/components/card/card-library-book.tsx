@@ -1,8 +1,8 @@
 import Icon from '@components/icon';
-import type { ILibraryBook, BookStatus } from '../../types/library.types';
+import type { ILibraryBook, BookStatus } from '@pages/library/types/library.types';
 import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '@routes/routes-config';
-import { useCart } from '../../hooks/useCart';
+import { useCart } from '@pages/library/hooks/useCart';
 
 interface CardLibraryBookProps {
   book: ILibraryBook;

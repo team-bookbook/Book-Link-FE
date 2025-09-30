@@ -1,7 +1,7 @@
 import { toast } from '@libs/toast';
 import { modal } from '@libs/modal';
 import { MODAL_TITLE } from '@constants/modal-presets';
-import type { ILibraryBook } from '../types/library.types';
+import type { ILibraryBook } from '@pages/library/types/library.types';
 
 const CART_STORAGE_KEY = 'library-cart';
 

@@ -6,8 +6,8 @@ import { useQueryTab } from '@hooks/use-query-tab';
 
 // import { TOAST_MESSAGE } from '@constants/toast-messages';
 // import { MODAL_TITLE } from '@constants/modal-presets';
-import LibraryList from './components/section/section-librarylist';
-import BookList from './components/section/section-booklist';
+import LibraryList from '@pages/library/components/section/section-librarylist';
+import BookList from '@pages/library/components/section/section-booklist';
 
 export default function LibraryPage() {
   const [tab, setTab] = useQueryTab<LibraryTabKey>('tab', 'books', ['books', 'libraries']);

@@ -2,8 +2,8 @@ import { BOOK_SORT_OPTIONS, type BookSort } from '@components/dropdown/constants
 import SelectDropdown from '@components/dropdown/select-dropdown';
 import Icon from '@components/icon';
 import { useState, useMemo } from 'react';
-import CardLibraryBook from '../card/card-library-book';
-import { useLibraryData } from '../../hooks/useLibraryData';
+import CardLibraryBook from '@pages/library/components/card/card-library-book';
+import { useLibraryData } from '@pages/library/hooks/useLibraryData';
 
 export default function BookList() {
   const [bookSort, setBookSort] = useState<BookSort>('recent');
