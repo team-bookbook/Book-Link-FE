@@ -8,6 +8,7 @@ export const ICONS = [
   'cat-profile',
   'caution',
   'chat',
+  'clock',
   'close',
   'comment',
   'dropdown',

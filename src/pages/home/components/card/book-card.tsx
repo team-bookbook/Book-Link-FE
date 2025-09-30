@@ -37,7 +37,7 @@ export default function BookCard({ id, index, imgurl, title, author, expDate, si
         {imgurl ? (
           <img src={imgurl} alt={title} className='h-full w-full object-cover object-center' />
         ) : (
-          <Icon name='logo-alt' className='' size={currentSize.iconSize} />
+          <Icon name='logo-alt' size={currentSize.iconSize} className='text-[#b5b5b5]' />
         )}
         <div
           className={`flex-row-center caption5 absolute right-[0.45rem] bottom-[0.45rem] h-[1.7rem] w-[3.5rem] rounded-[0.2rem] bg-gray-50 ${expDate <= 3 ? 'text-system-error' : 'text-gray-600'}`}

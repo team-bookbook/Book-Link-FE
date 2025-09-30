@@ -1,12 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
 import { cn } from '@libs/cn';
+import Icon from '@components/icon';
 
-interface TopMessageBannerProps {
+interface TopMessageBarProps {
   message?: string;
   threshold?: number;
 }
 
-export default function TopMessageBanner({ threshold = 300 }: TopMessageBannerProps) {
+export default function TopMessageBar({ threshold = 300 }: TopMessageBarProps) {
   const [visible, setVisible] = useState(false);
   const tickingRef = useRef(false);
 
@@ -51,7 +52,8 @@ export default function TopMessageBanner({ threshold = 300 }: TopMessageBannerPr
         tabIndex={-1}
       >
         <div className='flex-row-center'>
-          <p className='text-system-error body5'>
+          <p className='text-system-error body5 flex-row-center gap-[0.4rem]'>
+            <Icon name='clock' size={2} />
             <span className='button4'>모순</span> 도서 반납까지 D-1 남았어요!
           </p>
         </div>
