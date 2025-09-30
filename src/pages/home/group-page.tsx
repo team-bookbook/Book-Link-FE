@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
-import type { IGroupCard } from './types/home.types';
-import { generateDummyGroups } from './hooks/useHomeData';
-import GroupCard from './components/card/group-card';
+import type { IGroupCard } from '@pages/home/types/home.types';
+import { generateDummyGroups } from '@pages/home/hooks/useHomeData';
+import GroupCard from '@pages/home/components/card/group-card';
 
-export default function MyGroupPage() {
+export default function GroupPage() {
   const [dummy, setDummy] = useState<IGroupCard[]>([]);
 
   useEffect(() => {

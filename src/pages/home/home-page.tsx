@@ -1,32 +1,32 @@
 import 'keen-slider/keen-slider.min.css';
 import { useNavigate } from 'react-router-dom';
-import { useHomeData } from './hooks/useHomeData';
-import HomeBanner from './components/banner/home-banner';
-import HomeReservation from './components/section/home-reservation';
-import HomeLoan from './components/section/home-loan';
-import HomeGroup from './components/section/home-group';
-import IntroduceBanner from './components/banner/introduce-banner';
+import { useHomeData } from '@pages/home/hooks/useHomeData';
+import HomeBanner from '@pages/home/components/banner/home-banner';
+import HomeReservation from '@pages/home/components/section/home-reservation';
+import HomeLoan from '@pages/home/components/section/home-loan';
+import HomeGroup from '@pages/home/components/section/home-group';
+import IntroduceBanner from '@pages/home/components/banner/introduce-banner';
 import Divider from '@components/divider';
-import { HOME_SECTION_TITLES, HOME_SECTIONS } from './constants/sections';
-import { INTRODUCE_STEPS } from './constants/introduce';
-import { FAQ_ITEMS } from './constants/faq';
-import Faq from './components/faq/faq';
+import { HOME_SECTION_TITLES, HOME_SECTIONS } from '@pages/home/constants/sections';
+import { INTRODUCE_STEPS } from '@pages/home/constants/introduce';
+import { FAQ_ITEMS } from '@pages/home/constants/faq';
+import Faq from '@pages/home/components/faq/faq';
 import { ROUTES } from '@routes/routes-config';
-import TopMessageBar from './components/banner/top-message-bar';
+import TopMessageBar from '@pages/home/components/banner/top-message-bar';
 
 export default function HomePage() {
   const navigate = useNavigate();
 
   const handleLoanViewAll = () => {
-    navigate(ROUTES.MY_LOAN);
+    navigate(ROUTES.RENTAL);
   };
 
   const handleReservationViewAll = () => {
-    navigate(ROUTES.MY_RESERVATION);
+    navigate(ROUTES.RESERVATION);
   };
 
   const handleGroupViewAll = () => {
-    navigate(ROUTES.MY_GROUP);
+    navigate(ROUTES.GROUP);
   };
 
   const { loanData, reservationData, groupData, isLoadingLoans, isLoadingReservations, isLoadingGroups, error } =

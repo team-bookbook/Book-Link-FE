@@ -1,8 +1,6 @@
 import Icon from '@components/icon';
 import type { IGroupCard } from '@pages/home/types/home.types';
 
-const ICON_ALT_LOGO = new URL('@icons/logo-alt.svg', import.meta.url).href;
-
 export default function GroupCard({ id, imgurl, groupName, leaderName, memberCount, description }: IGroupCard) {
   console.log(id);
   return (
@@ -25,7 +23,7 @@ export default function GroupCard({ id, imgurl, groupName, leaderName, memberCou
               alt='defaultImage'
             ></img>
           ) : (
-            <img src={ICON_ALT_LOGO} alt='default_image' className='h-[3.8rem] w-[3.8rem]' loading='lazy' />
+            <Icon name='logo-alt' className='text-[#b5b5b5]' size={3.8} />
           )}
         </div>
       </div>

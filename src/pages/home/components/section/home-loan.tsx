@@ -1,6 +1,6 @@
-import HomeSectionLayout from '../layout/home-section-layout';
+import HomeSectionLayout from '@pages/home/components/layout/home-section-layout';
 import { useKeenSlider } from 'keen-slider/react';
-import BookCard from '../card/book-card';
+import BookCard from '@pages/home/components/card/book-card';
 import type { IBookCard } from '@pages/home/types/home.types';
 
 interface HomeLoanProps {

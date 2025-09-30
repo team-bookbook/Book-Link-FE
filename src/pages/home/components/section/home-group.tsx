@@ -1,5 +1,5 @@
-import HomeSectionLayout from '../layout/home-section-layout';
-import GroupCard from '../card/group-card';
+import HomeSectionLayout from '@pages/home/components/layout/home-section-layout';
+import GroupCard from '@pages/home/components/card/group-card';
 import type { IGroupCard } from '@pages/home/types/home.types';
 
 interface HomeGroupProps {

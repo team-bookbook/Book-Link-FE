@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import type { IBookCard, IGroupCard, IHomeData } from '../types/home.types';
+import type { IBookCard, IGroupCard, IHomeData } from '@pages/home/types/home.types';
 const sampleImages = [
   'https://picsum.photos/200/300?random=1',
   'https://picsum.photos/200/300?random=2',

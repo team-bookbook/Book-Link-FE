@@ -14,9 +14,9 @@ import OnboardingPage from '@pages/onboarding/onboarding-page';
 import LibraryCreatePage from '@pages/library/library-create-page';
 import BookCreatePage from '@pages/library/book-create-page';
 import { ROUTES } from '@routes/routes-config';
-import MyLoanPage from '@pages/home/my-loan-page';
-import MyReservationPage from '@pages/home/my-reservation-page';
-import MyGroupPage from '@pages/home/my-group-page';
+import GroupPage from '@pages/home/group-page';
+import ReservationPage from '@pages/home/reservation-page';
+import RentalPage from '@pages/home/rental-page';
 
 export const router = createBrowserRouter([
   {
@@ -35,9 +35,9 @@ export const router = createBrowserRouter([
       { path: ROUTES.LIBRARY_CREATE, element: <LibraryCreatePage /> },
       { path: ROUTES.BOOK_CREATE, element: <BookCreatePage /> },
       { path: ROUTES.NOTIFICATION, element: <NotificationPage /> },
-      { path: ROUTES.MY_RESERVATION, element: <MyReservationPage /> },
-      { path: ROUTES.MY_LOAN, element: <MyLoanPage /> },
-      { path: ROUTES.MY_GROUP, element: <MyGroupPage /> },
+      { path: ROUTES.RESERVATION, element: <ReservationPage /> },
+      { path: ROUTES.RENTAL, element: <RentalPage /> },
+      { path: ROUTES.GROUP, element: <GroupPage /> },
     ],
   },
 ]);

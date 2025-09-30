@@ -81,21 +81,19 @@ const chatDetailRule: Rule = (path) => {
 
 // 나의 예약 내역
 const myReservation: Rule = (path) =>
-  ROUTES.NOTIFICATION && matchPath({ path: ROUTES.MY_RESERVATION, end: true }, path)
+  ROUTES.RESERVATION && matchPath({ path: ROUTES.RESERVATION, end: true }, path)
     ? { left: 'back', title: '예약 내역' }
     : undefined;
 
 // 나의 대여 현황
 const myLoan: Rule = (path) =>
-  ROUTES.NOTIFICATION && matchPath({ path: ROUTES.MY_LOAN, end: true }, path)
+  ROUTES.RENTAL && matchPath({ path: ROUTES.RENTAL, end: true }, path)
     ? { left: 'back', title: '대여 현황' }
     : undefined;
 
 // 나의 모임
 const myGroup: Rule = (path) =>
-  ROUTES.NOTIFICATION && matchPath({ path: ROUTES.MY_GROUP, end: true }, path)
-    ? { left: 'back', title: '나의 모임' }
-    : undefined;
+  ROUTES.GROUP && matchPath({ path: ROUTES.GROUP, end: true }, path) ? { left: 'back', title: '나의 모임' } : undefined;
 // 도서관 등록
 const libraryCreateRule: Rule = (path) =>
   ROUTES.LIBRARY_CREATE && matchPath({ path: ROUTES.LIBRARY_CREATE, end: true }, path)

@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react';
-import type { IBookCard } from './types/home.types';
-import { generateDummyBooks } from './hooks/useHomeData';
-import BookCard from './components/card/book-card';
+import type { IBookCard } from '@pages/home/types/home.types';
+import { RESERVATION_NOTICE } from '@pages/home/constants/reservation-notice';
+import { generateDummyBooks } from '@pages/home/hooks/useHomeData';
+import BookCard from '@pages/home/components/card/book-card';
+import Icon from '@components/icon';
 
-export default function MyLoanPage() {
+export default function ReservationPage() {
   const [dummy, setDummy] = useState<IBookCard[]>([]);
 
   useEffect(() => {
@@ -11,6 +13,21 @@ export default function MyLoanPage() {
     if (!response) return;
     setDummy(response);
   }, []);
+
+  const renderNotice = () => (
+    <div className='bg-secondary-100 flex-col gap-[1.2rem] rounded-[0.4rem] p-[1.6rem] text-gray-600'>
+      <div className='flex-items-center gap-[0.4rem]'>
+        <Icon name='caution' className='text-gray-600' size={1.6} />
+
+        <h1 className='caption4'>{RESERVATION_NOTICE.title}</h1>
+      </div>
+      <ul className='caption5 dot list-inside list-disc flex-col gap-[0.4rem] indent-2'>
+        {RESERVATION_NOTICE.items.map((item, index) => (
+          <li key={index}>{item}</li>
+        ))}
+      </ul>
+    </div>
+  );
 
   const renderBookList = () => (
     <div className='flex-col gap-[1.5rem] pt-[2.5rem]'>
@@ -33,7 +50,8 @@ export default function MyLoanPage() {
 
   return (
     <div className='flex-col gap-[2rem] bg-gray-50'>
-      <div className='px-[2rem]'>
+      <div className='px-[2rem] pt-[2rem]'>
+        {renderNotice()}
         {dummy.length > 0 ? (
           renderBookList()
         ) : (
