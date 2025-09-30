@@ -15,4 +15,7 @@ export const ROUTES = {
   SCAN: '/scan',
   CART: '/cart',
   NOTIFICATION: '/notification',
+  RESERVATION: '/reservation',
+  RENTAL: '/rental',
+  GROUP: '/group',
 };

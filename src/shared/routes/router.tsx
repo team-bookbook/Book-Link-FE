@@ -17,6 +17,9 @@ const SignupPage = lazy(() => import('@pages/signup/signup-page'));
 const OnboardingPage = lazy(() => import('@pages/onboarding/onboarding-page'));
 const LibraryCreatePage = lazy(() => import('@pages/library/library-create-page'));
 const BookCreatePage = lazy(() => import('@pages/library/book-create-page'));
+const ReservationPage = lazy(() => import('@pages/home/reservation-page'));
+const GroupPage = lazy(() => import('@pages/home/group-page'));
+const RentalPage = lazy(() => import('@pages/home/rental-page'));
 
 export const router = createBrowserRouter([
   {
@@ -35,6 +38,10 @@ export const router = createBrowserRouter([
       { path: ROUTES.ONBOARDING, element: <OnboardingPage /> },
       { path: ROUTES.LIBRARY_CREATE, element: <LibraryCreatePage /> },
       { path: ROUTES.BOOK_CREATE, element: <BookCreatePage /> },
+      { path: ROUTES.NOTIFICATION, element: <NotificationPage /> },
+      { path: ROUTES.RESERVATION, element: <ReservationPage /> },
+      { path: ROUTES.RENTAL, element: <RentalPage /> },
+      { path: ROUTES.GROUP, element: <GroupPage /> },
     ],
   },
 ]);
