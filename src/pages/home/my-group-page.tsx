@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import type { IGroupCard } from './types/home.types';
-import { generateDummyGroups } from './hooks/use-home-data';
+import { generateDummyGroups } from './hooks/useHomeData';
 import GroupCard from './components/card/group-card';
 
 export default function MyGroupPage() {

@@ -46,8 +46,8 @@ export default function BookCard({ id, index, imgurl, title, author, expDate, si
         </div>
       </div>
       <div className='flex-col gap-[0.6rem] px-[1rem]'>
-        <h2 className={`${currentSize.titleClass} text-gray-900`}>{title}</h2>
-        <h3 className={`${currentSize.authorClass} text-gray-800`}>{author}</h3>
+        <h2 className={`${currentSize.titleClass} truncate text-gray-900`}>{title}</h2>
+        <h3 className={`${currentSize.authorClass} truncate text-gray-800`}>{author}</h3>
       </div>
     </div>
   );

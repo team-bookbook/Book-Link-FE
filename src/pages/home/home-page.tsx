@@ -1,6 +1,6 @@
 import 'keen-slider/keen-slider.min.css';
 import { useNavigate } from 'react-router-dom';
-import { useHomeData } from './hooks/use-home-data';
+import { useHomeData } from './hooks/useHomeData';
 import HomeBanner from './components/banner/home-banner';
 import HomeReservation from './components/section/home-reservation';
 import HomeLoan from './components/section/home-loan';

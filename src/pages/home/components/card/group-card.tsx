@@ -29,7 +29,7 @@ export default function GroupCard({ id, imgurl, groupName, leaderName, memberCou
           )}
         </div>
       </div>
-      <h4 className='caption5 line-clamp-2 break-words text-gray-800'>{description}</h4>
+      <h4 className='caption5 line-clamp-1 overflow-hidden text-ellipsis text-gray-800'>{description}</h4>{' '}
     </div>
   );
 }

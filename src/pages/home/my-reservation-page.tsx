@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import type { IBookCard } from './types/home.types';
 import { RESERVATION_NOTICE } from './constants/reservation-notice';
-import { generateDummyBooks } from './hooks/use-home-data';
+import { generateDummyBooks } from './hooks/useHomeData';
 import BookCard from './components/card/book-card';
 import Icon from '@components/icon';
 
