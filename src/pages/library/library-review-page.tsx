@@ -1,6 +1,6 @@
-import LibraryRatingSection from './components/library-rating-section';
-import ReviewCard from './components/card/libary-reivew-card';
-import { useLibraryDetailData } from './hooks/useLibraryDetailData';
+import LibraryRatingSection from '@pages/library/components/library-rating-section';
+import ReviewCard from '@pages/library/components/card/libary-reivew-card';
+import { useLibraryDetailData } from '@pages/library/hooks/useLibraryDetailData';
 
 export default function LibraryReviewPage() {
   const { libraryInfo, reviewData, isLoadingLibraryInfo, isLoadingReviews } = useLibraryDetailData();

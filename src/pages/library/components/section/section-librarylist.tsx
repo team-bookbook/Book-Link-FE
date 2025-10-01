@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import LibraryCard from '../card/library-card';
+import LibraryCard from '@pages/library/components/card/library-card';
 import type { ILibrary } from '@pages/library/types/library.types';
 import { LIBRARY_LIST_LABELS, type LibraryListTab } from '@pages/library/constants/library-list';
 import { useNavigate } from 'react-router-dom';

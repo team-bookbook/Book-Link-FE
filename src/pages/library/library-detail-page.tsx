@@ -3,10 +3,10 @@ import SectionLayout from '@components/section-layout';
 import { useLibraryDetailData } from '@pages/library/hooks/useLibraryDetailData';
 import { useKeenSlider } from 'keen-slider/react';
 import 'keen-slider/keen-slider.min.css';
-import ReviewCard from './components/card/libary-reivew-card';
+import ReviewCard from '@pages/library/components/card/libary-reivew-card';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { ROUTES } from '@routes/routes-config';
-import LibraryRatingSection from './components/library-rating-section';
+import LibraryRatingSection from '@pages/library/components/library-rating-section';
 
 export default function LibraryDetailPage() {
   const { libraryInfo, bookData, reviewData, isLoadingLibraryInfo, isLoadingBooks, isLoadingReviews, error } =

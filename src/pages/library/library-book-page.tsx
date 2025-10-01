@@ -1,5 +1,5 @@
-import LibraryBookCard from './components/card/library-book-card';
-import { useLibraryBooks } from './hooks/useLibraryBooks';
+import LibraryBookCard from '@pages/library/components/card/library-book-card';
+import { useLibraryBooks } from '@pages/library/hooks/useLibraryBooks';
 
 export default function LibraryBookPage() {
   const { books, isLoading } = useLibraryBooks();
