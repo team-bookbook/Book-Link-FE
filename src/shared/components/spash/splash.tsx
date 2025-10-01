@@ -5,21 +5,18 @@ import SplashTitle from '@images/splash-title.png';
 
 const MAX_W = '43rem';
 
-/** 위치(모두 rem) */
-const ELLIPSE_TOP_REM = 32.2; // 하단 타원 시작 y
-const BOOK_CENTER_TOP_REM = 18; // 책이 중앙에 착지할 y
-
-/** 사이즈(모두 rem) */
+/** 레이아웃/사이즈(rem) */
+const ELLIPSE_TOP_REM = 32.2;
 const BOOK_W_REM = 4.6;
 const TITLE_W_REM = 18.2;
-const GAP_REM = -2; // 디자인 상 겹치게(-2rem)
-const GROUP_W_REM = BOOK_W_REM + GAP_REM + TITLE_W_REM;
-const GROUP_HALF_REM = GROUP_W_REM / 2;
+const GAP_REM = -4;
 
+/** 이징/스프링(빠르고 통통) */
 const EASE = cubicBezier(1, 0, 0, 1);
-const SPRING_STRONG: Transition = { type: 'spring', stiffness: 600, damping: 17, mass: 1 };
-const SPRING_SOFT: Transition = { type: 'spring', stiffness: 400, damping: 30, mass: 1 };
+const SPRING_BACK: Transition = { type: 'spring', stiffness: 820, damping: 16, mass: 1 }; // 중앙 복귀
+const SPRING_SOFT: Transition = { type: 'spring', stiffness: 560, damping: 28, mass: 1 }; // 회전/슬라이드
 
+/** rem → px */
 function remToPx(rem: number): number {
   const base = parseFloat(getComputedStyle(document.documentElement).fontSize || '16');
   return rem * base;
@@ -30,79 +27,78 @@ export default function SplashSequence() {
   const bigCircleCtrl = useAnimationControls();
   const ellipseCtrl = useAnimationControls();
   const fragmentsCtrl = useAnimationControls();
-  const bookWrap = useAnimationControls(); // y/x/opacity
-  const bookIcon = useAnimationControls(); // rotate/scale
-  const titleCtrl = useAnimationControls();
+  const bookWrap = useAnimationControls(); // x, y, opacity
+  const bookIcon = useAnimationControls(); // rotate, scale
+  const titleCtrl = useAnimationControls(); // opacity, x
 
   useEffect(() => {
     const run = async () => {
-      const deltaUpPx = remToPx(BOOK_CENTER_TOP_REM - ELLIPSE_TOP_REM); // 타원y → 중앙y (음수)
-      const overshootPx = remToPx(-16); // 위로 더 튀기
-      const settleDipPx = remToPx(1.2); // 바운스용 살짝 눌림(+)
-      const bookLeftShiftPx = remToPx(GROUP_HALF_REM); // 로고 등장 시 왼쪽 이동
+      // 중앙(top) 기준
+      const centerTopPx = window.innerHeight / 2 - remToPx(BOOK_W_REM / 2);
+      const ellipseTopPx = remToPx(ELLIPSE_TOP_REM);
+      const startYOffsetPx = ellipseTopPx - centerTopPx; // 아래에서 시작(양수)
+      const overshootUpPx = remToPx(12); // 중앙 위로 6rem까지 튐
 
-      // 초기 상태
+      // 타이틀이 들어오며 책이 중앙 기준 왼쪽으로 밀려야 하는 양
+      const pushLeftPx = remToPx((TITLE_W_REM + GAP_REM) / 2); // ≈ 8.1rem
+      const pushOvershootPx = pushLeftPx + remToPx(0.8); // 살짝 더 밀렸다가 돌아오게
+
+      // 초기 상태(첫 화면 하늘색)
       await Promise.all([
         bgCtrl.set({ backgroundColor: 'var(--color-secondary-900)' }),
         bigCircleCtrl.set({ opacity: 1, display: 'block' }),
         ellipseCtrl.set({ scaleX: 1, scaleY: 1, opacity: 0.75, display: 'block' }),
         fragmentsCtrl.set({ opacity: 1, scale: 1, display: 'block' }),
-        bookWrap.set({ y: 0, x: 0, opacity: 0 }),
+        bookWrap.set({ x: 0, y: startYOffsetPx, opacity: 0 }),
         bookIcon.set({ rotate: 15, scale: 0.96 }),
-        titleCtrl.set({ opacity: 0, x: -remToPx(1.6) }),
+        titleCtrl.set({ opacity: 0, x: remToPx(6) }), // 오른쪽 대기
       ]);
 
-      // ① 100ms 대기
-      await new Promise((r) => setTimeout(r, 100));
+      // ① 아주 짧게 대기
+      await new Promise((r) => setTimeout(r, 80));
 
-      // ② 0.8s: 점프 + 배경 전환 + 파편/큰원 페이드
+      // ② 점프(오버슈트) + 배경전환 + 보조요소 페이드
       await Promise.all([
         ellipseCtrl.start({
-          scaleX: [1, 0.9, 0.7],
-          scaleY: [1, 0.9, 0.7],
-          opacity: [0.75, 0.6, 0.45],
-          transition: { type: 'tween', duration: 0.8, ease: EASE, times: [0, 0.3, 1] },
+          scaleX: [1, 0.9, 0.75, 0.6],
+          scaleY: [1, 0.8, 0.65, 0.5],
+          opacity: [0.75, 0.55, 0.4, 0],
+          transition: { type: 'tween', duration: 0.6, ease: EASE, times: [0, 0.35, 0.7, 1] },
         }),
-        bookWrap.start({
-          y: [0, overshootPx, deltaUpPx], // 아래→위 오버슈트→중앙
-          opacity: [0, 0.2, 1],
-          transition: { type: 'tween', duration: 0.8, ease: EASE, times: [0, 0.35, 1] },
-        }),
-        // (점프 중엔 회전 10°까지만 풀어둠)
-        bookIcon.start({ rotate: 10, scale: 1, transition: { ...SPRING_STRONG, duration: 0.8 } }),
-        bgCtrl.start({ backgroundColor: '#ffffff', transition: { type: 'tween', duration: 0.8, ease: EASE } }),
-        bigCircleCtrl.start({ opacity: [1, 0.3, 0], transition: { type: 'tween', duration: 0.8, ease: EASE } }),
         fragmentsCtrl.start({
-          opacity: [1, 0.2, 0],
-          scale: [1, 0.92, 0.85],
-          transition: { type: 'tween', duration: 0.5, ease: EASE, times: [0, 0.4, 1] },
+          opacity: [1, 0.15, 0],
+          scale: [1, 0.9, 0.82],
+          transition: { type: 'tween', duration: 0.36, ease: EASE, times: [0, 0.4, 1] },
           transitionEnd: { display: 'none' },
         }),
+        bigCircleCtrl.start({ opacity: [1, 0.25, 0], transition: { type: 'tween', duration: 0.6, ease: EASE } }),
+        bgCtrl.start({ backgroundColor: '#ffffff', transition: { type: 'tween', duration: 0.6, ease: EASE } }),
+        // 책: 중앙을 지나 위로(오버슈트), 빠르게
+        bookWrap.start({ y: -overshootUpPx, opacity: 1, transition: { type: 'tween', duration: 0.36, ease: EASE } }),
+        bookIcon.start({ rotate: 8, scale: 1, transition: { type: 'tween', duration: 0.36, ease: EASE } }),
       ]);
 
-      // ②-추가: 하단 타원/큰 원 제거(display:none)
+      // 보조요소 제거
       await Promise.all([
-        ellipseCtrl.start({
-          scaleX: 0,
-          scaleY: 0,
-          opacity: 0,
-          transition: { type: 'tween', duration: 0.25, ease: EASE },
-          transitionEnd: { display: 'none' },
-        }),
+        ellipseCtrl.start({ scaleX: 0, scaleY: 0, opacity: 0, transitionEnd: { display: 'none' } }),
         bigCircleCtrl.start({ opacity: 0, transitionEnd: { display: 'none' } }),
       ]);
 
-      // ②b 센터 바운스(회전 0으로 정렬 + 살짝 눌렸다 되돌아오는 느낌)
-      await bookWrap.start({ y: deltaUpPx + settleDipPx, transition: { ...SPRING_SOFT, duration: 0.18 } });
+      // ③ 중앙으로 스프링 복귀 + 회전 0°
       await Promise.all([
-        bookWrap.start({ y: deltaUpPx, transition: { ...SPRING_SOFT, duration: 0.32 } }),
-        bookIcon.start({ rotate: 0, scale: 1, transition: { ...SPRING_SOFT, duration: 0.32 } }),
+        bookWrap.start({ y: 0, transition: { ...SPRING_BACK, duration: 0.18 } }),
+        bookIcon.start({ rotate: 0, transition: { ...SPRING_SOFT, duration: 0.18 } }),
       ]);
 
-      // ③ 로고 등장 + 책을 왼쪽으로 밀어 그룹 중앙 정렬
+      // ④ 타이틀 인 + 책 '밀림'(오버슈트 → 최종)
       await Promise.all([
-        bookWrap.start({ x: -bookLeftShiftPx, transition: { ...SPRING_SOFT, duration: 0.4 } }),
-        titleCtrl.start({ opacity: 1, x: 0, transition: { ...SPRING_SOFT, duration: 0.4, delay: 0.02 } }),
+        // 책: 0 → -pushOvershootPx → -pushLeftPx
+        bookWrap.start({
+          x: [-pushOvershootPx, -pushLeftPx],
+          transition: { type: 'tween', duration: 0.28, ease: EASE, times: [0, 1] },
+        }),
+        // 타이틀: 오른쪽에서 슬라이드 인
+        titleCtrl.start({ opacity: 1, x: 0, transition: { ...SPRING_SOFT, duration: 0.28 } }),
       ]);
     };
 
@@ -112,7 +108,7 @@ export default function SplashSequence() {
   return (
     <motion.section className='relative h-dvh w-full overflow-hidden' animate={bgCtrl}>
       <div className='relative mx-auto h-full w-full' style={{ maxWidth: MAX_W }}>
-        {/* 좌상 큰 원 */}
+        {/* 좌상 큰 원(첫 화면 전용) */}
         <motion.div
           className='absolute rounded-[9999px]'
           style={{
@@ -125,10 +121,10 @@ export default function SplashSequence() {
           animate={bigCircleCtrl}
         />
 
-        {/* 하단 타원 */}
+        {/* 하단 타원(첫 화면 전용) */}
         <motion.div
           className='absolute'
-          style={{ left: 'calc(50% - 12.7rem)', top: `${ELLIPSE_TOP_REM}rem`, width: '25.4rem', height: '7.5rem' }}
+          style={{ left: 'calc(50% - 12.7rem)', top: '32.2rem', width: '25.4rem', height: '7.5rem' }}
           animate={ellipseCtrl}
         >
           <svg viewBox='0 0 254 75' width='100%' height='100%'>
@@ -152,23 +148,26 @@ export default function SplashSequence() {
           />
         </motion.div>
 
-        {/* 책 */}
+        {/* 책 — 항상 정중앙 기준. y로 점프, 마지막에만 x로 밀림 */}
         <motion.div
           className='absolute z-[10] will-change-transform'
-          style={{ left: `calc(50% - ${BOOK_W_REM / 2}rem)`, top: `${ELLIPSE_TOP_REM}rem` }}
+          style={{
+            left: `calc(50% - ${BOOK_W_REM / 2}rem)`,
+            top: `calc(50% - ${BOOK_W_REM / 2}rem)`,
+          }}
           animate={bookWrap}
         >
-          <motion.div animate={bookIcon} style={{ transformOrigin: '50% 100%' }}>
+          <motion.div animate={bookIcon} style={{ transformOrigin: '50% 50%' }}>
             <Icon name='booklink-open' className='h-[4.6rem] w-[4.6rem]' ariaHidden />
           </motion.div>
         </motion.div>
 
-        {/* 타이틀(책 오른쪽, GAP 적용) */}
+        {/* 타이틀 — 책은 중앙 고정, 타이틀만 오른쪽에서 등장 */}
         <motion.div
-          className='absolute z-[10] inline-flex items-center'
+          className='absolute z-[10] flex items-center'
           style={{
-            left: `calc(53% - ${GROUP_HALF_REM}rem + ${BOOK_W_REM + GAP_REM}rem)`,
-            top: `${BOOK_CENTER_TOP_REM + 0.2}rem`,
+            left: `calc(50%  + ${GAP_REM}rem)`,
+            top: `calc(50% - ${BOOK_W_REM / 2}rem + 0.2rem)`,
           }}
           animate={titleCtrl}
           aria-label='BookLink'
