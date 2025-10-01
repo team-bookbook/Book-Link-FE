@@ -7,7 +7,7 @@ import SplashGateRuntime from '@components/spash/runtime';
 export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <SplashGateRuntime totalMs={2000}>
+      <SplashGateRuntime>
         <RouterProvider router={router} />
       </SplashGateRuntime>
     </QueryClientProvider>

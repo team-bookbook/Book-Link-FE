@@ -1,55 +1,75 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
-import { useReducedMotion } from 'framer-motion';
+import { useEffect, useMemo, useState } from 'react';
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import SplashSequence from './splash';
 import { cn } from '@libs/cn';
 
 type Props = {
-  /** 전체 러닝타임(ms). 1→2(900) + 2→3(700) + 3→4(400) = 2000ms */
   totalMs?: number;
   children: React.ReactNode;
   className?: string;
 };
 
-/** 스토리지 없이, 앱 최초 마운트 시에만 1회 표시 */
 export default function SplashGateRuntime({ totalMs = 2000, className, children }: Props) {
-  const [visible, setVisible] = useState<boolean>(true);
-  const shownRef = useRef<boolean>(false); // 재렌더 시 중복 방지
   const prefersReducedMotion = useReducedMotion();
-
-  // 접근성: reduce-motion이면 스킵
   const shouldSkip = useMemo(() => Boolean(prefersReducedMotion), [prefersReducedMotion]);
 
-  useEffect(() => {
-    if (shownRef.current) return; // 이미 한 번 처리함
-    shownRef.current = true;
+  const [visible, setVisible] = useState<boolean>(() => !shouldSkip);
 
+  useEffect(() => {
     if (shouldSkip) {
       setVisible(false);
       return;
     }
 
-    const prev = document.documentElement.style.overflow;
-    document.documentElement.style.overflow = 'hidden';
+    setVisible(true);
 
-    const t = window.setTimeout(() => {
-      setVisible(false);
-      document.documentElement.style.overflow = prev;
-    }, totalMs + 50);
+    const t = window.setTimeout(
+      () => {
+        setVisible(false);
+      },
+      Math.max(0, totalMs)
+    );
 
     return () => {
-      clearTimeout(t);
-      document.documentElement.style.overflow = prev;
+      window.clearTimeout(t);
     };
   }, [shouldSkip, totalMs]);
+
+  useEffect(() => {
+    const { style } = document.documentElement;
+    const prevOverflow = style.overflow;
+
+    if (visible) {
+      style.overflow = 'hidden';
+    } else {
+      style.overflow = prevOverflow || '';
+    }
+
+    return () => {
+      style.overflow = prevOverflow || '';
+    };
+  }, [visible]);
 
   return (
     <>
       {children}
-      {visible && (
-        <div className={cn('fixed inset-0 z-[9999] bg-white', className)} role='dialog' aria-modal='true'>
-          <SplashSequence />
-        </div>
-      )}
+
+      <AnimatePresence>
+        {visible && (
+          <motion.div
+            key='splash-overlay'
+            className={cn('fixed inset-0 z-[9999] overflow-hidden', className)}
+            role='dialog'
+            aria-modal='true'
+            initial={{ opacity: 1 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.6, ease: 'linear' }}
+          >
+            <SplashSequence />
+          </motion.div>
+        )}
+      </AnimatePresence>
     </>
   );
 }
