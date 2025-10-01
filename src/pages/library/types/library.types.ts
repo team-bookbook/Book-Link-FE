@@ -34,3 +34,15 @@ export interface IBookDetail {
   latitude?: number;
   longitude?: number;
 }
+
+export interface ILibrary {
+  id: number;
+  name: string;
+  owner: string;
+  followerCount: number;
+  description: string;
+  profileImgUrl?: string;
+  coverImgUrl?: string;
+  isRecommended?: boolean;
+  isFavorite?: boolean;
+}
