@@ -6,8 +6,7 @@ import type { ILibraryBook } from '@pages/library/types/library.types';
 import Divider from '@components/divider';
 import Button from '@components/button/button';
 import { useNavigate } from 'react-router-dom';
-
-const CART_STORAGE_KEY = 'library-cart';
+import { CART_STORAGE_KEY, CART_LABELS } from '@pages/library/constants/cart';
 
 export default function CartPage() {
   const [cartBooks, setCartBooks] = useState<ILibraryBook[]>([]);
@@ -44,34 +43,34 @@ export default function CartPage() {
       <div className='mb-[1rem] px-[2rem]'>
         <Input
           id='due-date'
-          label='반납기한을 입력해 주세요.'
-          placeholder='숫자만 입력해 주세요 (ex. 20)'
+          label={CART_LABELS.dueDate}
+          placeholder={CART_LABELS.dueDatePlaceholder}
           value={dueDate}
           onChange={(e) => setDueDate(e.currentTarget.value)}
         />
       </div>
       <Divider />
       <div className='flex-col gap-[1.4rem] px-[3rem]'>
-        <h1 className='caption1 text-gray-900'>최종 결제</h1>
+        <h1 className='caption1 text-gray-900'>{CART_LABELS.finalPayment}</h1>
         <div className='flex-col gap-[0.5rem]'>
           <div className='flex-row-between'>
-            <span className='caption4 text-gray-900'>내 포인트</span>
+            <span className='caption4 text-gray-900'>{CART_LABELS.myPoint}</span>
             <span className='caption2 text-gray-900'>48000</span>
           </div>
           <div className='flex-row-between'>
-            <span className='caption4 text-gray-900'>총 보증금</span>
+            <span className='caption4 text-gray-900'>{CART_LABELS.totalDeposit}</span>
             <span className='caption2 text-gray-900'>2000</span>
           </div>
         </div>
         <Divider />
         <div className='flex-row-between'>
-          <h2 className='caption1 text-gray-900'>총 결제 금액</h2>
+          <h2 className='caption1 text-gray-900'>{CART_LABELS.totalPayment}</h2>
           <span className='body1 text-gray-900'>46000</span>
         </div>
       </div>
       <div className='px-[2rem]'>
         <Button fullWidth={true} onClick={() => nav('/chat/1')}>
-          대여 요청
+          {CART_LABELS.rentalRequest}
         </Button>
       </div>
     </div>

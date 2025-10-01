@@ -5,6 +5,7 @@ import Icon from '@components/icon';
 import { useCart } from '@pages/library/hooks/useCart';
 import type { IBookDetail } from '@pages/library/types/library.types';
 import Button from '@components/button/button';
+import { BOOK_DETAIL_LABELS } from '@pages/library/constants/book-detail';
 
 export default function BookDetailPage() {
   const { bookId } = useParams<{ bookId: string }>();
@@ -48,7 +49,7 @@ export default function BookDetailPage() {
   };
 
   if (!book) {
-    return <div>Loading...</div>;
+    return <div>{BOOK_DETAIL_LABELS.loading}</div>;
   }
 
   const bookDetailHeader = () => {
@@ -64,9 +65,15 @@ export default function BookDetailPage() {
           <span className='flex-row-center caption5 bg-gray-100 px-[0.7rem] text-gray-600'>{book.publisher}</span>
         </span>
         <span className='flex-items-center caption5 gap-[0.5rem] text-gray-600'>
-          <p>최대 반납기한 {book.maxDays}일</p>
+          <p>
+            {BOOK_DETAIL_LABELS.maxDays} {book.maxDays}
+            {BOOK_DETAIL_LABELS.maxDaysUnit}
+          </p>
           <p>|</p>
-          <p>보증금 {book.deposit}p</p>
+          <p>
+            {BOOK_DETAIL_LABELS.deposit} {book.deposit}
+            {BOOK_DETAIL_LABELS.depositUnit}
+          </p>
         </span>
       </div>
     );
@@ -78,13 +85,13 @@ export default function BookDetailPage() {
         <div className='caption5 max-w-[8.5rem] flex-col gap-[1rem] text-gray-800'>
           {book.genre && (
             <div className='flex-row-between caption5'>
-              <span>장르</span>
+              <span>{BOOK_DETAIL_LABELS.genre}</span>
               <span>{book.genre}</span>
             </div>
           )}
           {book.price && (
             <div className='flex-row-between caption5'>
-              <span>정가</span>
+              <span>{BOOK_DETAIL_LABELS.price}</span>
               <span>{book.price}</span>
             </div>
           )}
@@ -95,7 +102,7 @@ export default function BookDetailPage() {
           </div>
         )}
         <div className='flex-col gap-[1rem]'>
-          <h2 className='caption2 text-gray-800'>도서관 위치</h2>
+          <h2 className='caption2 text-gray-800'>{BOOK_DETAIL_LABELS.mapTitle}</h2>
           <div className='min-h-[33.5rem] max-w-[43rem] min-w-[33.5rem] bg-gray-100'></div>
         </div>
       </div>
@@ -106,7 +113,7 @@ export default function BookDetailPage() {
     return (
       <div className='bg-gray-white shadow-bottom-fixed fixed bottom-0 left-1/2 z-50 w-full max-w-[43rem] -translate-x-1/2 px-[2rem] pt-[1.2rem] pb-[2.5rem]'>
         <Button fullWidth={true} onClick={() => nav('/chat/1')}>
-          대여 요청
+          {BOOK_DETAIL_LABELS.rentalRequest}
         </Button>
       </div>
     );
@@ -125,7 +132,7 @@ export default function BookDetailPage() {
         <button
           onClick={handleCartClick}
           className='flex-row-center absolute right-[1rem] bottom-[1rem] z-1 min-h-[3.2rem] min-w-[3.2rem] cursor-pointer rounded-[0.8rem] bg-gray-50'
-          aria-label='장바구니에 담기'
+          aria-label={BOOK_DETAIL_LABELS.addToCart}
         >
           <Icon name='cart-bag' size={2} className='text-gray-800'></Icon>
         </button>
