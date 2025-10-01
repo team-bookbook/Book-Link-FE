@@ -50,7 +50,7 @@ export default function ReservationPage() {
 
   return (
     <div className='flex-col gap-[2rem] bg-gray-50'>
-      <div className='px-[2rem] pt-[2rem]'>
+      <div className='p-[2rem]'>
         {renderNotice()}
         {dummy.length > 0 ? (
           renderBookList()

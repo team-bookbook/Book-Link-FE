@@ -25,6 +25,7 @@ export default function Layout() {
 
   const isOnboarding = useMemo(() => isUnder(pathname, ROUTES.ONBOARDING), [pathname]);
   const isChat = useMemo(() => isUnder(pathname, ROUTES.CHAT), [pathname]);
+  const isCart = useMemo(() => isUnder(pathname, ROUTES.CART), [pathname]);
   const isAuthOrOnboarding = useMemo(
     () =>
       isUnder(pathname, ROUTES.LOGIN) ||
@@ -46,7 +47,7 @@ export default function Layout() {
 
   const currentTab = useMemo(() => {
     const params = new URLSearchParams(search);
-    return params.get('tab') ?? 'library';
+    return params.get('tab') ?? 'books';
   }, [search]);
 
   const floatingBtn: FloatingBtn = isAuthOrOnboarding
@@ -56,10 +57,10 @@ export default function Layout() {
           return { name: 'back', onClick: () => window.scrollTo({ top: 0, behavior: 'smooth' }) };
         }
         if (isUnder(pathname, ROUTES.LIBRARY)) {
-          if (currentTab === 'library') {
+          if (currentTab === 'libraries') {
             return { name: 'scan', onClick: () => navigate(ROUTES.SCAN) };
           }
-          if (currentTab === 'book') {
+          if (currentTab === 'books') {
             return { name: 'cart', onClick: () => navigate(ROUTES.CART) };
           }
         }
@@ -81,7 +82,7 @@ export default function Layout() {
         <div className='mx-auto w-full'>
           <Outlet />
         </div>
-        {!isAuthOrOnboarding && !isChat && <Footer />}
+        {!isAuthOrOnboarding && !isChat && !isCart && <Footer />}
       </main>
 
       {!isAuthOrOnboarding && <BottomNav />}

@@ -13,7 +13,7 @@ export default function GroupPage() {
   }, []);
 
   return (
-    <div className='flex-col gap-[1.2rem] bg-gray-50 px-[2rem] pt-[2rem]'>
+    <div className='flex-col gap-[1.2rem] bg-gray-50 p-[2rem]'>
       {dummy.map((group) => (
         <GroupCard
           key={group.id}

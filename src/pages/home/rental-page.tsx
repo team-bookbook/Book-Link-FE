@@ -13,7 +13,7 @@ export default function RentalPage() {
   }, []);
 
   const renderBookList = () => (
-    <div className='flex-col gap-[1.5rem] pt-[2.5rem]'>
+    <div className='flex-col gap-[1.5rem]'>
       <div className='grid grid-cols-2 gap-[2rem]'>
         {dummy.map((book) => (
           <BookCard
@@ -33,7 +33,7 @@ export default function RentalPage() {
 
   return (
     <div className='flex-col gap-[2rem] bg-gray-50'>
-      <div className='px-[2rem]'>
+      <div className='p-[2rem]'>
         {dummy.length > 0 ? (
           renderBookList()
         ) : (
