@@ -27,7 +27,7 @@ export default function CardLibrary({ library }: CardLibraryProps) {
         </div>
         <div className='flex-col'>
           <h1 className='caption3'>{library.owner}</h1>
-          <h2 className='caption5 text-gray-600'>팔로워 수 {library.followerCount}명</h2>
+          <h2 className='caption5 text-gray-600'>구독자 수 {library.followerCount}명</h2>
         </div>
       </div>
     );

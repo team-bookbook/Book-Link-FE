@@ -90,6 +90,7 @@ export interface ILibraryInfo {
   hours: string;
   rating: number;
   reviewCount: number;
+  favoriteCount: number;
   imageUrl?: string;
   description: {
     title: string;
@@ -109,6 +110,7 @@ const fetchLibraryInfo = async (): Promise<ILibraryInfo> => {
     hours: '영업시간 : 08:00 ~ 24:00, 월화수목금',
     rating: 4.8,
     reviewCount: 100,
+    favoriteCount: 256,
     imageUrl: 'https://picsum.photos/800/480?random=library', // 이미지가 있는 경우
     description: {
       title: '우리 도서관을 소개합니다!',

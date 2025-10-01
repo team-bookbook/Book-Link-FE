@@ -4,6 +4,7 @@ import { useLibraryDetailData } from '@pages/library/hooks/useLibraryDetailData'
 import { useKeenSlider } from 'keen-slider/react';
 import 'keen-slider/keen-slider.min.css';
 import CardReview from './components/card/card-reivew';
+import Icon from '@components/icon';
 
 export default function LibraryDetailPage() {
   const { libraryInfo, bookData, reviewData, isLoadingLibraryInfo, isLoadingBooks, isLoadingReviews, error } =
@@ -17,6 +18,10 @@ export default function LibraryDetailPage() {
   });
 
   console.log(error);
+
+  const handleFavoriteClick = () => {
+    console.log('즐겨찾기 버튼 클릭');
+  };
 
   const header = () => {
     if (isLoadingLibraryInfo || !libraryInfo) {
@@ -34,7 +39,6 @@ export default function LibraryDetailPage() {
     const stars = '★'.repeat(starCount);
 
     return (
-      // 이미지 섹션
       <div
         className='flex min-h-[30rem] flex-col justify-end gap-[0.5rem] p-[2rem] text-white'
         style={
@@ -57,7 +61,14 @@ export default function LibraryDetailPage() {
             <h2 className='caption1'>{libraryInfo.reviewCount}개</h2>
             <span className='text-system-error ml-[0.5rem] text-[1.6rem]'>{stars}</span>
           </div>
-          <div className='flex-col'></div>
+          <button
+            onClick={handleFavoriteClick}
+            className='flex-items-center cursor-pointer flex-col gap-[0.4rem]'
+            type='button'
+          >
+            <Icon name='heart' className='text-system-error' size={2.4} aria-label='즐겨찾기 버튼' />
+            <h2 className='caption2 text-gray-white'>{libraryInfo.favoriteCount}</h2>
+          </button>
         </div>
       </div>
     );
