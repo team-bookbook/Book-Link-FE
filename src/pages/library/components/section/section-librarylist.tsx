@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import CardLibrary from '../card/card-libray';
+import LibraryCard from '../card/library-card';
 import type { ILibrary } from '@pages/library/types/library.types';
 import { LIBRARY_LIST_LABELS, type LibraryListTab } from '@pages/library/constants/library-list';
 import { useNavigate } from 'react-router-dom';
@@ -83,7 +83,7 @@ export default function LibraryList() {
       </div>
       <div className='flex-col gap-[2rem] px-[2rem]'>
         {filteredLibraries.map((library) => (
-          <CardLibrary key={library.id} library={library} />
+          <LibraryCard key={library.id} library={library} />
         ))}
       </div>
     </div>

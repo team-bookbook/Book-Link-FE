@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import EmptyState from '@components/empty/empty-state';
-import CardLibraryBook from '@pages/library/components/card/card-library-book';
+import LibraryBookCard from '@pages/library/components/card/library-book-card';
 import Input from '@components/input/input';
 import type { ILibraryBook } from '@pages/library/types/library.types';
 import Divider from '@components/divider';
@@ -37,7 +37,7 @@ export default function CartPage() {
     <div className='flex-col gap-[2rem] pt-[2rem]'>
       <div className='flex-col gap-[1rem] px-[2rem]'>
         {cartBooks.map((book) => (
-          <CardLibraryBook key={book.id} book={book} isCart={false} />
+          <LibraryBookCard key={book.id} book={book} isCart={false} />
         ))}
       </div>
       <div className='mb-[1rem] px-[2rem]'>

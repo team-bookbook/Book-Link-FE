@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '@routes/routes-config';
 import { useCart } from '@pages/library/hooks/useCart';
 
-interface CardLibraryBookProps {
+interface LibraryBookCardProps {
   book: ILibraryBook;
   isCart?: boolean;
 }
@@ -22,7 +22,7 @@ const getStatusInfo = (status: BookStatus) => {
   }
 };
 
-export default function CardLibraryBook({ book, isCart = true }: CardLibraryBookProps) {
+export default function LibraryBookCard({ book, isCart = true }: LibraryBookCardProps) {
   const statusInfo = getStatusInfo(book.status);
   const navigate = useNavigate();
   const { addToCart } = useCart();

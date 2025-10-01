@@ -2,7 +2,7 @@ import { BOOK_SORT_OPTIONS, type BookSort } from '@components/dropdown/constants
 import SelectDropdown from '@components/dropdown/select-dropdown';
 import Icon from '@components/icon';
 import { useState, useMemo } from 'react';
-import CardLibraryBook from '@pages/library/components/card/card-library-book';
+import LibraryBookCard from '@pages/library/components/card/library-book-card';
 import { useLibraryData } from '@pages/library/hooks/useLibraryData';
 
 export default function BookList() {
@@ -48,7 +48,7 @@ export default function BookList() {
         {isLoading ? (
           <div className='text-center'>로딩 중...</div>
         ) : sortedBooks.length > 0 ? (
-          sortedBooks.map((book) => <CardLibraryBook key={book.id} book={book} />)
+          sortedBooks.map((book) => <LibraryBookCard key={book.id} book={book} />)
         ) : (
           <div className='text-center text-gray-500'>대출할 수 있는 책이 없습니다.</div>
         )}

@@ -20,4 +20,6 @@ export const ROUTES = {
   GROUP: '/group',
   BOOK_DETAIL: (id = ':bookId') => `/book/${id}`,
   LIBRARY_DETAIL: (id = ':libraryId') => `/library/${id}`,
+  LIBRARY_BOOK: (id = ':libraryId') => `/library/${id}/book`,
+  LIBRARY_REVIEW: (id = ':libraryId') => `/library/${id}/review`,
 };

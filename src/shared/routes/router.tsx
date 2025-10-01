@@ -23,6 +23,8 @@ const RentalPage = lazy(() => import('@pages/home/rental-page'));
 const CartPage = lazy(() => import('@pages/library/cart-page'));
 const BookDetailPage = lazy(() => import('@pages/library/book-detail-page'));
 const LibraryDetailPage = lazy(() => import('@pages/library/library-detail-page'));
+const LibraryBookPage = lazy(() => import('@pages/library/library-book-page'));
+const LibraryReviewPage = lazy(() => import('@pages/library/library-review-page'));
 
 export const router = createBrowserRouter([
   {
@@ -48,6 +50,8 @@ export const router = createBrowserRouter([
       { path: ROUTES.CART, element: <CartPage /> },
       { path: ROUTES.BOOK_DETAIL(':id'), element: <BookDetailPage /> },
       { path: ROUTES.LIBRARY_DETAIL(':id'), element: <LibraryDetailPage /> },
+      { path: ROUTES.LIBRARY_BOOK(':id'), element: <LibraryBookPage /> },
+      { path: ROUTES.LIBRARY_REVIEW(':id'), element: <LibraryReviewPage /> },
     ],
   },
 ]);

@@ -3,11 +3,11 @@ import type { ILibrary } from '@pages/library/types/library.types';
 import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '@routes/routes-config';
 
-interface CardLibraryProps {
+interface LibraryCardProps {
   library: ILibrary;
 }
 
-export default function CardLibrary({ library }: CardLibraryProps) {
+export default function LibraryCard({ library }: LibraryCardProps) {
   const navigate = useNavigate();
 
   const handleCardClick = () => {

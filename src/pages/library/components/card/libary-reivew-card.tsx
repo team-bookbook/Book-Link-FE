@@ -2,11 +2,11 @@ import { useState, useRef, useEffect } from 'react';
 import Icon from '@components/icon';
 import type { IReview } from '@pages/library/types/review.types';
 
-interface CardReviewProps {
+interface ReviewCardProps {
   review: IReview;
 }
 
-export default function CardReview({ review }: CardReviewProps) {
+export default function ReviewCard({ review }: ReviewCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [needsExpansion, setNeedsExpansion] = useState(false);
   const contentRef = useRef<HTMLDivElement>(null);

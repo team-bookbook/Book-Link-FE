@@ -3,8 +3,10 @@ import SectionLayout from '@components/section-layout';
 import { useLibraryDetailData } from '@pages/library/hooks/useLibraryDetailData';
 import { useKeenSlider } from 'keen-slider/react';
 import 'keen-slider/keen-slider.min.css';
-import CardReview from './components/card/card-reivew';
-import Icon from '@components/icon';
+import ReviewCard from './components/card/libary-reivew-card';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { ROUTES } from '@routes/routes-config';
+import LibraryRatingSection from './components/library-rating-section';
 
 export default function LibraryDetailPage() {
   const { libraryInfo, bookData, reviewData, isLoadingLibraryInfo, isLoadingBooks, isLoadingReviews, error } =
@@ -16,11 +18,28 @@ export default function LibraryDetailPage() {
       spacing: 10,
     },
   });
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { id: libraryId } = useParams<{ id: string }>();
+  const isMyPage = location.pathname === '/library/my';
+
+  console.log(libraryId);
 
   console.log(error);
 
   const handleFavoriteClick = () => {
     console.log('즐겨찾기 버튼 클릭');
+  };
+
+  const handleEditClick = () => {
+    navigate(ROUTES.LIBRARY_CREATE);
+  };
+
+  const handleDeleteClick = () => {
+    if (window.confirm('도서관을 삭제하시겠습니까?')) {
+      // 삭제 로직 추가
+      console.log('도서관 삭제');
+    }
   };
 
   const header = () => {
@@ -35,12 +54,9 @@ export default function LibraryDetailPage() {
       );
     }
 
-    const starCount = Math.floor(libraryInfo.rating);
-    const stars = '★'.repeat(starCount);
-
     return (
       <div
-        className='flex min-h-[30rem] flex-col justify-end gap-[0.5rem] p-[2rem] text-white'
+        className='relative flex min-h-[30rem] flex-col justify-end gap-[0.5rem] p-[2rem] text-white'
         style={
           libraryInfo.imageUrl
             ? {
@@ -51,25 +67,33 @@ export default function LibraryDetailPage() {
             : { backgroundColor: 'rgb(229, 231, 235)' }
         }
       >
+        {/* 내 페이지인 경우 */}
+        {isMyPage && (
+          <div className='absolute top-[3rem] right-[2rem] flex gap-[0.3rem]'>
+            <button
+              onClick={handleEditClick}
+              className='flex-row-center caption5 cursor-pointer rounded-[0.2rem] bg-gray-100 px-[0.7rem] text-gray-600'
+            >
+              수정하기
+            </button>
+            <button
+              onClick={handleDeleteClick}
+              className='flex-row-center caption5 text-system-error cursor-pointer rounded-[0.2rem] bg-gray-100 px-[0.7rem]'
+            >
+              삭제하기
+            </button>
+          </div>
+        )}
         <div className='flex-col gap-[0.4rem]'>
           <h1 className='title3'>{libraryInfo.name}</h1>
           <h2 className='caption1'>{libraryInfo.hours}</h2>
         </div>
-        <div className='flex-row-between'>
-          <div className='flex-items-center gap-[1rem]'>
-            <h1 className='title1'>{libraryInfo.rating}</h1>
-            <h2 className='caption1'>{libraryInfo.reviewCount}개</h2>
-            <span className='text-system-error ml-[0.5rem] text-[1.6rem]'>{stars}</span>
-          </div>
-          <button
-            onClick={handleFavoriteClick}
-            className='flex-items-center cursor-pointer flex-col gap-[0.4rem]'
-            type='button'
-          >
-            <Icon name='heart' className='text-system-error' size={2.4} aria-label='즐겨찾기 버튼' />
-            <h2 className='caption2 text-gray-white'>{libraryInfo.favoriteCount}</h2>
-          </button>
-        </div>
+        <LibraryRatingSection
+          rating={libraryInfo.rating}
+          reviewCount={libraryInfo.reviewCount}
+          favoriteCount={libraryInfo.favoriteCount}
+          onFavoriteClick={handleFavoriteClick}
+        />
       </div>
     );
   };
@@ -104,7 +128,12 @@ export default function LibraryDetailPage() {
       <SectionLayout
         title='책장'
         linkText='전체보기 →'
-        onLinkClick={() => {}}
+        onLinkClick={() => {
+          console.log(libraryId);
+          if (libraryId) {
+            navigate(ROUTES.LIBRARY_BOOK(libraryId));
+          }
+        }}
         isLoading={isLoadingBooks}
         isEmpty={bookData.length === 0}
       >
@@ -132,13 +161,17 @@ export default function LibraryDetailPage() {
       <SectionLayout
         title='리뷰'
         linkText='전체보기 →'
-        onLinkClick={() => {}}
+        onLinkClick={() => {
+          if (libraryId) {
+            navigate(ROUTES.LIBRARY_REVIEW(libraryId));
+          }
+        }}
         isLoading={isLoadingReviews}
         isEmpty={reviewData.length === 0}
       >
         <div className='flex-col gap-[2rem]'>
           {reviewData.map((review) => (
-            <CardReview key={review.id} review={review} />
+            <ReviewCard key={review.id} review={review} />
           ))}
         </div>
       </SectionLayout>
