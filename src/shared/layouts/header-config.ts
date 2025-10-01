@@ -79,6 +79,22 @@ const chatDetailRule: Rule = (path) => {
     : undefined;
 };
 
+// 나의 예약 내역
+const myReservation: Rule = (path) =>
+  ROUTES.RESERVATION && matchPath({ path: ROUTES.RESERVATION, end: true }, path)
+    ? { left: 'back', title: '예약 내역' }
+    : undefined;
+
+// 나의 대여 현황
+const myLoan: Rule = (path) =>
+  ROUTES.RENTAL && matchPath({ path: ROUTES.RENTAL, end: true }, path)
+    ? { left: 'back', title: '대여 현황' }
+    : undefined;
+
+// 나의 모임
+const myGroup: Rule = (path) =>
+  ROUTES.GROUP && matchPath({ path: ROUTES.GROUP, end: true }, path) ? { left: 'back', title: '나의 모임' } : undefined;
+
 // 도서관 등록
 const libraryCreateRule: Rule = (path) =>
   ROUTES.LIBRARY_CREATE && matchPath({ path: ROUTES.LIBRARY_CREATE, end: true }, path)
@@ -89,6 +105,12 @@ const libraryCreateRule: Rule = (path) =>
 const bookCreateRule: Rule = (path) =>
   ROUTES.BOOK_CREATE && matchPath({ path: ROUTES.BOOK_CREATE, end: true }, path)
     ? { left: 'back', title: '도서 등록' }
+    : undefined;
+
+// 장바구니
+const cartRule: Rule = (path) =>
+  ROUTES.BOOK_CREATE && matchPath({ path: ROUTES.CART, end: true }, path)
+    ? { left: 'back', title: '장바구니' }
     : undefined;
 
 // 기본
@@ -111,8 +133,12 @@ const RULES: ReadonlyArray<Rule> = [
   notiRole,
   loginRule,
   signupRule,
+  myReservation,
+  myLoan,
+  myGroup,
   libraryCreateRule,
   bookCreateRule,
+  cartRule,
 ];
 
 export function getHeaderForRoute(pathname: string, search: string): HeaderProps {

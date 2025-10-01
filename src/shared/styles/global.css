@@ -2,6 +2,7 @@
 @import './theme.css';
 @import './reset.css';
 @import './custom-utilities.css';
+@import 'keen-slider/keen-slider.min.css';
 
 @layer base {
   :root {
