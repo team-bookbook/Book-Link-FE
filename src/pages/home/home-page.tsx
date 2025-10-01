@@ -51,7 +51,7 @@ export default function HomePage() {
 
     return (
       <div className='flex-row-center gap-[1.5rem] px-[2rem]'>
-        <div className='h-[12.8rem] min-h-[12.8rem] w-full flex-col gap-[1.5rem] rounded-[0.8rem] bg-white p-[2rem]'>
+        <div className='h-[12.8rem] min-h-[12.8rem] w-full flex-col gap-[1.5rem] rounded-[8px] bg-white p-[2rem]'>
           <div className='flex-row-between'>
             <h1 className='title5 text-gray-900'>보유 포인트</h1>
             <h1 className='title5 text-secondary-900'>1000p</h1>
@@ -59,9 +59,9 @@ export default function HomePage() {
           <h2 className='body5 text-gray-700'>
             <span className='text-primary-900'>9000p</span> 더 모으면 상품권으로 교환할 수 있어요!
           </h2>
-          <div className='relative h-[1.2rem] rounded-[2rem] bg-gray-100'>
+          <div className='relative h-[1.2rem] rounded-[20px] bg-gray-100'>
             <div
-              className='bg-secondary-900 h-full min-h-[1.2rem] rounded-[2rem] transition-all duration-300'
+              className='bg-secondary-900 h-full min-h-[1.2rem] rounded-[20px] transition-all duration-300'
               style={{ width: `${progressPercentage}%` }}
             ></div>
           </div>

@@ -15,7 +15,7 @@ export default function ReservationPage() {
   }, []);
 
   const renderNotice = () => (
-    <div className='bg-secondary-100 flex-col gap-[1.2rem] rounded-[0.4rem] p-[1.6rem] text-gray-600'>
+    <div className='bg-secondary-100 flex-col gap-[1.2rem] rounded-[4px] p-[1.6rem] text-gray-600'>
       <div className='flex-items-center gap-[0.4rem]'>
         <Icon name='caution' className='text-gray-600' size={1.6} />
 

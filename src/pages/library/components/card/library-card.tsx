@@ -16,7 +16,7 @@ export default function LibraryCard({ library }: LibraryCardProps) {
 
   const header = () => {
     return (
-      <div className='flex gap-[1rem] rounded-tl-[1rem] rounded-tr-[1rem] p-[1rem]'>
+      <div className='flex gap-[1rem] rounded-tl-[10px] rounded-tr-[10px] p-[1rem]'>
         {/* 프로필 이미지 */}
         <div className='bl-[1rem] flex-row-center h-[4rem] w-[4rem] shrink-0 overflow-hidden rounded-full bg-white'>
           {library.profileImgUrl ? (
@@ -33,7 +33,7 @@ export default function LibraryCard({ library }: LibraryCardProps) {
     );
   };
   return (
-    <div onClick={handleCardClick} className='min-h-[50.8rem] cursor-pointer flex-col rounded-[1rem] bg-gray-100'>
+    <div onClick={handleCardClick} className='min-h-[50.8rem] cursor-pointer flex-col rounded-[10px] bg-gray-100'>
       {header()}
       <div className='flex-row-center h-[31.7rem] w-full overflow-hidden bg-gray-200'>
         {library.coverImgUrl ? (
@@ -42,7 +42,7 @@ export default function LibraryCard({ library }: LibraryCardProps) {
           <Icon name='logo-alt' size={6} className='text-gray-400' />
         )}
       </div>
-      <div className='flex-col gap-[1rem] rounded-br-[1rem] rounded-bl-[1rem] px-[1rem] py-[2rem]'>
+      <div className='flex-col gap-[1rem] rounded-br-[10px] rounded-bl-[10px] px-[1rem] py-[2rem]'>
         <h1 className='caption2'>{library.name}</h1>
         <h2 className='caption5'>{library.description}</h2>
       </div>

@@ -76,7 +76,7 @@ export default function LibraryList() {
         </div>
         <div
           onClick={() => navigate(ROUTES.LIBRARY_DETAIL('my'))}
-          className='caption3 flex-row-center bg-gray-white cursor-pointer rounded-[0.8rem] border border-gray-300 px-[1.3rem] py-[0.8rem]'
+          className='caption3 flex-row-center bg-gray-white cursor-pointer rounded-[8px] border border-gray-300 px-[1.3rem] py-[0.8rem]'
         >
           {LIBRARY_LIST_LABELS.myLibrary}
         </div>

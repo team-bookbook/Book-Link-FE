@@ -7,7 +7,7 @@ import { useLibraryData } from '@pages/library/hooks/useLibraryData';
 
 export default function BookList() {
   const [bookSort, setBookSort] = useState<BookSort>('recent');
-  const { books, isLoading } = useLibraryData();
+  const { books } = useLibraryData();
 
   const sortedBooks = useMemo(() => {
     if (!books.length) return [];
@@ -45,9 +45,7 @@ export default function BookList() {
     <div className='flex-col gap-[0.4rem] pt-[0.4rem]'>
       {BookListOptions()}
       <div className='flex-col gap-[1rem] px-[2rem]'>
-        {isLoading ? (
-          <div className='text-center'>로딩 중...</div>
-        ) : sortedBooks.length > 0 ? (
+        {sortedBooks.length > 0 ? (
           sortedBooks.map((book) => <LibraryBookCard key={book.id} book={book} />)
         ) : (
           <div className='text-center text-gray-500'>대출할 수 있는 책이 없습니다.</div>

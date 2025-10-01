@@ -12,10 +12,10 @@ export default function LibraryReviewPage() {
   if (isLoadingLibraryInfo || isLoadingReviews) {
     return (
       <div className='flex-col gap-[2rem] px-[2rem] pt-[3rem]'>
-        <div className='h-[6rem] animate-pulse rounded-[1rem] bg-gray-200'></div>
+        <div className='h-[6rem] animate-pulse rounded-[10px] bg-gray-200'></div>
         <div className='flex-col gap-[2rem]'>
           {Array.from({ length: 5 }).map((_, index) => (
-            <div key={index} className='h-[10rem] animate-pulse rounded-[1rem] bg-gray-200'></div>
+            <div key={index} className='h-[10rem] animate-pulse rounded-[10px] bg-gray-200'></div>
           ))}
         </div>
       </div>

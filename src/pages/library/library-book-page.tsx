@@ -9,7 +9,7 @@ export default function LibraryBookPage() {
       <div className='flex-col gap-[1rem] px-[2rem] pt-[3rem]'>
         <div className='flex-col gap-[1rem]'>
           {Array.from({ length: 7 }).map((_, index) => (
-            <div key={index} className='h-[13.8rem] animate-pulse rounded-[1rem] bg-gray-200'></div>
+            <div key={index} className='h-[13.8rem] animate-pulse rounded-[10px] bg-gray-200'></div>
           ))}
         </div>
       </div>

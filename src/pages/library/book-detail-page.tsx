@@ -131,7 +131,7 @@ export default function BookDetailPage() {
         )}
         <button
           onClick={handleCartClick}
-          className='flex-row-center absolute right-[1rem] bottom-[1rem] z-1 min-h-[3.2rem] min-w-[3.2rem] cursor-pointer rounded-[0.8rem] bg-gray-50'
+          className='flex-row-center absolute right-[1rem] bottom-[1rem] z-1 min-h-[3.2rem] min-w-[3.2rem] cursor-pointer rounded-[8px] bg-gray-50'
           aria-label={BOOK_DETAIL_LABELS.addToCart}
         >
           <Icon name='cart-bag' size={2} className='text-gray-800'></Icon>

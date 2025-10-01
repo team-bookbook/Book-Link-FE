@@ -43,12 +43,12 @@ export default function LibraryDetailPage() {
   };
 
   const header = () => {
-    if (isLoadingLibraryInfo || !libraryInfo) {
+    if (!libraryInfo) {
       return (
         <div className='flex min-h-[30rem] flex-col justify-end gap-[0.5rem] bg-gray-200 p-[2rem] text-white'>
           <div className='flex-col gap-[0.4rem]'>
-            <div className='h-[2.4rem] w-[20rem] animate-pulse rounded bg-gray-300'></div>
-            <div className='h-[1.6rem] w-[30rem] animate-pulse rounded bg-gray-300'></div>
+            <div className='h-[2.4rem] w-[20rem] animate-pulse rounded bg-gray-300' />
+            <div className='h-[1.6rem] w-[30rem] animate-pulse rounded bg-gray-300' />
           </div>
         </div>
       );
@@ -72,13 +72,13 @@ export default function LibraryDetailPage() {
           <div className='absolute top-[3rem] right-[2rem] flex gap-[0.3rem]'>
             <button
               onClick={handleEditClick}
-              className='flex-row-center caption5 cursor-pointer rounded-[0.2rem] bg-gray-100 px-[0.7rem] text-gray-600'
+              className='flex-row-center caption5 cursor-pointer rounded-[2px] bg-gray-100 px-[0.7rem] text-gray-600'
             >
               수정하기
             </button>
             <button
               onClick={handleDeleteClick}
-              className='flex-row-center caption5 text-system-error cursor-pointer rounded-[0.2rem] bg-gray-100 px-[0.7rem]'
+              className='flex-row-center caption5 text-system-error cursor-pointer rounded-[2px] bg-gray-100 px-[0.7rem]'
             >
               삭제하기
             </button>
