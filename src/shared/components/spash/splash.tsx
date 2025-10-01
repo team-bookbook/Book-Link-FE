@@ -1,171 +1,182 @@
-import { useEffect, useMemo, useState } from 'react';
-import { AnimatePresence, motion, type Transition, type Variants, cubicBezier } from 'framer-motion';
+import { useEffect } from 'react';
+import { motion, useAnimationControls, cubicBezier, type Transition } from 'framer-motion';
 import Icon from '@components/icon';
+import SplashTitle from '@images/splash-title.png';
 
-type Step = 1 | 2 | 3 | 4;
+const MAX_W = '43rem';
 
-const EASE_BEZIER = cubicBezier(1, 0, 0, 1);
-const SPRING_STRONG = { type: 'spring', stiffness: 600, damping: 17, mass: 1 } satisfies Transition;
-const SPRING_SOFT = { type: 'spring', stiffness: 400, damping: 30, mass: 1 } satisfies Transition;
+/** 위치(모두 rem) */
+const ELLIPSE_TOP_REM = 32.2; // 하단 타원 시작 y
+const BOOK_CENTER_TOP_REM = 18; // 책이 중앙에 착지할 y
+
+/** 사이즈(모두 rem) */
+const BOOK_W_REM = 4.6;
+const TITLE_W_REM = 18.2;
+const GAP_REM = -2; // 디자인 상 겹치게(-2rem)
+const GROUP_W_REM = BOOK_W_REM + GAP_REM + TITLE_W_REM;
+const GROUP_HALF_REM = GROUP_W_REM / 2;
+
+const EASE = cubicBezier(1, 0, 0, 1);
+const SPRING_STRONG: Transition = { type: 'spring', stiffness: 600, damping: 17, mass: 1 };
+const SPRING_SOFT: Transition = { type: 'spring', stiffness: 400, damping: 30, mass: 1 };
+
+function remToPx(rem: number): number {
+  const base = parseFloat(getComputedStyle(document.documentElement).fontSize || '16');
+  return rem * base;
+}
 
 export default function SplashSequence() {
-  const [step, setStep] = useState<Step>(1);
+  const bgCtrl = useAnimationControls();
+  const bigCircleCtrl = useAnimationControls();
+  const ellipseCtrl = useAnimationControls();
+  const fragmentsCtrl = useAnimationControls();
+  const bookWrap = useAnimationControls(); // y/x/opacity
+  const bookIcon = useAnimationControls(); // rotate/scale
+  const titleCtrl = useAnimationControls();
 
   useEffect(() => {
-    const timers: number[] = [];
-    // 1 -> 2
-    timers.push(window.setTimeout(() => setStep(2), 100 + 800));
-    // 2 -> 3
-    timers.push(window.setTimeout(() => setStep(3), 100 + 800 + 700));
-    // 3 -> 4
-    timers.push(window.setTimeout(() => setStep(4), 100 + 800 + 700 + 400));
-    return () => timers.forEach(clearTimeout);
-  }, []);
+    const run = async () => {
+      const deltaUpPx = remToPx(BOOK_CENTER_TOP_REM - ELLIPSE_TOP_REM); // 타원y → 중앙y (음수)
+      const overshootPx = remToPx(-16); // 위로 더 튀기
+      const settleDipPx = remToPx(1.2); // 바운스용 살짝 눌림(+)
+      const bookLeftShiftPx = remToPx(GROUP_HALF_REM); // 로고 등장 시 왼쪽 이동
+
+      // 초기 상태
+      await Promise.all([
+        bgCtrl.set({ backgroundColor: 'var(--color-secondary-900)' }),
+        bigCircleCtrl.set({ opacity: 1, display: 'block' }),
+        ellipseCtrl.set({ scaleX: 1, scaleY: 1, opacity: 0.75, display: 'block' }),
+        fragmentsCtrl.set({ opacity: 1, scale: 1, display: 'block' }),
+        bookWrap.set({ y: 0, x: 0, opacity: 0 }),
+        bookIcon.set({ rotate: 15, scale: 0.96 }),
+        titleCtrl.set({ opacity: 0, x: -remToPx(1.6) }),
+      ]);
+
+      // ① 100ms 대기
+      await new Promise((r) => setTimeout(r, 100));
+
+      // ② 0.8s: 점프 + 배경 전환 + 파편/큰원 페이드
+      await Promise.all([
+        ellipseCtrl.start({
+          scaleX: [1, 0.9, 0.7],
+          scaleY: [1, 0.9, 0.7],
+          opacity: [0.75, 0.6, 0.45],
+          transition: { type: 'tween', duration: 0.8, ease: EASE, times: [0, 0.3, 1] },
+        }),
+        bookWrap.start({
+          y: [0, overshootPx, deltaUpPx], // 아래→위 오버슈트→중앙
+          opacity: [0, 0.2, 1],
+          transition: { type: 'tween', duration: 0.8, ease: EASE, times: [0, 0.35, 1] },
+        }),
+        // (점프 중엔 회전 10°까지만 풀어둠)
+        bookIcon.start({ rotate: 10, scale: 1, transition: { ...SPRING_STRONG, duration: 0.8 } }),
+        bgCtrl.start({ backgroundColor: '#ffffff', transition: { type: 'tween', duration: 0.8, ease: EASE } }),
+        bigCircleCtrl.start({ opacity: [1, 0.3, 0], transition: { type: 'tween', duration: 0.8, ease: EASE } }),
+        fragmentsCtrl.start({
+          opacity: [1, 0.2, 0],
+          scale: [1, 0.92, 0.85],
+          transition: { type: 'tween', duration: 0.5, ease: EASE, times: [0, 0.4, 1] },
+          transitionEnd: { display: 'none' },
+        }),
+      ]);
+
+      // ②-추가: 하단 타원/큰 원 제거(display:none)
+      await Promise.all([
+        ellipseCtrl.start({
+          scaleX: 0,
+          scaleY: 0,
+          opacity: 0,
+          transition: { type: 'tween', duration: 0.25, ease: EASE },
+          transitionEnd: { display: 'none' },
+        }),
+        bigCircleCtrl.start({ opacity: 0, transitionEnd: { display: 'none' } }),
+      ]);
+
+      // ②b 센터 바운스(회전 0으로 정렬 + 살짝 눌렸다 되돌아오는 느낌)
+      await bookWrap.start({ y: deltaUpPx + settleDipPx, transition: { ...SPRING_SOFT, duration: 0.18 } });
+      await Promise.all([
+        bookWrap.start({ y: deltaUpPx, transition: { ...SPRING_SOFT, duration: 0.32 } }),
+        bookIcon.start({ rotate: 0, scale: 1, transition: { ...SPRING_SOFT, duration: 0.32 } }),
+      ]);
+
+      // ③ 로고 등장 + 책을 왼쪽으로 밀어 그룹 중앙 정렬
+      await Promise.all([
+        bookWrap.start({ x: -bookLeftShiftPx, transition: { ...SPRING_SOFT, duration: 0.4 } }),
+        titleCtrl.start({ opacity: 1, x: 0, transition: { ...SPRING_SOFT, duration: 0.4, delay: 0.02 } }),
+      ]);
+    };
+
+    run();
+  }, [bgCtrl, bigCircleCtrl, ellipseCtrl, fragmentsCtrl, bookWrap, bookIcon, titleCtrl]);
 
   return (
-    <div className='bg-gray-white relative h-dvh w-full overflow-hidden'>
-      <AnimatePresence initial={false} mode='wait'>
-        {step === 1 && <Scene1 key='s1' />}
-        {step === 2 && <Scene2 key='s2' />}
-        {step === 3 && <Scene3 key='s3' />}
-        {step === 4 && <Scene4 key='s4' />}
-      </AnimatePresence>
-    </div>
-  );
-}
+    <motion.section className='relative h-dvh w-full overflow-hidden' animate={bgCtrl}>
+      <div className='relative mx-auto h-full w-full' style={{ maxWidth: MAX_W }}>
+        {/* 좌상 큰 원 */}
+        <motion.div
+          className='absolute rounded-[9999px]'
+          style={{
+            width: '78.4rem',
+            height: '78.4rem',
+            left: '-20.5rem',
+            top: '-5.8rem',
+            background: 'var(--color-secondary-900)',
+          }}
+          animate={bigCircleCtrl}
+        />
 
-/* ================= Scene 1 =================
-   - 좌상에 큰 원(배경), 바닥 타원 그림자, 물방울 파편
-   - 책 아이콘이 30deg 기울어진 채 작게 등장
-*/
-function Scene1() {
-  const variants: Variants = useMemo(
-    () => ({
-      initial: { opacity: 1 },
-      animate: { opacity: 1, transition: { duration: 0.8, ease: EASE_BEZIER } },
-      exit: { opacity: 1 },
-    }),
-    []
-  );
+        {/* 하단 타원 */}
+        <motion.div
+          className='absolute'
+          style={{ left: 'calc(50% - 12.7rem)', top: `${ELLIPSE_TOP_REM}rem`, width: '25.4rem', height: '7.5rem' }}
+          animate={ellipseCtrl}
+        >
+          <svg viewBox='0 0 254 75' width='100%' height='100%'>
+            <ellipse cx='127' cy='37.5' rx='127' ry='37.5' fill='#356B8E' />
+          </svg>
+        </motion.div>
 
-  return (
-    <motion.section
-      className='relative h-full w-full overflow-hidden'
-      style={{ background: 'var(--color-secondary-900)' }} // #71C6FF
-      variants={variants}
-      initial='initial'
-      animate='animate'
-      exit='exit'
-    >
-      {/* 좌상 대원 */}
-      <div
-        className='absolute rounded-[9999px]'
-        style={{
-          width: '78.4rem',
-          height: '78.4rem',
-          left: '-20.5rem',
-          top: '-5.8rem',
-          background: 'var(--color-secondary-900)',
-        }}
-      />
-      {/* 바닥 타원 그림자 */}
-      <div className='absolute'>
-        <svg width='254' height='75' viewBox='0 0 254 75' fill='none' xmlns='http://www.w3.org/2000/svg'>
-          <ellipse cx='127' cy='37.5' rx='127' ry='37.5' fill='#356B8E' />
-        </svg>
+        {/* 파편 */}
+        <motion.div className='absolute' style={{ left: 'calc(50% - 5rem)', top: '42rem' }} animate={fragmentsCtrl}>
+          <span
+            className='absolute block h-[5.76rem] w-[5.76rem] rounded-[9999px] border-[0.6rem]'
+            style={{ borderColor: 'var(--color-secondary-900)' }}
+          />
+          <span
+            className='absolute top-[-2rem] left-[2.8rem] block h-[2.44rem] w-[2.44rem] rotate-[30deg] rounded-[0.16rem]'
+            style={{ background: 'var(--color-secondary-900)' }}
+          />
+          <span
+            className='absolute top-[7.7rem] left-[3rem] block h-[2.46rem] w-[2.46rem] rotate-[-150deg] rounded-[0.16rem]'
+            style={{ background: 'var(--color-secondary-900)' }}
+          />
+        </motion.div>
+
+        {/* 책 */}
+        <motion.div
+          className='absolute z-[10] will-change-transform'
+          style={{ left: `calc(50% - ${BOOK_W_REM / 2}rem)`, top: `${ELLIPSE_TOP_REM}rem` }}
+          animate={bookWrap}
+        >
+          <motion.div animate={bookIcon} style={{ transformOrigin: '50% 100%' }}>
+            <Icon name='booklink-open' className='h-[4.6rem] w-[4.6rem]' ariaHidden />
+          </motion.div>
+        </motion.div>
+
+        {/* 타이틀(책 오른쪽, GAP 적용) */}
+        <motion.div
+          className='absolute z-[10] inline-flex items-center'
+          style={{
+            left: `calc(53% - ${GROUP_HALF_REM}rem + ${BOOK_W_REM + GAP_REM}rem)`,
+            top: `${BOOK_CENTER_TOP_REM + 0.2}rem`,
+          }}
+          animate={titleCtrl}
+          aria-label='BookLink'
+          role='img'
+        >
+          <img src={SplashTitle} alt='타이틀로고' className='h-auto w-[18.2rem]' />
+        </motion.div>
       </div>
-
-      {/* 스플래시 파편 (간단화) */}
-      <div className='absolute top-[42rem] left-[16rem]'>
-        <span
-          className='absolute block h-[5.76rem] w-[5.76rem] rounded-[9999px] border-[0.6rem]'
-          style={{ borderColor: 'var(--color-secondary-900)' }}
-        />
-        <span
-          className='absolute top-[-2rem] left-[2.8rem] block h-[2.44rem] w-[2.44rem] rotate-[30deg] rounded-[0.16rem]'
-          style={{ background: 'var(--color-secondary-900)' }}
-        />
-        <span
-          className='absolute top-[7.7rem] left-[3rem] block h-[2.46rem] w-[2.46rem] rotate-[-150deg] rounded-[0.16rem]'
-          style={{ background: 'var(--color-secondary-900)' }}
-        />
-      </div>
-
-      {/* 책 아이콘 (작게, 15deg 기울임) */}
-      <motion.div
-        className='absolute top-[18rem] left-1/2 -translate-x-1/2'
-        initial={{ rotate: 15, scale: 0.9, y: 0, opacity: 0.95 }}
-        animate={{ rotate: 15, scale: 1, y: 0, opacity: 1, transition: { duration: 0.8, ease: EASE_BEZIER } }}
-      >
-        <Icon name='booklink-open' size={4.6} ariaHidden />
-      </motion.div>
-    </motion.section>
-  );
-}
-
-/* ================= Scene 2 =================
-   - 흰 배경 + 책이 화면 가운데로 이동하며 살짝 기울어짐 (베지어 800ms)
-*/
-function Scene2() {
-  return (
-    <motion.section
-      className='relative h-full w-full bg-white'
-      initial={{ opacity: 1 }}
-      animate={{ opacity: 1, transition: { duration: 0.8, ease: EASE_BEZIER } }}
-      exit={{ opacity: 1 }}
-    >
-      <motion.div
-        className='absolute top-[18rem] left-1/2 -translate-x-1/2'
-        initial={{ y: 10, rotate: 15, scale: 1 }}
-        animate={{ y: 0, rotate: 15, scale: 1, transition: { duration: 0.8, ease: EASE_BEZIER } }}
-      >
-        <Icon name='booklink-open' size={4.6} ariaHidden />
-      </motion.div>
-    </motion.section>
-  );
-}
-
-/* ================= Scene 3 =================
-   - 같은 흰 배경 + 책이 오른쪽으로 스르륵 이동하며 스프링(700ms 근사)
-*/
-function Scene3() {
-  return (
-    <motion.section className='relative h-full w-full bg-white'>
-      <motion.div
-        className='absolute top-[18rem] left-1/2'
-        initial={{ x: '-50%', y: 0, rotate: 0, scale: 1 }}
-        animate={{ x: '10rem', y: 0, rotate: 0, scale: 1, transition: { ...SPRING_STRONG, duration: 0.7 } }}
-      >
-        <Icon name='booklink-open' size={4.6} ariaHidden />
-      </motion.div>
-    </motion.section>
-  );
-}
-
-/* ================= Scene 4 =================
-   - 로고 타이프가 왼쪽에서 나타나며 책 아이콘과 간격 맞춤, 부드러운 스프링(400ms)
-*/
-function Scene4() {
-  return (
-    <motion.section className='relative h-full w-full bg-white'>
-      {/* 책 아이콘: 최종 자리 */}
-      <motion.div
-        className='absolute top-[18rem] left-[15.6rem]'
-        initial={{ opacity: 0, x: '-2rem', scale: 0.98 }}
-        animate={{ opacity: 1, x: 0, scale: 1, transition: { ...SPRING_SOFT, duration: 0.4 } }}
-      >
-        <Icon name='booklink-open' size={4.6} ariaHidden />
-      </motion.div>
-
-      {/* BOOK + Link 두 톤 로고텍스트 (프로젝트 폰트 사용) */}
-      <motion.h1
-        className='absolute top-[18.2rem] ml-[2rem] inline-flex items-center gap-[0.8rem] text-[3.2rem] leading-[1.2] font-semibold'
-        initial={{ opacity: 0, x: '-1.6rem' }}
-        animate={{ opacity: 1, x: 0, transition: { ...SPRING_SOFT, duration: 0.4 } }}
-        style={{ left: 'calc(15.6rem + 4.6rem)' }}
-      >
-        <Icon name='splash-title' width={18.2} />
-      </motion.h1>
     </motion.section>
   );
 }

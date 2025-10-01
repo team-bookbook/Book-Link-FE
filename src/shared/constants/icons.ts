@@ -39,7 +39,6 @@ export const ICONS = [
   "scan",
   "search",
   "send",
-  "splash-title",
   "toast-error",
   "toast-info",
   "toast-success",
