@@ -6,7 +6,7 @@ import 'keen-slider/keen-slider.min.css';
 import ReviewCard from '@pages/library/components/card/libary-reivew-card';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { ROUTES } from '@routes/routes-config';
-import LibraryRatingSection from '@pages/library/components/library-rating-section';
+import LibraryRatingSection from '@pages/library/components/section/section-library-rating';
 
 export default function LibraryDetailPage() {
   const { libraryInfo, bookData, reviewData, isLoadingLibraryInfo, isLoadingBooks, isLoadingReviews, error } =
@@ -169,7 +169,7 @@ export default function LibraryDetailPage() {
         isLoading={isLoadingReviews}
         isEmpty={reviewData.length === 0}
       >
-        <div className='flex-col gap-[2rem]'>
+        <div className='flex-col gap-[2rem] px-[2rem]'>
           {reviewData.map((review) => (
             <ReviewCard key={review.id} review={review} />
           ))}

@@ -1,4 +1,4 @@
-import LibraryRatingSection from '@pages/library/components/library-rating-section';
+import LibraryRatingSection from '@pages/library/components/section/section-library-rating';
 import ReviewCard from '@pages/library/components/card/libary-reivew-card';
 import { useLibraryDetailData } from '@pages/library/hooks/useLibraryDetailData';
 

@@ -29,7 +29,7 @@ export default function ReviewCard({ review }: ReviewCardProps) {
   };
 
   return (
-    <div className='flex-col gap-[1.5rem] px-[2rem]'>
+    <div className='flex-col gap-[1.5rem]'>
       <div className='flex-row-between'>
         <div className='flex gap-[1rem]'>
           {/* 프로필 이미지 섹션 */}

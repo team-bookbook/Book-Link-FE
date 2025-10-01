@@ -1,18 +1,13 @@
 import Icon from '@components/icon';
 
-interface LibraryRatingSectionProps {
+interface LibraryRatingProps {
   rating: number;
   reviewCount: number;
   favoriteCount: number;
   onFavoriteClick: () => void;
 }
 
-export default function LibraryRatingSection({
-  rating,
-  reviewCount,
-  favoriteCount,
-  onFavoriteClick,
-}: LibraryRatingSectionProps) {
+export default function LibraryRating({ rating, reviewCount, favoriteCount, onFavoriteClick }: LibraryRatingProps) {
   const starCount = Math.floor(rating);
   const stars = '★'.repeat(starCount);
 
