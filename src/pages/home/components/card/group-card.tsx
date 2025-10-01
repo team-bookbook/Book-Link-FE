@@ -4,7 +4,7 @@ import type { IGroupCard } from '@pages/home/types/home.types';
 export default function GroupCard({ id, imgurl, groupName, leaderName, memberCount, description }: IGroupCard) {
   console.log(id);
   return (
-    <div className='flex h-[14rem] min-w-[33rem] cursor-pointer flex-col gap-[1.5rem] rounded-[1rem] bg-white px-[2.3rem] py-[2.45rem]'>
+    <div className='flex h-[14rem] min-w-[33rem] cursor-pointer flex-col gap-[1.5rem] rounded-[10px] bg-white px-[2.3rem] py-[2.45rem]'>
       <div className='flex justify-between'>
         <div className='flex-col gap-[0.6rem]'>
           <h1 className='title4 text-gray-900'>{groupName}</h1>
@@ -15,11 +15,11 @@ export default function GroupCard({ id, imgurl, groupName, leaderName, memberCou
             <h3 className='caption5 text-system-error'>{memberCount}명</h3>
           </div>
         </div>
-        <div className='flex-row-center h-[5rem] w-[5rem] rounded-[1rem] bg-gray-100'>
+        <div className='flex-row-center h-[5rem] w-[5rem] rounded-[10px] bg-gray-100'>
           {imgurl ? (
             <img
               src={imgurl}
-              className='h-full w-full rounded-[1rem] object-cover object-center'
+              className='h-full w-full rounded-[10px] object-cover object-center'
               alt='defaultImage'
             ></img>
           ) : (

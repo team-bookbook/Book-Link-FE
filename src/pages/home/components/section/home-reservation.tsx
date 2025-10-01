@@ -1,4 +1,4 @@
-import HomeSectionLayout from '@pages/home/components/layout/home-section-layout';
+import SectionLayout from '@components/section-layout';
 import { useKeenSlider } from 'keen-slider/react';
 import BookCard from '@pages/home/components/card/book-card';
 import type { IBookCard } from '@pages/home/types/home.types';
@@ -26,7 +26,7 @@ export default function HomeReservation({
     },
   });
   return (
-    <HomeSectionLayout
+    <SectionLayout
       title={title}
       linkText={linkText}
       onLinkClick={onLinkClick}
@@ -48,6 +48,6 @@ export default function HomeReservation({
           ))}
         </div>
       </div>
-    </HomeSectionLayout>
+    </SectionLayout>
   );
 }

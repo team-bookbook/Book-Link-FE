@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import type { ILibraryBook, ILibraryData, BookStatus } from '../types/library.types';
+import type { ILibraryBook, ILibraryData, BookStatus } from '@pages/library/types/library.types';
 
 const sampleImages = [
   'https://picsum.photos/200/300?random=1',

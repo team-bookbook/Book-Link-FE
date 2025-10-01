@@ -94,6 +94,7 @@ const myLoan: Rule = (path) =>
 // 나의 모임
 const myGroup: Rule = (path) =>
   ROUTES.GROUP && matchPath({ path: ROUTES.GROUP, end: true }, path) ? { left: 'back', title: '나의 모임' } : undefined;
+
 // 도서관 등록
 const libraryCreateRule: Rule = (path) =>
   ROUTES.LIBRARY_CREATE && matchPath({ path: ROUTES.LIBRARY_CREATE, end: true }, path)

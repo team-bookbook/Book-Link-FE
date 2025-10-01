@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '@routes/routes-config';
 import { useCart } from '@pages/library/hooks/useCart';
 
-interface CardLibraryBookProps {
+interface LibraryBookCardProps {
   book: ILibraryBook;
   isCart?: boolean;
 }
@@ -22,7 +22,7 @@ const getStatusInfo = (status: BookStatus) => {
   }
 };
 
-export default function CardLibraryBook({ book, isCart = true }: CardLibraryBookProps) {
+export default function LibraryBookCard({ book, isCart = true }: LibraryBookCardProps) {
   const statusInfo = getStatusInfo(book.status);
   const navigate = useNavigate();
   const { addToCart } = useCart();
@@ -39,10 +39,10 @@ export default function CardLibraryBook({ book, isCart = true }: CardLibraryBook
   return (
     <div
       onClick={handleCardClick}
-      className='flex-items-center relative min-h-[13.8rem] w-full cursor-pointer gap-[1rem] rounded-[1rem] bg-gray-50 px-[1.4rem]'
+      className='flex-items-center relative min-h-[13.8rem] w-full cursor-pointer gap-[1rem] rounded-[10px] bg-gray-50 px-[1.4rem]'
     >
       <div
-        className={`caption5 flex-row-center px-[0.7rem] ${statusInfo.color} absolute top-[2rem] right-[1.5rem] min-h-[1.7rem] min-w-[4.8rem] rounded-[0.2rem] bg-gray-100`}
+        className={`caption5 flex-row-center px-[0.7rem] ${statusInfo.color} absolute top-[2rem] right-[1.5rem] min-h-[1.7rem] min-w-[4.8rem] rounded-[2px] bg-gray-100`}
       >
         {statusInfo.text}
       </div>
@@ -50,7 +50,7 @@ export default function CardLibraryBook({ book, isCart = true }: CardLibraryBook
         {isCart && (
           <button
             onClick={handleCartClick}
-            className='flex-row-center absolute right-[0.5rem] bottom-[0.5rem] z-1 min-h-[3.2rem] min-w-[3.2rem] cursor-pointer rounded-[0.8rem] bg-gray-50'
+            className='flex-row-center absolute right-[0.5rem] bottom-[0.5rem] z-1 min-h-[3.2rem] min-w-[3.2rem] cursor-pointer rounded-[8px] bg-gray-50'
             aria-label='장바구니에 담기'
           >
             <Icon name='cart-bag' size={2} className='text-gray-800'></Icon>
@@ -77,7 +77,7 @@ export default function CardLibraryBook({ book, isCart = true }: CardLibraryBook
           </div>
         </div>
         <div className='flex-col gap-[0.3rem]'>
-          <p className='flex-row-center caption5 max-w-[7.4rem] rounded-[0.2rem] bg-gray-100 text-gray-600'>
+          <p className='flex-row-center caption5 max-w-[7.4rem] rounded-[2px] bg-gray-100 text-gray-600'>
             {book.dueDate}
           </p>
           <h3 className='caption5 flex gap-[0.5rem] text-gray-600'>
