@@ -1,4 +1,4 @@
-import HomeSectionLayout from '@pages/home/components/layout/home-section-layout';
+import SectionLayout from '@components/section-layout';
 import { useKeenSlider } from 'keen-slider/react';
 import BookCard from '@pages/home/components/card/book-card';
 import type { IBookCard } from '@pages/home/types/home.types';
@@ -21,7 +21,7 @@ export default function HomeLoan({ title, data, linkText, isLoading = false, onL
   });
 
   return (
-    <HomeSectionLayout
+    <SectionLayout
       title={title}
       linkText={linkText}
       onLinkClick={onLinkClick}
@@ -43,6 +43,6 @@ export default function HomeLoan({ title, data, linkText, isLoading = false, onL
           ))}
         </div>
       </div>
-    </HomeSectionLayout>
+    </SectionLayout>
   );
 }

@@ -1,11 +1,19 @@
 import Icon from '@components/icon';
 import type { ILibrary } from '@pages/library/types/library.types';
+import { useNavigate } from 'react-router-dom';
+import { ROUTES } from '@routes/routes-config';
 
 interface CardLibraryProps {
   library: ILibrary;
 }
 
 export default function CardLibrary({ library }: CardLibraryProps) {
+  const navigate = useNavigate();
+
+  const handleCardClick = () => {
+    navigate(ROUTES.LIBRARY_DETAIL(library.id.toString()));
+  };
+
   const header = () => {
     return (
       <div className='flex gap-[1rem] rounded-tl-[1rem] rounded-tr-[1rem] p-[1rem]'>
@@ -25,7 +33,7 @@ export default function CardLibrary({ library }: CardLibraryProps) {
     );
   };
   return (
-    <div className='min-h-[50.8rem] cursor-pointer flex-col rounded-[1rem] bg-gray-100'>
+    <div onClick={handleCardClick} className='min-h-[50.8rem] cursor-pointer flex-col rounded-[1rem] bg-gray-100'>
       {header()}
       <div className='flex-row-center h-[31.7rem] w-full overflow-hidden bg-gray-200'>
         {library.coverImgUrl ? (

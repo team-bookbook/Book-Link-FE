@@ -2,8 +2,11 @@ import { useEffect, useMemo, useState } from 'react';
 import CardLibrary from '../card/card-libray';
 import type { ILibrary } from '@pages/library/types/library.types';
 import { LIBRARY_LIST_LABELS, type LibraryListTab } from '@pages/library/constants/library-list';
+import { useNavigate } from 'react-router-dom';
+import { ROUTES } from '@routes/routes-config';
 
 export default function LibraryList() {
+  const navigate = useNavigate();
   const [libraries, setLibraries] = useState<ILibrary[]>([]);
   const [activeTab, setActiveTab] = useState<LibraryListTab>('recommended');
 
@@ -71,7 +74,10 @@ export default function LibraryList() {
             {LIBRARY_LIST_LABELS.favorite}
           </span>
         </div>
-        <div className='caption3 flex-row-center bg-gray-white rounded-[0.8rem] border border-gray-300 px-[1.3rem] py-[0.8rem]'>
+        <div
+          onClick={() => navigate(ROUTES.LIBRARY_DETAIL('my'))}
+          className='caption3 flex-row-center bg-gray-white cursor-pointer rounded-[0.8rem] border border-gray-300 px-[1.3rem] py-[0.8rem]'
+        >
           {LIBRARY_LIST_LABELS.myLibrary}
         </div>
       </div>

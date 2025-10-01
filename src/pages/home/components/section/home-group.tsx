@@ -1,4 +1,4 @@
-import HomeSectionLayout from '@pages/home/components/layout/home-section-layout';
+import SectionLayout from '@components/section-layout';
 import GroupCard from '@pages/home/components/card/group-card';
 import type { IGroupCard } from '@pages/home/types/home.types';
 
@@ -12,7 +12,7 @@ interface HomeGroupProps {
 
 export default function HomeGroup({ title, data, linkText, isLoading, onLinkClick }: HomeGroupProps) {
   return (
-    <HomeSectionLayout
+    <SectionLayout
       title={title}
       linkText={linkText}
       onLinkClick={onLinkClick}
@@ -32,6 +32,6 @@ export default function HomeGroup({ title, data, linkText, isLoading, onLinkClic
           />
         ))}
       </div>
-    </HomeSectionLayout>
+    </SectionLayout>
   );
 }
