@@ -1,9 +1,11 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect, useRef } from 'react';
 import PostCard from '@pages/board/components/post-card';
 import PillTab from '@components/tab/pill-tab';
 import SearchBar from '@components/search-bar';
 import UnderlineTab from '@components/tab/underline-tab';
 import SelectDropdown from '@components/dropdown/select-dropdown';
+import { cn } from '@libs/cn';
+
 type TabItem = { key: string; label: string };
 
 const COMMUNITY_TABS: TabItem[] = [
@@ -17,6 +19,7 @@ const CATEGORIES: TabItem[] = [
   { key: 'daily', label: '일상' },
   { key: 'gather', label: '모임 모집' },
 ];
+
 type Post = {
   id: string;
   title: string;
@@ -30,10 +33,10 @@ type Post = {
 
 type SortType = 'latest' | 'popular';
 
-const SORT_OPTIONS: readonly { value: SortType; label: string }[] = [
+const SORT_OPTIONS: ReadonlyArray<{ value: SortType; label: string }> = [
   { value: 'latest', label: '최신순' },
   { value: 'popular', label: '인기순' },
-] as const;
+];
 
 const MOCK_POSTS: Post[] = [
   {
@@ -83,12 +86,22 @@ export default function BoardPage() {
   const [category, setCategory] = useState<string>('all');
   const [sort, setSort] = useState<SortType>('latest');
 
+  const searchAnchorRef = useRef<HTMLDivElement | null>(null);
+  const floatingSearchRef = useRef<HTMLDivElement | null>(null);
+
+  const [showFloatingSearch, setShowFloatingSearch] = useState(false);
+
+  useEffect(() => {
+    const el = searchAnchorRef.current;
+    if (!el) return;
+    const io = new IntersectionObserver(([entry]) => setShowFloatingSearch(!entry.isIntersecting), { threshold: 0 });
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
   const filtered = useMemo(() => {
     const list = category === 'all' ? MOCK_POSTS : MOCK_POSTS.filter((p) => p.category === category);
-    if (sort === 'popular') {
-      return [...list].sort((a, b) => b.likeCount - a.likeCount);
-    }
-    return list;
+    return sort === 'popular' ? [...list].sort((a, b) => b.likeCount - a.likeCount) : list;
   }, [category, sort]);
 
   return (
@@ -97,13 +110,28 @@ export default function BoardPage() {
         items={COMMUNITY_TABS}
         value={topTab}
         onChange={(k) => setTopTab(k as 'community' | 'reading')}
-        className='sticky top-0'
+        className={cn('sticky', showFloatingSearch ? 'top-[6.6rem]' : 'top-0')}
       />
-      <div className='flex-col-center gap-[0.9rem]'>
-        <PillTab items={CATEGORIES} value={category} onChange={setCategory} />
-        <div className='w-full px-[2rem]'>
+
+      {showFloatingSearch && (
+        <div
+          ref={floatingSearchRef}
+          className={cn(
+            'bg-gray-white shadow-top-fixed sticky top-0 z-[var(--z-header)]',
+            'px-[2rem] pt-[0.8rem] pb-[0.8rem]'
+          )}
+        >
           <SearchBar placeholder='검색어를 입력해 주세요.' />
         </div>
+      )}
+
+      {/* 카테고리 + 원본 검색바 (이 요소가 화면에서 사라지면 위 플로팅 검색바가 나타남) */}
+      <div className='flex-col-center gap-[0.9rem]'>
+        <PillTab items={CATEGORIES} value={category} onChange={setCategory} />
+        <div ref={searchAnchorRef} className='w-full px-[2rem]'>
+          <SearchBar placeholder='검색어를 입력해 주세요.' />
+        </div>
+
         <div className='flex-row-between w-full px-[2rem]'>
           <div className='flex py-[1.2rem]'>
             <span className='caption2 text-gray-900'>
@@ -134,9 +162,6 @@ export default function BoardPage() {
               likeCount={p.likeCount}
               date={p.date}
               author={p.author}
-              onClick={() => {
-                // TODO: 상세 이동 추가
-              }}
             />
           </li>
         ))}
