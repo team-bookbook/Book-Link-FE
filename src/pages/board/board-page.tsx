@@ -1,17 +1,151 @@
-import { useState } from 'react';
-import Calendar from '@components/calendar/calendar';
+import { useMemo, useState } from 'react';
+import PostCard from '@pages/board/components/post-card';
+import PillTab from '@components/tab/pill-tab';
+import SearchBar from '@components/search-bar';
+import UnderlineTab from '@components/tab/underline-tab';
+import SelectDropdown from '@components/dropdown/select-dropdown';
+type TabItem = { key: string; label: string };
+
+const COMMUNITY_TABS: TabItem[] = [
+  { key: 'community', label: '커뮤니티' },
+  { key: 'reading', label: '독서 모임' },
+];
+
+const CATEGORIES: TabItem[] = [
+  { key: 'all', label: '전체' },
+  { key: 'recommend', label: '책 추천' },
+  { key: 'daily', label: '일상' },
+  { key: 'gather', label: '모임 모집' },
+];
+type Post = {
+  id: string;
+  title: string;
+  content: string;
+  commentCount: number;
+  likeCount: number;
+  date: string;
+  author: string;
+  category: string;
+};
+
+type SortType = 'latest' | 'popular';
+
+const SORT_OPTIONS: readonly { value: SortType; label: string }[] = [
+  { value: 'latest', label: '최신순' },
+  { value: 'popular', label: '인기순' },
+] as const;
+
+const MOCK_POSTS: Post[] = [
+  {
+    id: 'p1',
+    title: '게시글 제목',
+    content: '내용이 여기에 들어갑니다. 내용이 여기에 들어갑니다. 내용이 여기에 들어갑니다. 내용이 여기에 들어갑니다.',
+    commentCount: 9,
+    likeCount: 9,
+    date: '2025.09.21',
+    author: '작성자이름',
+    category: 'all',
+  },
+  {
+    id: 'p2',
+    title: '게시글 제목',
+    content: '내용이 여기에 들어갑니다. 내용이 여기에…',
+    commentCount: 9,
+    likeCount: 9,
+    date: '2025.09.21',
+    author: '작성자이름',
+    category: 'all',
+  },
+  {
+    id: 'p3',
+    title: '게시글 제목',
+    content: '내용이 여기에 들어갑니다. 내용이 여기에…',
+    commentCount: 9,
+    likeCount: 9,
+    date: '2025.09.21',
+    author: '작성자이름',
+    category: 'all',
+  },
+  {
+    id: 'p4',
+    title: '게시글 제목',
+    content: '내용이 여기에 들어갑니다. 내용이 여기에…',
+    commentCount: 9,
+    likeCount: 9,
+    date: '2025.09.21',
+    author: '작성자이름',
+    category: 'all',
+  },
+];
 
 export default function BoardPage() {
-  const [selected, setSelected] = useState(new Date());
+  const [topTab, setTopTab] = useState<'community' | 'reading'>('community');
+  const [category, setCategory] = useState<string>('all');
+  const [sort, setSort] = useState<SortType>('latest');
+
+  const filtered = useMemo(() => {
+    const list = category === 'all' ? MOCK_POSTS : MOCK_POSTS.filter((p) => p.category === category);
+    if (sort === 'popular') {
+      return [...list].sort((a, b) => b.likeCount - a.likeCount);
+    }
+    return list;
+  }, [category, sort]);
 
   return (
-    <Calendar
-      value={selected}
-      onChange={setSelected}
-      markers={[
-        { date: '2025-09-03', tone: 'info' },
-        { date: '2025-09-11', tone: 'info' },
-      ]}
-    />
+    <div>
+      <UnderlineTab
+        items={COMMUNITY_TABS}
+        value={topTab}
+        onChange={(k) => setTopTab(k as 'community' | 'reading')}
+        className='sticky top-0'
+      />
+      <div className='flex-col-center gap-[0.9rem]'>
+        <PillTab items={CATEGORIES} value={category} onChange={setCategory} />
+        <div className='w-full px-[2rem]'>
+          <SearchBar placeholder='검색어를 입력해 주세요.' />
+        </div>
+        <div className='flex-row-between w-full px-[2rem]'>
+          <div className='flex py-[1.2rem]'>
+            <span className='caption2 text-gray-900'>
+              총 <span className='text-primary-700'>20개</span>
+            </span>
+          </div>
+
+          <SelectDropdown<SortType>
+            value={sort}
+            options={SORT_OPTIONS}
+            onChange={setSort}
+            align='end'
+            variant='title'
+            menuWidthRem={12}
+            itemHeightRem={3.2}
+            className='relative'
+          />
+        </div>
+      </div>
+
+      {/* 리스트 */}
+      <ul className='divide-y divide-gray-200'>
+        {filtered.map((p) => (
+          <li key={p.id} className='bg-gray-white'>
+            <PostCard
+              title={p.title}
+              content={p.content}
+              commentCount={p.commentCount}
+              likeCount={p.likeCount}
+              date={p.date}
+              author={p.author}
+              className='first:border-t-0'
+              onClick={() => {
+                // 상세 이동
+              }}
+            />
+          </li>
+        ))}
+      </ul>
+
+      {/* 바텀 여백(탭바 겹침 방지) */}
+      <div className='h-[8rem]' aria-hidden />
+    </div>
   );
 }
