@@ -10,6 +10,8 @@ export const ROUTES = {
   ONBOARDING: '/onboarding',
   SETTING: '/mypage',
   SETTING_EDIT: '/mypage/edit',
+  PRIVACY: '/privacy',
+  TERMS_OR_SERVICE: '/terms-of-service',
   CHAT: '/chat',
   CHAT_ROOM: (id = ':matchId') => `/chat/${id}`,
   SCAN: '/scan',

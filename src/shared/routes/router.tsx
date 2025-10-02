@@ -4,7 +4,6 @@ import { ROUTES } from '@routes/routes-config';
 
 const Layout = lazy(() => import('@layouts/layout'));
 const ErrorPage = lazy(() => import('@pages/error/error-page'));
-
 const HomePage = lazy(() => import('@pages/home/home-page'));
 const LibraryPage = lazy(() => import('@pages/library/library-page'));
 const SettingPage = lazy(() => import('@pages/setting/setting-page'));
@@ -25,6 +24,8 @@ const BookDetailPage = lazy(() => import('@pages/library/book-detail-page'));
 const LibraryDetailPage = lazy(() => import('@pages/library/library-detail-page'));
 const LibraryBookPage = lazy(() => import('@pages/library/library-book-page'));
 const LibraryReviewPage = lazy(() => import('@pages/library/library-review-page'));
+const PrivacyPage = lazy(() => import('@pages/setting/privacy-page'));
+const TermsOfService = lazy(() => import('@pages/setting/terms-of-service-page'));
 
 export const router = createBrowserRouter([
   {
@@ -34,6 +35,8 @@ export const router = createBrowserRouter([
       { path: ROUTES.HOME, element: <HomePage /> },
       { path: ROUTES.LIBRARY, element: <LibraryPage /> },
       { path: ROUTES.SETTING, element: <SettingPage /> },
+      { path: ROUTES.PRIVACY, element: <PrivacyPage /> },
+      { path: ROUTES.TERMS_OR_SERVICE, element: <TermsOfService /> },
       { path: ROUTES.BOARD, element: <BoardPage /> },
       { path: ROUTES.CHAT, element: <ChatPage /> },
       { path: ROUTES.CHAT_ROOM(':id'), element: <ChatDetailPage /> },
