@@ -9,9 +9,10 @@ function isUnder(pathname: string, root: string) {
 export default function Footer() {
   const { pathname } = useLocation();
   const isSetting = useMemo(() => isUnder(pathname, ROUTES.SETTING), [pathname]);
-
+  const isHome = useMemo(() => isUnder(pathname, ROUTES.HOME), [pathname]);
+  const BackgroundGray = isSetting || isHome;
   return (
-    <footer className={cn('flex-col-items-start gap-[2.5rem] px-[2.5rem] py-[4rem]', isSetting && 'bg-gray-50')}>
+    <footer className={cn('flex-col-items-start gap-[2.5rem] px-[2.5rem] py-[4rem]', BackgroundGray && 'bg-gray-50')}>
       <div className='flex-col gap-[0.8rem]'>
         <Icon className='text-[#B5B5B5]' name='footer' width={16.5} height={4.5} />
         <p className='caption5 text-gray-500'>booklink@gmail.com</p>
