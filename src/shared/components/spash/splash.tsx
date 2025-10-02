@@ -3,7 +3,6 @@ import { motion, useAnimationControls, cubicBezier, type Transition } from 'fram
 import Icon from '@components/icon';
 import SplashTitle from '@images/splash-title.png';
 
-const MAX_W = '43rem';
 const ELLIPSE_TOP_REM = 32.2;
 const BOOK_W_REM = 4.6;
 const TITLE_W_REM = 18.2;
@@ -96,8 +95,11 @@ export default function Splash() {
   }, [bgCtrl, bigCircleCtrl, ellipseSvgCtrl, ellipseCtrl, fragmentsCtrl, bookWrap, bookIcon, titleCtrl]);
 
   return (
-    <motion.section className='relative h-dvh w-full overflow-hidden' animate={bgCtrl}>
-      <div className='relative mx-auto h-full w-full' style={{ maxWidth: MAX_W }}>
+    <motion.section
+      className='fixed bottom-0 left-1/2 h-dvh w-full max-w-[43rem] -translate-x-1/2 overflow-hidden'
+      animate={bgCtrl}
+    >
+      <div className='relative mx-auto h-full w-full'>
         <motion.div
           className='absolute rounded-[9999px] will-change-transform'
           style={{
@@ -144,26 +146,26 @@ export default function Splash() {
           className='absolute z-[10] will-change-transform'
           style={{
             left: `calc(50% - ${BOOK_W_REM / 2}rem)`,
-            top: `calc(48% - ${BOOK_W_REM / 2}rem)`,
+            top: `calc(48.8% - ${BOOK_W_REM / 2}rem)`,
           }}
           animate={bookWrap}
         >
           <motion.div animate={bookIcon} style={{ transformOrigin: '50% 50%' }}>
-            <Icon name='booklink-open' size={7} ariaHidden />
+            <Icon name='booklink-open' size={6} ariaHidden />
           </motion.div>
         </motion.div>
 
         <motion.div
           className='absolute z-[10] flex items-center'
           style={{
-            left: `calc(50% + ${GAP_REM}rem)`,
+            left: `calc(50% + ${GAP_REM}rem - 0.1rem)`,
             top: `calc(50% - ${BOOK_W_REM / 2}rem + 0.2rem)`,
           }}
           animate={titleCtrl}
           aria-label='BookLink'
           role='img'
         >
-          <img src={SplashTitle} alt='타이틀로고' className='h-auto w-[18.2rem]' />
+          <img src={SplashTitle} alt='타이틀로고' className='h-auto w-[17rem]' />
         </motion.div>
       </div>
     </motion.section>
