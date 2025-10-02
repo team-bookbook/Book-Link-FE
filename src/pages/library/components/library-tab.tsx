@@ -19,6 +19,7 @@ export default function LibraryTab({
       items={TAB_ITEMS as unknown as { key: string; label: string }[]}
       value={value}
       onChange={(k) => onChange(k as LibraryTabKey)}
+      className='sticky top-0'
     />
   );
 }
