@@ -1,9 +1,11 @@
 import { useMemo, useState, useEffect, useRef } from 'react';
 import PostCard from '@pages/board/components/post-card';
+import type { IGroupCard } from '@pages/home/types/home.types';
 import PillTab from '@components/tab/pill-tab';
 import SearchBar from '@components/search-bar';
 import UnderlineTab from '@components/tab/underline-tab';
 import SelectDropdown from '@components/dropdown/select-dropdown';
+import GroupCard from '@pages/home/components/card/group-card';
 import { cn } from '@libs/cn';
 
 type TabItem = { key: string; label: string };
@@ -81,6 +83,41 @@ const MOCK_POSTS: Post[] = [
   },
 ];
 
+const MOCK_GROUPS: IGroupCard[] = [
+  {
+    id: 1,
+    imgurl: 'https://picsum.photos/seed/11/100/100',
+    groupName: '그룹명',
+    leaderName: '그룹장이름',
+    memberCount: 8,
+    description: '그룹에 대한 설명이 여기에 들어갑니다. 그룹에 대한 설명이...',
+  },
+  {
+    id: 2,
+    imgurl: '',
+    groupName: '그룹명',
+    leaderName: '그룹장이름',
+    memberCount: 12,
+    description: '그룹에 대한 설명이 여기에 들어갑니다. 그룹에 대한 설명이...',
+  },
+  {
+    id: 3,
+    imgurl: 'https://picsum.photos/seed/22/100/100',
+    groupName: '그룹명',
+    leaderName: '그룹장이름',
+    memberCount: 5,
+    description: '그룹에 대한 설명이 여기에 들어갑니다. 그룹에 대한 설명이...',
+  },
+  {
+    id: 4,
+    imgurl: '',
+    groupName: '그룹명',
+    leaderName: '그룹장이름',
+    memberCount: 20,
+    description: '그룹에 대한 설명이 여기에 들어갑니다. 그룹에 대한 설명이...',
+  },
+];
+
 export default function BoardPage() {
   const [topTab, setTopTab] = useState<'community' | 'reading'>('community');
   const [category, setCategory] = useState<string>('all');
@@ -99,10 +136,12 @@ export default function BoardPage() {
     return () => io.disconnect();
   }, []);
 
-  const filtered = useMemo(() => {
+  const filteredPosts = useMemo(() => {
     const list = category === 'all' ? MOCK_POSTS : MOCK_POSTS.filter((p) => p.category === category);
     return sort === 'popular' ? [...list].sort((a, b) => b.likeCount - a.likeCount) : list;
   }, [category, sort]);
+
+  const searchPlaceholder = topTab === 'community' ? '검색어를 입력해 주세요.' : '독서모임명으로 검색';
 
   return (
     <div>
@@ -116,55 +155,73 @@ export default function BoardPage() {
       {showFloatingSearch && (
         <div
           ref={floatingSearchRef}
-          className={cn(
-            'bg-gray-white shadow-top-fixed sticky top-0 z-[var(--z-header)]',
-            'px-[2rem] pt-[0.8rem] pb-[0.8rem]'
-          )}
+          className={cn('bg-gray-white sticky top-0 z-[var(--z-header)]', 'px-[2rem] pt-[0.8rem] pb-[0.8rem]')}
         >
-          <SearchBar placeholder='검색어를 입력해 주세요.' />
+          <SearchBar placeholder={searchPlaceholder} />
         </div>
       )}
 
-      <div className='flex-col-center gap-[0.9rem]'>
-        <PillTab items={CATEGORIES} value={category} onChange={setCategory} />
-        <div ref={searchAnchorRef} className='w-full px-[2rem]'>
-          <SearchBar placeholder='검색어를 입력해 주세요.' />
-        </div>
-
-        <div className='flex-row-between w-full px-[2rem]'>
-          <div className='flex py-[1.2rem]'>
-            <span className='caption2 text-gray-900'>
-              총 <span className='text-primary-700'>20개</span>
-            </span>
-          </div>
-
-          <SelectDropdown<SortType>
-            value={sort}
-            options={SORT_OPTIONS}
-            onChange={setSort}
-            align='end'
-            variant='title'
-            menuWidthRem={12}
-            itemHeightRem={3.2}
-            className='relative'
-          />
-        </div>
+      <div className='px-[2rem] pt-[1.2rem]' ref={searchAnchorRef}>
+        <SearchBar placeholder={searchPlaceholder} />
       </div>
 
-      <ul className='space-y-[0.1rem]'>
-        {filtered.map((p) => (
-          <li key={p.id} className='bg-gray-white'>
-            <PostCard
-              title={p.title}
-              content={p.content}
-              commentCount={p.commentCount}
-              likeCount={p.likeCount}
-              date={p.date}
-              author={p.author}
-            />
-          </li>
-        ))}
-      </ul>
+      {topTab === 'community' ? (
+        <>
+          <div className='flex-col-center gap-[0.9rem]'>
+            <PillTab items={CATEGORIES} value={category} onChange={setCategory} />
+            <div className='flex-row-between w-full px-[2rem]'>
+              <div className='flex py-[1.2rem]'>
+                <span className='caption2 text-gray-900'>
+                  총 <span className='text-primary-700'>20개</span>
+                </span>
+              </div>
+
+              <SelectDropdown<SortType>
+                value={sort}
+                options={SORT_OPTIONS}
+                onChange={setSort}
+                align='end'
+                variant='title'
+                menuWidthRem={12}
+                itemHeightRem={3.2}
+                className='relative'
+              />
+            </div>
+          </div>
+
+          <ul className='space-y-[0.1rem]'>
+            {filteredPosts.map((p) => (
+              <li key={p.id} className='bg-gray-white'>
+                <PostCard
+                  title={p.title}
+                  content={p.content}
+                  commentCount={p.commentCount}
+                  likeCount={p.likeCount}
+                  date={p.date}
+                  author={p.author}
+                />
+              </li>
+            ))}
+          </ul>
+        </>
+      ) : (
+        <>
+          <ul className='space-y-[1.2rem] bg-gray-50 px-[2.2rem] py-[2rem]'>
+            {MOCK_GROUPS.map((g) => (
+              <li key={g.id}>
+                <GroupCard
+                  id={g.id}
+                  imgurl={g.imgurl}
+                  groupName={g.groupName}
+                  leaderName={g.leaderName}
+                  memberCount={g.memberCount}
+                  description={g.description}
+                />
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
     </div>
   );
 }
