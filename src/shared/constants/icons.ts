@@ -1,6 +1,7 @@
 export const ICONS = [
   'arrow',
   'back',
+  'booklink-open',
   'cancel',
   'cart',
   'cart-bag',
