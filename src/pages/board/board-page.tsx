@@ -49,7 +49,7 @@ const MOCK_POSTS: Post[] = [
   {
     id: 'p2',
     title: '게시글 제목',
-    content: '내용이 여기에 들어갑니다. 내용이 여기에…',
+    content: '내용이 여기에 들어갑니다. 내용이 여기에 들어갑니다. 내용이 여기에 들어갑니다. 내용이 여기에 들어갑니다.',
     commentCount: 9,
     likeCount: 9,
     date: '2025.09.21',
@@ -59,7 +59,7 @@ const MOCK_POSTS: Post[] = [
   {
     id: 'p3',
     title: '게시글 제목',
-    content: '내용이 여기에 들어갑니다. 내용이 여기에…',
+    content: '내용이 여기에 들어갑니다. 내용이 여기에 들어갑니다. 내용이 여기에 들어갑니다. 내용이 여기에 들어갑니다.',
     commentCount: 9,
     likeCount: 9,
     date: '2025.09.21',
@@ -69,7 +69,7 @@ const MOCK_POSTS: Post[] = [
   {
     id: 'p4',
     title: '게시글 제목',
-    content: '내용이 여기에 들어갑니다. 내용이 여기에…',
+    content: '내용이 여기에 들어갑니다. 내용이 여기에 들어갑니다. 내용이 여기에 들어갑니다. 내용이 여기에 들어갑니다.',
     commentCount: 9,
     likeCount: 9,
     date: '2025.09.21',
@@ -124,8 +124,7 @@ export default function BoardPage() {
         </div>
       </div>
 
-      {/* 리스트 */}
-      <ul className='divide-y divide-gray-200'>
+      <ul className='space-y-[0.1rem]'>
         {filtered.map((p) => (
           <li key={p.id} className='bg-gray-white'>
             <PostCard
@@ -135,17 +134,13 @@ export default function BoardPage() {
               likeCount={p.likeCount}
               date={p.date}
               author={p.author}
-              className='first:border-t-0'
               onClick={() => {
-                // 상세 이동
+                // TODO: 상세 이동 추가
               }}
             />
           </li>
         ))}
       </ul>
-
-      {/* 바텀 여백(탭바 겹침 방지) */}
-      <div className='h-[8rem]' aria-hidden />
     </div>
   );
 }

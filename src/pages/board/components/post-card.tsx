@@ -28,25 +28,25 @@ export default function PostCard({
       onClick={onClick}
       className={cn(
         'bg-gray-white w-full border-t border-gray-200',
-        'p-[1.5rem] text-gray-900',
-        'flex flex-col gap-[1rem]',
+        'px-[2rem] py-[1.5rem] text-gray-900',
+        'flex-col justify-start gap-[1rem]',
         className
       )}
     >
-      <div className='flex w-full justify-start'>
+      <div className='flex w-full'>
         <h3 className='title6'>{title}</h3>
       </div>
-      <div className='flex w-full justify-start'>
-        <p className='body5 text-left text-gray-800'>{content}</p>
+      <div className='flex w-full min-w-0'>
+        <p className='body5 truncate text-left text-gray-800'>{content}</p>
       </div>
 
-      <div className='flex flex-wrap items-center gap-[0.8rem]'>
-        <div className='flex items-center gap-[0.4rem]'>
-          <Icon name='chat' size={1.6} ariaHidden />
+      <div className='flex flex-wrap items-center gap-[0.5rem]'>
+        <div className='flex items-center gap-[0.3rem]'>
+          <Icon name='comment' size={1.6} ariaHidden />
           <span className='caption5'>{commentCount}</span>
         </div>
 
-        <div className='flex items-center gap-[0.4rem]'>
+        <div className='flex items-center gap-[0.3rem]'>
           <Icon name='heart' size={1.6} ariaHidden />
           <span className='caption5'>{likeCount}</span>
         </div>
