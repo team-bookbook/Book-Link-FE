@@ -125,7 +125,6 @@ export default function BoardPage() {
         </div>
       )}
 
-      {/* 카테고리 + 원본 검색바 (이 요소가 화면에서 사라지면 위 플로팅 검색바가 나타남) */}
       <div className='flex-col-center gap-[0.9rem]'>
         <PillTab items={CATEGORIES} value={category} onChange={setCategory} />
         <div ref={searchAnchorRef} className='w-full px-[2rem]'>

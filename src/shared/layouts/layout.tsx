@@ -1,4 +1,4 @@
-import { Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { Outlet, useLocation, useNavigate, matchPath } from 'react-router-dom';
 import { useMemo } from 'react';
 import Header from '@layouts/header';
 import Footer from '@layouts/footer';
@@ -26,6 +26,10 @@ export default function Layout() {
   const isOnboarding = useMemo(() => isUnder(pathname, ROUTES.ONBOARDING), [pathname]);
   const isChat = useMemo(() => isUnder(pathname, ROUTES.CHAT), [pathname]);
   const isCart = useMemo(() => isUnder(pathname, ROUTES.CART), [pathname]);
+  const isChatRoom = useMemo(() => {
+    const pattern = typeof ROUTES.CHAT_ROOM === 'function' ? ROUTES.CHAT_ROOM(':id') : `${ROUTES.CHAT}/:id`;
+    return matchPath({ path: pattern, end: true }, pathname) != null;
+  }, [pathname]);
   const isAuthOrOnboarding = useMemo(
     () =>
       isUnder(pathname, ROUTES.LOGIN) ||
@@ -85,7 +89,7 @@ export default function Layout() {
         {!isAuthOrOnboarding && !isChat && !isCart && <Footer />}
       </main>
 
-      {!isAuthOrOnboarding && <BottomNav />}
+      {!isAuthOrOnboarding && !isChatRoom && <BottomNav />}
 
       {floatingBtn && (
         <div
