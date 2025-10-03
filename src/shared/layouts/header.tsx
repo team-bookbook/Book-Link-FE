@@ -63,6 +63,8 @@ export default function Header({
   const nav = useNavigate();
   const { pathname } = useLocation();
   const isSetting = useMemo(() => isUnder(pathname, ROUTES.SETTING), [pathname]);
+  const isBoard = useMemo(() => isUnder(pathname, ROUTES.BOARD), [pathname]);
+  const NoShadow = isSetting || isBoard;
 
   const handleAction = (id: ActionId) => {
     if (id === 'bell') {
@@ -82,7 +84,7 @@ export default function Header({
       className={clsx(
         'bg-gray-white sticky top-0 z-[var(--z-header)]',
         safeTop && 'pt-[env(safe-area-inset-top)]',
-        !isSetting && 'shadow-top-fixed',
+        !NoShadow && 'shadow-top-fixed',
         className
       )}
     >

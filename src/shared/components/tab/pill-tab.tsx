@@ -19,7 +19,12 @@ export default function PillTab({ items, value, onChange, className }: PillTabPr
     <div
       role='tablist'
       aria-label='필터 탭'
-      className={cn('w-full', 'scrollbar-hide overflow-x-auto whitespace-nowrap', 'px-[2rem] py-[1rem]', className)}
+      className={cn(
+        'w-full',
+        'scrollbar-hide overflow-x-auto whitespace-nowrap',
+        'h-[5.7rem] px-[2rem] py-[1rem]',
+        className
+      )}
     >
       <div className='flex w-full items-center gap-[0.6rem]'>
         {items.map((it) => {

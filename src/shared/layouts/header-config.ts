@@ -58,6 +58,18 @@ const settingRule: Rule = (path) =>
     ? { title: '마이페이지', actions: ['logout', 'bell'], safeTop: true }
     : undefined;
 
+// 개인정보 처리방침
+const privacyRule: Rule = (path) =>
+  ROUTES.PRIVACY && matchPath({ path: ROUTES.PRIVACY, end: true }, path)
+    ? { left: 'back', title: '개인정보 처리방침' }
+    : undefined;
+
+// 이용약관
+const serviceRule: Rule = (path) =>
+  ROUTES.TERMS_OR_SERVICE && matchPath({ path: ROUTES.TERMS_OR_SERVICE, end: true }, path)
+    ? { left: 'back', title: '서비스 이용약관' }
+    : undefined;
+
 // 알림 목록
 const notiRole: Rule = (path) =>
   ROUTES.NOTIFICATION && matchPath({ path: ROUTES.NOTIFICATION, end: true }, path)
@@ -139,6 +151,8 @@ const RULES: ReadonlyArray<Rule> = [
   libraryCreateRule,
   bookCreateRule,
   cartRule,
+  privacyRule,
+  serviceRule,
 ];
 
 export function getHeaderForRoute(pathname: string, search: string): HeaderProps {

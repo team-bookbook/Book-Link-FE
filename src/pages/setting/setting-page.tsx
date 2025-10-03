@@ -1,4 +1,5 @@
 import Icon from '@components/icon';
+import { Link } from 'react-router-dom';
 
 export default function SettingPage() {
   return (
@@ -19,8 +20,8 @@ export default function SettingPage() {
 
         <section className='bg-gray-white overflow-hidden rounded-[16px] py-[1rem]'>
           <ListItem icon='point' label='포인트 내역 조회' withDivider />
-          <ListItem icon='my-docs' label='개인정보 처리방침' withDivider />
-          <ListItem icon='my-docs' label='이용약관' />
+          <ListItem icon='my-docs' label='개인정보 처리방침' to='/privacy' withDivider /> {/* ⬅️ 이동 */}
+          <ListItem icon='my-docs' label='이용약관' to='/terms-of-service' /> {/* ⬅️ 이동 */}
         </section>
 
         <section className='bg-gray-white overflow-hidden rounded-[16px]'>
@@ -35,19 +36,29 @@ type ItemProps = {
   icon: string;
   label: string;
   withDivider?: boolean;
+  to?: string;
 };
 
-function ListItem({ icon, label, withDivider }: ItemProps) {
+function ListItem({ icon, label, withDivider, to }: ItemProps) {
+  const content = (
+    <div className='flex items-center justify-between px-[2rem] py-[2rem]'>
+      <div className='flex items-center gap-[0.6rem] text-gray-900'>
+        <Icon name={icon} size={2.0} ariaHidden />
+        <span className='title6'>{label}</span>
+      </div>
+      <Icon name='arrow' rotate={180} size={1.6} className='text-gray-900' ariaHidden />
+    </div>
+  );
+
   return (
     <>
-      <div className='flex cursor-pointer items-center justify-between px-[2rem] py-[2rem]'>
-        <div className='flex items-center gap-[0.6rem] text-gray-900'>
-          <Icon name={icon} size={2.0} ariaHidden />
-          <span className='title6'>{label}</span>
-        </div>
-        <Icon name='arrow' rotate={180} size={1.6} className='text-gray-900' ariaHidden />
-      </div>
-
+      {to ? (
+        <Link to={to} className='block cursor-pointer'>
+          {content}
+        </Link>
+      ) : (
+        <div className='cursor-pointer'>{content}</div>
+      )}
       {withDivider && <div aria-hidden className='mx-[2rem] h-[0.1rem] bg-gray-100' />}
     </>
   );
