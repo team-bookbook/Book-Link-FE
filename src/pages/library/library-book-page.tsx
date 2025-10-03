@@ -4,12 +4,13 @@ import SelectBottomSheet from '@components/bottom-sheet/select-bottom-sheet';
 import useBottomSheet from '@components/bottom-sheet/hooks/use-bottom-sheet';
 import LibraryBookCard from '@pages/library/components/card/library-book-card';
 import { useLibraryBooks } from '@pages/library/hooks/useLibraryBooks';
-import { BOOK_CATEGORY_OPTIONS, type BookCategory } from '@components/dropdown/constants/select-options';
+import { BOOK_CATEGORY_OPTIONS } from '@components/dropdown/constants/select-options';
+import SearchBar from '@components/search-bar';
 
 export default function LibraryBookPage() {
   const { books, isLoading } = useLibraryBooks();
   const { isOpen, open, close } = useBottomSheet();
-  const [selectCategory, setSelectCategory] = useState<BookCategory>('all');
+  const [selectCategory, setSelectCategory] = useState<string>('all');
 
   if (isLoading) {
     return (
@@ -24,7 +25,8 @@ export default function LibraryBookPage() {
   }
 
   return (
-    <div className='flex-col gap-[1rem] px-[2rem] pt-[3rem]'>
+    <div className='pt-1.5rem] flex-col gap-[1rem] px-[2rem]'>
+      <SearchBar placeholder={'검색어를 입력해 주세요.'} />
       <button onClick={open} className='body4 flex cursor-pointer items-center gap-[0.4rem] self-end text-gray-900'>
         <span>{BOOK_CATEGORY_OPTIONS.find((opt) => opt.value === selectCategory)?.label}</span>
         <Icon name='dropdown' size={1.2} />
