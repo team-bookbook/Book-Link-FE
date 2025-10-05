@@ -28,8 +28,8 @@ export default function LibraryCard({ library }: LibraryCardProps) {
           <h1 className='caption3'>{library.owner}</h1>
           <h2 className='caption5 text-gray-600'>즐겨찾는 인원 {library.followerCount}명</h2>
         </div>
-        <button className='bg-gray-white caption3 ml-auto cursor-pointer rounded-[8px] border border-gray-300 px-[2.8rem] py-[0.8rem]'>
-          즐겨찾기
+        <button className='ml-auto cursor-pointer'>
+          <Icon name='heart' className='text-system-error' size={2.4} />
         </button>
       </div>
     );
