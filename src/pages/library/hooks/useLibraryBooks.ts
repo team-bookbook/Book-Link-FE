@@ -47,7 +47,7 @@ const generateDummyLibraryBooks = (count: number = 7): ILibraryBook[] => {
     title: bookTitles[Math.floor(Math.random() * bookTitles.length)],
     author: authors[Math.floor(Math.random() * authors.length)],
     library: libraries[Math.floor(Math.random() * libraries.length)],
-    dueDate: `${Math.floor(Math.random() * 12) + 1}월 ${Math.floor(Math.random() * 28) + 1}일 ~ ${Math.floor(Math.random() * 12) + 1}월 ${Math.floor(Math.random() * 28) + 1}일`,
+    dueDate: `2025.1${Math.floor(Math.random() * 2) + 1}.0${Math.floor(Math.random() * 9) + 1}`,
     maxDays: Math.floor(Math.random() * 30) + 7,
     deposit: Math.floor(Math.random() * 5) * 1000 + 3000,
     status: statuses[Math.floor(Math.random() * statuses.length)],

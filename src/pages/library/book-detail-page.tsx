@@ -49,7 +49,7 @@ export default function BookDetailPage() {
   };
 
   if (!book) {
-    return <div>{BOOK_DETAIL_LABELS.loading}</div>;
+    return;
   }
 
   const bookDetailHeader = () => {
