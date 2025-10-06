@@ -65,6 +65,19 @@ const createHttpClient = (baseURL: string) => {
     },
   });
 
+  instance.interceptors.request.use(
+    (config) => {
+      const token = localStorage.getItem('accessToken');
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
+      return config;
+    },
+    (error) => {
+      return Promise.reject(error);
+    }
+  );
+
   instance.interceptors.response.use(
     (response) => {
       const res = response.data as ApiResponse;
@@ -89,8 +102,9 @@ const createHttpClient = (baseURL: string) => {
   return instance;
 };
 
-const baseURL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api';
+const baseURL = import.meta.env.VITE_API_BASE_URL;
 export const httpClient = createHttpClient(baseURL);
+console.log(baseURL);
 
 export async function get<T>(...args: Parameters<typeof httpClient.get>): Promise<T> {
   return httpClient.get<T>(...args).then((res) => res.data);
