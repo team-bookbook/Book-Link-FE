@@ -25,7 +25,7 @@ export default function LibraryBookPage() {
   }
 
   return (
-    <div className='pt-1.5rem] flex-col gap-[1rem] px-[2rem]'>
+    <div className='pt-[1.5rem] flex-col gap-[1rem] px-[2rem]'>
       <SearchBar placeholder={'검색어를 입력해 주세요.'} />
       <button onClick={open} className='body4 flex cursor-pointer items-center gap-[0.4rem] self-end text-gray-900'>
         <span>{BOOK_CATEGORY_OPTIONS.find((opt) => opt.value === selectCategory)?.label}</span>
