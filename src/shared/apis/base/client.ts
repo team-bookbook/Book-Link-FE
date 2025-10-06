@@ -102,7 +102,7 @@ const createHttpClient = (baseURL: string) => {
   return instance;
 };
 
-const baseURL = import.meta.env.VITE_API_BASE_URL;
+const baseURL = import.meta.env.DEV ? '/api' : import.meta.env.VITE_API_BASE_URL;
 export const httpClient = createHttpClient(baseURL);
 console.log(baseURL);
 
