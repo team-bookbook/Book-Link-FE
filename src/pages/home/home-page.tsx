@@ -33,7 +33,6 @@ export default function HomePage() {
     useHomeData();
 
   console.log(error);
-
   const hasData = loanData.length > 0 && groupData.length > 0 && reservationData.length > 0;
 
   const renderUserGreeting = () => (
