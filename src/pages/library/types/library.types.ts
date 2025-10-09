@@ -32,14 +32,22 @@ export interface IBookDetail {
   longitude?: number;
 }
 
-export interface ILibrary {
-  id: number;
+export type ILibrary = {
+  id: string;
   name: string;
-  owner: string;
-  followerCount: number;
   description: string;
-  profileImgUrl?: string;
-  coverImgUrl?: string;
-  isRecommended?: boolean;
-  isFavorite?: boolean;
-}
+  stars: number;
+  likeCount: number;
+  bookCount: number;
+  createdAt: string;
+  thumbnailUrl: string;
+  startTime: string;
+  endTime: string;
+  topBooks: Array<{
+    bookId: string;
+    title: string;
+    author: string;
+    publisher: string;
+    category: string;
+  }>;
+};
