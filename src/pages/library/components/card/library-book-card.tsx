@@ -23,7 +23,8 @@ const getStatusInfo = (status: BookStatus) => {
 };
 
 export default function LibraryBookCard({ book, isCart = true }: LibraryBookCardProps) {
-  const statusInfo = getStatusInfo(book.status);
+  const status: BookStatus = book.rentedOut ? 'rented' : 'available';
+  const statusInfo = getStatusInfo(status);
   const navigate = useNavigate();
   const { addToCart } = useCart();
 
@@ -57,8 +58,8 @@ export default function LibraryBookCard({ book, isCart = true }: LibraryBookCard
           </button>
         )}
 
-        {book.imgUrl ? (
-          <img src={book.imgUrl} alt={book.title} className='h-full w-full object-cover' />
+        {book.imageUrl ? (
+          <img src={book.imageUrl} alt={book.title} className='h-full w-full object-cover' />
         ) : (
           <div className='flex h-full w-full items-center justify-center bg-gray-200'>
             <Icon name='logo-alt' size={3.6} className='text-gray-400' />
@@ -72,16 +73,16 @@ export default function LibraryBookCard({ book, isCart = true }: LibraryBookCard
             <h2 className='caption5 text-gray-600'>{book.author}</h2>
             <span className='flex'>
               <Icon name='location' size={1.6} className='text-primary-700' />
-              <h2 className='caption5 text-gray-600'>{book.library}</h2>
+              <h2 className='caption5 text-gray-600'>{book.libraryName}</h2>
             </span>
           </div>
         </div>
         <div className='flex-col gap-[0.3rem]'>
           <p className='flex-row-center caption5 max-w-[7.4rem] rounded-[2px] bg-gray-100 text-gray-600'>
-            {book.dueDate}
+            {book.expectedReturnDate}
           </p>
           <h3 className='caption5 flex gap-[0.5rem] text-gray-600'>
-            <span>최대 반납기한 {book.maxDays}일</span>
+            <span>거리 {book.distance}m</span>
             <span>|</span>
             <span>보증금 {book.deposit}p</span>
           </h3>

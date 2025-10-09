@@ -1,5 +1,5 @@
 export type LibSort = 'recent' | 'popular' | 'distance';
-export type BookSort = 'recent' | 'popular';
+export type BookSort = 'DISTANCE' | 'LATEST' | 'MOST_BORROWED';
 export type RentStatus = 'pending' | 'confirmed' | 'stopped';
 export type BookCategory = 'all' | '000' | '100' | '200' | '300' | '400' | '500' | '600' | '700' | '800' | '900';
 export type BookCategoryLabel =
@@ -22,8 +22,9 @@ export const LIB_SORT_OPTIONS: ReadonlyArray<{ value: LibSort; label: string }> 
 ];
 
 export const BOOK_SORT_OPTIONS: ReadonlyArray<{ value: BookSort; label: string }> = [
-  { value: 'recent', label: '최신순' },
-  { value: 'popular', label: '인기순' },
+  { value: 'LATEST', label: '최신순' },
+  { value: 'MOST_BORROWED', label: '인기순' },
+  { value: 'DISTANCE', label: '거리순' },
 ];
 
 export const RENT_STATUS_OPTIONS: ReadonlyArray<{ value: RentStatus; label: string }> = [

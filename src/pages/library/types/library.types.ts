@@ -1,21 +1,18 @@
 export type BookStatus = 'available' | 'rented' | 'reserved';
+export type TBookSort = 'DISTANCE' | 'LATEST' | 'MOST_BORROWED';
 
 export interface ILibraryBook {
-  id: number;
+  imageUrl: string;
+  id: string;
   title: string;
   author: string;
-  library: string;
-  dueDate: string;
-  maxDays: number;
+  libraryName: string;
+  distance: number;
+  copies: number;
+  borrowedCount: number;
   deposit: number;
-  status: BookStatus;
-  imgUrl?: string;
-}
-
-export interface ILibraryData {
-  books: ILibraryBook[];
-  isLoading: boolean;
-  error: string | null;
+  rentedOut: boolean;
+  expectedReturnDate: string;
 }
 
 export interface IBookDetail {

@@ -4,7 +4,6 @@ import type { ILibrary } from '@pages/library/types/library.types';
 import { LIBRARY_LIST_LABELS, type LibraryListTab } from '@pages/library/constants/library-list';
 import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '@routes/routes-config';
-
 export default function LibraryList() {
   const navigate = useNavigate();
   const [libraries, setLibraries] = useState<ILibrary[]>([]);
