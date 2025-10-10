@@ -41,7 +41,7 @@ export const END_POINT = {
 
   // 도서관 API
   LIBRARY: 'library',
-  LIBRARY_BY_ID: (libraryId: number) => `/library/${libraryId}`,
+  LIBRARY_BY_ID: (libraryId: string) => `/library/${libraryId}`,
 
   // 1:1 채팅 API
   SINGLE_CHATS_SEND_MESSAGE: '/singleChats/sendMessage',

@@ -32,4 +32,13 @@ export const libraryQueries = {
         return res;
       },
     }),
+
+  GET_LIBRARY_DETAIL: (id: string) =>
+    queryOptions<ILibrary>({
+      queryKey: ['GET_LIBRARY_DETAIL', id],
+      queryFn: async () => {
+        const res = await get<ILibrary>(END_POINT.LIBRARY_BY_ID(id));
+        return res;
+      },
+    }),
 };

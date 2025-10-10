@@ -1,16 +1,22 @@
 import BookCard from '@pages/home/components/card/book-card';
 import SectionLayout from '@components/section-layout';
-import { useLibraryDetailData } from '@pages/library/hooks/useLibraryDetailData';
 import { useKeenSlider } from 'keen-slider/react';
 import 'keen-slider/keen-slider.min.css';
-import ReviewCard from '@pages/library/components/card/libary-reivew-card';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { ROUTES } from '@routes/routes-config';
 import LibraryRatingSection from '@pages/library/components/section/section-library-rating';
+import { libraryQueries } from '@apis/library/library-queries';
+import { useQuery } from '@tanstack/react-query';
 
 export default function LibraryDetailPage() {
-  const { libraryInfo, bookData, reviewData, isLoadingLibraryInfo, isLoadingBooks, isLoadingReviews, error } =
-    useLibraryDetailData();
+  const { id: libraryId } = useParams<{ id: string }>();
+
+  const { data: libraryInfo, isLoading } = useQuery(libraryQueries.GET_LIBRARY_DETAIL(libraryId || ''));
+
+  const bookData = libraryInfo?.topBooks || [];
+  const isLoadingBooks = isLoading;
+  const isLoadingReviews = false;
+
   const [sliderRef] = useKeenSlider({
     mode: 'free-snap',
     slides: {
@@ -18,14 +24,10 @@ export default function LibraryDetailPage() {
       spacing: 10,
     },
   });
+
   const location = useLocation();
   const navigate = useNavigate();
-  const { id: libraryId } = useParams<{ id: string }>();
   const isMyPage = location.pathname === '/library/my';
-
-  console.log(libraryId);
-
-  console.log(error);
 
   const handleFavoriteClick = () => {
     console.log('즐겨찾기 버튼 클릭');
@@ -58,9 +60,9 @@ export default function LibraryDetailPage() {
       <div
         className='relative flex min-h-[30rem] flex-col justify-end gap-[0.5rem] p-[2rem] text-white'
         style={
-          libraryInfo.imageUrl
+          libraryInfo.thumbnailUrl
             ? {
-                backgroundImage: `linear-gradient(to bottom, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.6)), url(${libraryInfo.imageUrl})`,
+                backgroundImage: `linear-gradient(to bottom, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.6)), url(${libraryInfo.thumbnailUrl})`,
                 backgroundSize: 'cover',
                 backgroundPosition: 'center',
               }
@@ -86,12 +88,12 @@ export default function LibraryDetailPage() {
         )}
         <div className='flex-col gap-[0.4rem]'>
           <h1 className='title3'>{libraryInfo.name}</h1>
-          <h2 className='caption1'>{libraryInfo.hours}</h2>
+          <h2 className='caption1'>{`${libraryInfo.startTime} - ${libraryInfo.endTime}`}</h2>
         </div>
         <LibraryRatingSection
-          rating={libraryInfo.rating}
-          reviewCount={libraryInfo.reviewCount}
-          favoriteCount={libraryInfo.favoriteCount}
+          rating={libraryInfo.stars}
+          reviewCount={0}
+          favoriteCount={libraryInfo.likeCount}
           onFavoriteClick={handleFavoriteClick}
         />
       </div>
@@ -99,28 +101,17 @@ export default function LibraryDetailPage() {
   };
 
   const titleDescription = () => {
-    if (isLoadingLibraryInfo || !libraryInfo) return null;
+    if (!libraryInfo?.description) return null;
 
     return (
       <div className='flex-col gap-[1rem] px-[2rem]'>
-        <h1 className='caption2'>{libraryInfo.description.title}</h1>
-        <h2 className='caption5'>{libraryInfo.description.content}</h2>
+        <h2 className='caption5'>{libraryInfo.description}</h2>
       </div>
     );
   };
 
   const rewardDescription = () => {
-    if (isLoadingLibraryInfo || !libraryInfo) return null;
-
-    return (
-      <div className='flex-col gap-[1rem] px-[2rem]'>
-        <h1 className='caption2'>{libraryInfo.reward.title}</h1>
-        <span className='flex-items-center gap-[0.8rem]'>
-          <h2 className='catpion4 text-gray-700'>{libraryInfo.reward.pointLabel}</h2>
-          <h2 className='caption5'>{libraryInfo.reward.pointDescription}</h2>
-        </span>
-      </div>
-    );
+    return null;
   };
 
   const bookListSection = () => {
@@ -141,13 +132,13 @@ export default function LibraryDetailPage() {
           <div ref={sliderRef} className='keen-slider px-[2rem]'>
             {bookData.map((book, index) => (
               <BookCard
-                key={`${book.id}-${index}`}
-                id={book.id}
+                key={`${book.bookId}-${index}`}
+                id={parseInt(book.bookId, 10)}
                 index={index}
-                imgurl={book.imgurl}
+                imgurl=''
                 title={book.title}
                 author={book.author}
-                expDate={book.expDate}
+                expDate={0}
               />
             ))}
           </div>
@@ -167,12 +158,12 @@ export default function LibraryDetailPage() {
           }
         }}
         isLoading={isLoadingReviews}
-        isEmpty={reviewData.length === 0}
+        // isEmpty={reviewData.length === 0}
       >
         <div className='flex-col gap-[2rem] px-[2rem]'>
-          {reviewData.map((review) => (
+          {/* {reviewData.map((review) => (
             <ReviewCard key={review.id} review={review} />
-          ))}
+          ))} */}
         </div>
       </SectionLayout>
     );
