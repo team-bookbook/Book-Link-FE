@@ -7,19 +7,26 @@ import { libraryBookQueries } from '@apis/library/library-book-queries';
 import { useQuery } from '@tanstack/react-query';
 import { v4 as uuidv4 } from 'uuid';
 import useDaumPostcode from '@hooks/use-daum-postcode';
+import type { TLocation } from '@pages/library/types/library.types';
 
-export default function BookList() {
+interface Coordinates {
+  latitude: number;
+  longitude: number;
+}
+
+interface BookListProps {
+  location: TLocation;
+  setLocation: React.Dispatch<React.SetStateAction<TLocation>>;
+  convertCoord: (address: string) => Promise<Coordinates>;
+}
+
+export default function BookList({ location, setLocation, convertCoord }: BookListProps) {
   const [bookSort, setBookSort] = useState<BookSort>('DISTANCE');
-  const [location, setLocation] = useState({
-    address: '서울 마포구 효창원로98길 1-1',
-    latitude: 37.48486731057572,
-    longitude: 126.92841740891708,
-  });
   const openPostcode = useDaumPostcode();
 
   const queryParams = {
-    latitude: location.latitude,
-    longitude: location.longitude,
+    latitude: location.lat,
+    longitude: location.lng,
     page: 0,
     size: 10,
   };
@@ -29,18 +36,17 @@ export default function BookList() {
   console.log(data, isLoading, error);
 
   const handleLocationSearch = async () => {
-    try {
-      await openPostcode((d) => {
-        const address = d.address;
-        setLocation({
-          address,
-          latitude: location.latitude, // TODO: 주소를 위도/경도로 변환하는 로직 추가 필요
-          longitude: location.longitude,
-        });
+    await openPostcode(async (d) => {
+      const address = d.address;
+
+      const coords = await convertCoord(address);
+      console.log(coords);
+      setLocation({
+        address,
+        lat: coords.latitude,
+        lng: coords.longitude,
       });
-    } catch {
-      /* */
-    }
+    });
   };
 
   const BookListOptions = () => {

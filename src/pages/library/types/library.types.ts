@@ -32,7 +32,7 @@ export interface IBookDetail {
   longitude?: number;
 }
 
-export type ILibrary = {
+export interface ILibrary {
   id: string;
   name: string;
   description: string;
@@ -50,4 +50,10 @@ export type ILibrary = {
     publisher: string;
     category: string;
   }>;
+}
+
+export type TLocation = {
+  address: string;
+  lat: number;
+  lng: number;
 };

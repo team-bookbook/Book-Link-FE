@@ -6,15 +6,15 @@ import { ROUTES } from '@routes/routes-config';
 import { libraryQueries } from '@apis/library/library-queries';
 import { useQuery } from '@tanstack/react-query';
 import { v4 as uuidv4 } from 'uuid';
+import type { TLocation } from '@pages/library/types/library.types';
 
-export default function LibraryList() {
+interface LibaryListProps {
+  queryParams: TLocation;
+}
+
+export default function LibraryList({ queryParams }: LibaryListProps) {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<LibraryListTab>('recommended');
-
-  const queryParams = {
-    lat: 15.341,
-    lng: 12.341,
-  };
 
   const { data, isLoading, error } = useQuery(libraryQueries.GET_LIBRARY(queryParams));
   console.log(data, isLoading, error);
