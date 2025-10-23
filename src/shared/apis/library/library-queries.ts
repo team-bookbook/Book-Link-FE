@@ -1,5 +1,6 @@
 import { get } from '@apis/base/client';
 import { END_POINT } from '@constants/end-point';
+import { queryKeys } from '@constants/query-keys';
 import type { ILibrary } from '@pages/library/types/library.types';
 import { queryOptions } from '@tanstack/react-query';
 
@@ -24,7 +25,7 @@ interface ILibraryParams {
 export const libraryQueries = {
   GET_LIBRARY: (params: ILibraryParams) =>
     queryOptions<ILibrary[]>({
-      queryKey: ['GET_LIBRARY', params],
+      queryKey: queryKeys.library.list(params),
       queryFn: async () => {
         const res = await get<ILibrary[]>(END_POINT.LIBRARY, {
           params,
@@ -35,7 +36,7 @@ export const libraryQueries = {
 
   GET_LIBRARY_DETAIL: (id: string) =>
     queryOptions<ILibrary>({
-      queryKey: ['GET_LIBRARY_DETAIL', id],
+      queryKey: queryKeys.library.detail(id),
       queryFn: async () => {
         const res = await get<ILibrary>(END_POINT.LIBRARY_BY_ID(id));
         return res;

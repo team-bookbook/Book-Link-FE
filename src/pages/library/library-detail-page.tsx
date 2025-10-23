@@ -10,7 +10,6 @@ import { useQuery } from '@tanstack/react-query';
 
 export default function LibraryDetailPage() {
   const { id: libraryId } = useParams<{ id: string }>();
-
   const { data: libraryInfo, isLoading } = useQuery(libraryQueries.GET_LIBRARY_DETAIL(libraryId || ''));
 
   const bookData = libraryInfo?.topBooks || [];

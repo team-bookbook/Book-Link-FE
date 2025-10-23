@@ -1,5 +1,6 @@
 import { get } from '@apis/base/client';
 import { END_POINT } from '@constants/end-point';
+import { queryKeys } from '@constants/query-keys';
 import type { ILibraryBook, TBookSort } from '@pages/library/types/library.types';
 import { queryOptions } from '@tanstack/react-query';
 
@@ -25,7 +26,7 @@ interface IgetLibraryBook {
 export const libraryBookQueries = {
   GET_LIBRARY_BOOK: (params: ILibraryBookParams) =>
     queryOptions<IgetLibraryBook>({
-      queryKey: ['GET_LIBRARY_BOOK', params],
+      queryKey: queryKeys.libraryBook.list(params),
       queryFn: async () => {
         const res = await get<IgetLibraryBook>(END_POINT.LIBRARY_BOOK, {
           params,
