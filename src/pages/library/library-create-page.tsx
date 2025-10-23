@@ -3,6 +3,8 @@ import Button from '@components/button/button';
 import ButtonFrame from '@components/button/button-frame';
 import Input from '@components/input/input';
 import TimePicker, { type HMValue } from '@components/time-picker/time-picker';
+import { libraryMutations } from '@apis/library/library-mutations';
+import { useMutation } from '@tanstack/react-query';
 
 export default function LibraryCreatePage() {
   const fileRef = useRef<HTMLInputElement | null>(null);
@@ -12,6 +14,8 @@ export default function LibraryCreatePage() {
   const [openAt, setOpenAt] = useState<HMValue | undefined>(undefined);
   const [closeAt, setCloseAt] = useState<HMValue | undefined>(undefined);
   const [intro, setIntro] = useState('');
+
+  const { mutate: createLibrary } = useMutation(libraryMutations.POST_LIBRARY());
 
   const canSubmit = name.trim().length > 0 && !!openAt && !!closeAt && intro.trim().length > 10;
 
@@ -28,22 +32,30 @@ export default function LibraryCreatePage() {
     reader.readAsDataURL(f);
   };
 
+  const formatTime = (time: HMValue): string => {
+    const hours = String(time.hour).padStart(2, '0');
+    const minutes = String(time.minute).padStart(2, '0');
+    return `${hours}:${minutes}`;
+  };
+
   const submit = () => {
-    if (!canSubmit) return;
-    const payload: {
-      name: string;
-      intro: string;
-      openAt: HMValue;
-      closeAt: HMValue;
-      imageUrl?: string;
-    } = {
-      name: name.trim(),
-      intro: intro.trim(),
-      openAt: openAt as HMValue,
-      closeAt: closeAt as HMValue,
-      imageUrl: imageUrl || undefined,
-    };
-    console.log('create library payload ->', payload);
+    if (!openAt || !closeAt) return;
+
+    const latitude = Number(localStorage.getItem('latitude')) || 0;
+    const longitude = Number(localStorage.getItem('longitude')) || 0;
+
+    createLibrary({
+      name,
+      description: intro,
+      thumbnailUrl: imageUrl,
+      startTime: formatTime(openAt),
+      endTime: formatTime(closeAt),
+      latitude,
+      longitude,
+      validOperatingHours: true,
+    });
+
+    console.log(name, intro, imageUrl, openAt, closeAt, latitude, longitude, true);
   };
 
   return (
