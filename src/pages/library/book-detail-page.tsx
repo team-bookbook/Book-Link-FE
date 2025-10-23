@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import Divider from '@components/divider';
 import Icon from '@components/icon';
-import { useCart } from '@pages/library/hooks/useCart';
 import type { IBookDetail } from '@pages/library/types/library.types';
 import Button from '@components/button/button';
 import { BOOK_DETAIL_LABELS } from '@pages/library/constants/book-detail';
@@ -11,7 +10,7 @@ export default function BookDetailPage() {
   const { bookId } = useParams<{ bookId: string }>();
   const [book, setBook] = useState<IBookDetail | null>(null);
   const nav = useNavigate();
-  const { addToCart } = useCart();
+  // const { addToCart } = useCart();
 
   useEffect(() => {
     const mockBook: IBookDetail = {
@@ -34,17 +33,17 @@ export default function BookDetailPage() {
   const handleCartClick = async (e: React.MouseEvent) => {
     e.stopPropagation();
     if (book) {
-      await addToCart({
-        id: book.id,
-        title: book.title,
-        author: book.author,
-        library: book.library,
-        dueDate: new Date(Date.now() + book.maxDays * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-        maxDays: book.maxDays,
-        deposit: book.deposit,
-        status: book.status,
-        imgUrl: book.imgUrl,
-      });
+      // await addToCart({
+      //   id: String(book.id),
+      //   title: book.title,
+      //   author: book.author,
+      //   library: book.library,
+      //   dueDate: new Date(Date.now() + book.maxDays * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+      //   maxDays: book.maxDays,
+      //   deposit: book.deposit,
+      //   status: book.status,
+      //   imgUrl: book.imgUrl,
+      // });
     }
   };
 
