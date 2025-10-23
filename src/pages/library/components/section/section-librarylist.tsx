@@ -1,61 +1,23 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useState } from 'react';
 import LibraryCard from '@pages/library/components/card/library-card';
-import type { ILibrary } from '@pages/library/types/library.types';
 import { LIBRARY_LIST_LABELS, type LibraryListTab } from '@pages/library/constants/library-list';
 import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '@routes/routes-config';
+import { libraryQueries } from '@apis/library/library-queries';
+import { useQuery } from '@tanstack/react-query';
+import { v4 as uuidv4 } from 'uuid';
+import type { TLocation } from '@pages/library/types/library.types';
 
-export default function LibraryList() {
+interface LibaryListProps {
+  queryParams: TLocation;
+}
+
+export default function LibraryList({ queryParams }: LibaryListProps) {
   const navigate = useNavigate();
-  const [libraries, setLibraries] = useState<ILibrary[]>([]);
   const [activeTab, setActiveTab] = useState<LibraryListTab>('recommended');
 
-  useEffect(() => {
-    const mockLibraries: ILibrary[] = [
-      {
-        id: 1,
-        name: '우리 도서관을 소개합니다!',
-        owner: 'changchangwoo',
-        followerCount: 14,
-        description: '여기에 도서관 소개글이 작성됩니다. 도서관 소유자가 자유롭게 도서관 소개글을 작성할 수 있습니다.',
-        profileImgUrl: undefined,
-        coverImgUrl: undefined,
-        isRecommended: true,
-        isFavorite: false,
-      },
-      {
-        id: 2,
-        name: '동네 작은 책방',
-        owner: 'bookLover88',
-        followerCount: 32,
-        description: '책을 사랑하는 사람들이 모이는 따뜻한 공간입니다. 다양한 장르의 책들을 보유하고 있어요.',
-        profileImgUrl: 'https://picsum.photos/330/330?random=2',
-        coverImgUrl: 'https://picsum.photos/330/330?random=4',
-        isRecommended: true,
-        isFavorite: true,
-      },
-      {
-        id: 3,
-        name: '동네 작은 책방',
-        owner: 'bookLover99',
-        followerCount: 32,
-        description: '책을 사랑하는 사람들이 모이는 따뜻한 공간입니다. 다양한 장르의 책들을 보유하고 있어요.',
-        profileImgUrl: undefined,
-        coverImgUrl: 'https://picsum.photos/330/330?random=2',
-        isRecommended: false,
-        isFavorite: true,
-      },
-    ];
-    setLibraries(mockLibraries);
-  }, []);
-
-  const filteredLibraries = useMemo(() => {
-    return libraries.filter((library) => {
-      if (activeTab === 'recommended') return library.isRecommended;
-      if (activeTab === 'favorite') return library.isFavorite;
-      return true;
-    });
-  }, [libraries, activeTab]);
+  const { data, isLoading, error } = useQuery(libraryQueries.GET_LIBRARY(queryParams));
+  console.log(data, isLoading, error);
 
   return (
     <div className='flex-col gap-[1.2rem] py-[2rem]'>
@@ -82,8 +44,8 @@ export default function LibraryList() {
         </div>
       </div>
       <div className='flex-col gap-[2rem] px-[2rem]'>
-        {filteredLibraries.map((library) => (
-          <LibraryCard key={library.id} library={library} />
+        {data?.map((library) => (
+          <LibraryCard key={uuidv4()} library={library} />
         ))}
       </div>
     </div>

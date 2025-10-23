@@ -18,15 +18,15 @@ export default function LibraryCard({ library }: LibraryCardProps) {
     return (
       <div className='flex gap-[1rem] rounded-tl-[10px] rounded-tr-[10px] p-[1rem]'>
         <div className='bl-[1rem] flex-row-center h-[4rem] w-[4rem] shrink-0 overflow-hidden rounded-full bg-white'>
-          {library.profileImgUrl ? (
-            <img src={library.profileImgUrl} alt={library.owner} className='h-full w-full object-cover' />
+          {library.thumbnailUrl ? (
+            <img src={library.thumbnailUrl} alt={library.name} className='h-full w-full object-cover' />
           ) : (
             <Icon name='logo-alt' size={2} className='text-gray-400' />
           )}
         </div>
         <div className='flex-col'>
-          <h1 className='caption3'>{library.owner}</h1>
-          <h2 className='caption5 text-gray-600'>즐겨찾는 인원 {library.followerCount}명</h2>
+          <h1 className='caption3'>{library.name}</h1>
+          <h2 className='caption5 text-gray-600'>좋아요 {library.likeCount}개</h2>
         </div>
         <button className='ml-auto cursor-pointer'>
           <Icon name='heart' className='text-system-error' size={2.4} />
@@ -41,15 +41,19 @@ export default function LibraryCard({ library }: LibraryCardProps) {
     >
       {header()}
       <div className='flex-row-center h-[31.7rem] w-full overflow-hidden bg-gray-50'>
-        {library.coverImgUrl ? (
-          <img src={library.coverImgUrl} alt={library.name} className='h-full w-full object-cover' />
+        {library.thumbnailUrl ? (
+          <img src={library.thumbnailUrl} alt={library.name} className='h-full w-full object-cover' />
         ) : (
           <Icon name='logo-alt' size={6} className='text-gray-400' />
         )}
       </div>
       <div className='flex-col gap-[1rem] rounded-br-[10px] rounded-bl-[10px] px-[1rem]'>
-        <h1 className='caption2'>{library.name}</h1>
+        <div className='flex items-center gap-[0.5rem]'>
+          <h1 className='caption2'>{library.name}</h1>
+          <span className='caption5 text-gray-600'>★ {library.stars}</span>
+        </div>
         <h2 className='caption5'>{library.description}</h2>
+        <div className='caption5 text-gray-600'>도서 {library.bookCount}권</div>
       </div>
       <div />
     </div>

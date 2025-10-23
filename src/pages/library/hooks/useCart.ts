@@ -28,18 +28,18 @@ export const useCart = () => {
     const currentCart = getCartData();
 
     if (!currentCart) {
-      saveCartData({ library: book.library, books: [book] });
+      saveCartData({ library: book.libraryName, books: [book] });
       toast.success('장바구니에 담았습니다.');
       return true;
     }
 
-    if (currentCart.library !== book.library) {
+    if (currentCart.library !== book.libraryName) {
       const res = await modal.confirm({
         title: MODAL_TITLE.CART_REPLACE,
         confirmVariant: 'danger',
       });
       if (res.ok) {
-        saveCartData({ library: book.library, books: [book] });
+        saveCartData({ library: book.libraryName, books: [book] });
         toast.info('기존 도서를 비우고 담았어요.');
       }
       return true;

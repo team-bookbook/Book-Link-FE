@@ -1,36 +1,64 @@
 import { BOOK_SORT_OPTIONS, type BookSort } from '@components/dropdown/constants/select-options';
 import SelectDropdown from '@components/dropdown/select-dropdown';
 import Icon from '@components/icon';
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import LibraryBookCard from '@pages/library/components/card/library-book-card';
-import { useLibraryData } from '@pages/library/hooks/useLibraryData';
+import { libraryBookQueries } from '@apis/library/library-book-queries';
+import { useQuery } from '@tanstack/react-query';
+import { v4 as uuidv4 } from 'uuid';
+import useDaumPostcode from '@hooks/use-daum-postcode';
+import type { TLocation } from '@pages/library/types/library.types';
 
-export default function BookList() {
-  const [bookSort, setBookSort] = useState<BookSort>('recent');
-  const { books } = useLibraryData();
+interface Coordinates {
+  latitude: number;
+  longitude: number;
+}
 
-  const sortedBooks = useMemo(() => {
-    if (!books.length) return [];
+interface BookListProps {
+  location: TLocation;
+  setLocation: React.Dispatch<React.SetStateAction<TLocation>>;
+  convertCoord: (address: string) => Promise<Coordinates>;
+}
 
-    return [...books].sort((a, b) => {
-      if (bookSort === 'recent') {
-        return new Date(b.dueDate).getTime() - new Date(a.dueDate).getTime();
-      } else {
-        return a.title.localeCompare(b.title);
-      }
+export default function BookList({ location, setLocation, convertCoord }: BookListProps) {
+  const [bookSort, setBookSort] = useState<BookSort>('DISTANCE');
+  const openPostcode = useDaumPostcode();
+
+  const queryParams = {
+    latitude: location.lat,
+    longitude: location.lng,
+    page: 0,
+    size: 10,
+  };
+
+  const { data } = useQuery(libraryBookQueries.GET_LIBRARY_BOOK(queryParams));
+
+  const handleLocationSearch = async () => {
+    await openPostcode(async (d) => {
+      const address = d.address;
+
+      const coords = await convertCoord(address);
+      console.log(coords);
+      setLocation({
+        address,
+        lat: coords.latitude,
+        lng: coords.longitude,
+      });
     });
-  }, [books, bookSort]);
+  };
 
   const BookListOptions = () => {
+    const sortLabel = BOOK_SORT_OPTIONS.find((option) => option.value === bookSort)?.label || '거리순';
+
     return (
       <div className='flex-row-between px-[1.5rem]'>
-        <div className='flex-row-center min-h-[4.8rem] cursor-pointer gap-[0.2rem]'>
+        <button onClick={handleLocationSearch} className='flex-row-center min-h-[4.8rem] cursor-pointer gap-[0.2rem]'>
           <Icon name='location' size={2.4} className='text-primary-700' />
-          <span className='caption1'>서울시 용산구</span>
+          <span className='caption1'>{location.address}</span>
           <Icon name='dropdown' size={1.2} ariaHidden />
-        </div>
+        </button>
         <SelectDropdown
-          triggerLabel={bookSort === 'recent' ? '최신순' : '인기순'}
+          triggerLabel={sortLabel}
           value={bookSort}
           onChange={setBookSort}
           options={BOOK_SORT_OPTIONS}
@@ -45,11 +73,9 @@ export default function BookList() {
     <div className='flex-col gap-[0.4rem] pt-[0.4rem]'>
       {BookListOptions()}
       <div className='flex-col gap-[1rem] px-[2rem]'>
-        {sortedBooks.length > 0 ? (
-          sortedBooks.map((book) => <LibraryBookCard key={book.id} book={book} />)
-        ) : (
-          <div className='text-center text-gray-500'>대출할 수 있는 책이 없습니다.</div>
-        )}
+        {data?.content.map((book) => (
+          <LibraryBookCard key={uuidv4()} book={book} />
+        ))}
       </div>
     </div>
   );

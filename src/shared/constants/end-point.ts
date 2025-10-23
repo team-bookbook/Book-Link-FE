@@ -39,6 +39,10 @@ export const END_POINT = {
   LIBRARY_BOOK: '/library-book',
   LIBRARY_BOOK_BY_ID: (libraryBookId: number) => `/library-book/${libraryBookId}`,
 
+  // 도서관 API
+  LIBRARY: 'library',
+  LIBRARY_BY_ID: (libraryId: string) => `/library/${libraryId}`,
+
   // 1:1 채팅 API
   SINGLE_CHATS_SEND_MESSAGE: '/singleChats/sendMessage',
   SINGLE_CHATS_ROOMS: '/singleChats/rooms',

@@ -1,21 +1,18 @@
 export type BookStatus = 'available' | 'rented' | 'reserved';
+export type TBookSort = 'DISTANCE' | 'LATEST' | 'MOST_BORROWED';
 
 export interface ILibraryBook {
-  id: number;
+  imageUrl: string;
+  id: string;
   title: string;
   author: string;
-  library: string;
-  dueDate: string;
-  maxDays: number;
+  libraryName: string;
+  distance: number;
+  copies: number;
+  borrowedCount: number;
   deposit: number;
-  status: BookStatus;
-  imgUrl?: string;
-}
-
-export interface ILibraryData {
-  books: ILibraryBook[];
-  isLoading: boolean;
-  error: string | null;
+  rentedOut: boolean;
+  expectedReturnDate: string;
 }
 
 export interface IBookDetail {
@@ -36,13 +33,27 @@ export interface IBookDetail {
 }
 
 export interface ILibrary {
-  id: number;
+  id: string;
   name: string;
-  owner: string;
-  followerCount: number;
   description: string;
-  profileImgUrl?: string;
-  coverImgUrl?: string;
-  isRecommended?: boolean;
-  isFavorite?: boolean;
+  stars: number;
+  likeCount: number;
+  bookCount: number;
+  createdAt: string;
+  thumbnailUrl: string;
+  startTime: string;
+  endTime: string;
+  topBooks: Array<{
+    bookId: string;
+    title: string;
+    author: string;
+    publisher: string;
+    category: string;
+  }>;
 }
+
+export type TLocation = {
+  address: string;
+  lat: number;
+  lng: number;
+};
