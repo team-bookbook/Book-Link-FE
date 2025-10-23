@@ -31,9 +31,7 @@ export default function BookList({ location, setLocation, convertCoord }: BookLi
     size: 10,
   };
 
-  const { data, isLoading, error } = useQuery(libraryBookQueries.GET_LIBRARY_BOOK(queryParams));
-
-  console.log(data, isLoading, error);
+  const { data } = useQuery(libraryBookQueries.GET_LIBRARY_BOOK(queryParams));
 
   const handleLocationSearch = async () => {
     await openPostcode(async (d) => {

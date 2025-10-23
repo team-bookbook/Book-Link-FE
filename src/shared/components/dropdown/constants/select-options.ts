@@ -16,15 +16,15 @@ export type BookCategoryLabel =
   | '역사';
 
 export const LIB_SORT_OPTIONS: ReadonlyArray<{ value: LibSort; label: string }> = [
+  { value: 'distance', label: '거리순' },
   { value: 'recent', label: '최신순' },
   { value: 'popular', label: '인기순' },
-  { value: 'distance', label: '거리순' },
 ];
 
 export const BOOK_SORT_OPTIONS: ReadonlyArray<{ value: BookSort; label: string }> = [
+  { value: 'DISTANCE', label: '거리순' },
   { value: 'LATEST', label: '최신순' },
   { value: 'MOST_BORROWED', label: '인기순' },
-  { value: 'DISTANCE', label: '거리순' },
 ];
 
 export const RENT_STATUS_OPTIONS: ReadonlyArray<{ value: RentStatus; label: string }> = [
