@@ -16,8 +16,7 @@ export default function LibraryList({ queryParams }: LibaryListProps) {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<LibraryListTab>('recommended');
 
-  const { data, isLoading, error } = useQuery(libraryQueries.GET_LIBRARY(queryParams));
-  console.log(data, isLoading, error);
+  const { data } = useQuery(libraryQueries.GET_LIBRARY(queryParams));
 
   return (
     <div className='flex-col gap-[1.2rem] py-[2rem]'>
