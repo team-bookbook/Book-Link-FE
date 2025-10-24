@@ -4,12 +4,14 @@ import ButtonFrame from '@components/button/button-frame';
 import Input from '@components/input/input';
 import TimePicker, { type HMValue } from '@components/time-picker/time-picker';
 import { libraryMutations } from '@apis/library/library-mutations';
+import { uploadImage } from '@apis/s3/s3-api';
 import { useMutation } from '@tanstack/react-query';
 
 export default function LibraryCreatePage() {
   const fileRef = useRef<HTMLInputElement | null>(null);
 
-  const [imageUrl, setImageUrl] = useState('');
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState('');
   const [name, setName] = useState('');
   const [openAt, setOpenAt] = useState<HMValue | undefined>(undefined);
   const [closeAt, setCloseAt] = useState<HMValue | undefined>(undefined);
@@ -24,10 +26,15 @@ export default function LibraryCreatePage() {
   const onFile = (e: React.ChangeEvent<HTMLInputElement>) => {
     const f = e.currentTarget.files?.[0];
     if (!f) return;
+
+    // 선택한 파일 저장
+    setSelectedFile(f);
+
+    // 미리보기를 위한 data URL 생성
     const reader = new FileReader();
     reader.onload = () => {
       const url = typeof reader.result === 'string' ? reader.result : '';
-      setImageUrl(url);
+      setPreviewUrl(url);
     };
     reader.readAsDataURL(f);
   };
@@ -38,24 +45,35 @@ export default function LibraryCreatePage() {
     return `${hours}:${minutes}`;
   };
 
-  const submit = () => {
+  const submit = async () => {
     if (!openAt || !closeAt) return;
 
-    const latitude = Number(localStorage.getItem('latitude')) || 0;
-    const longitude = Number(localStorage.getItem('longitude')) || 0;
+    try {
+      let thumbnailUrl = '';
+      if (selectedFile) {
+        thumbnailUrl = await uploadImage(selectedFile);
+        console.log(thumbnailUrl);
+      }
+      const library_location = JSON.parse(localStorage.getItem('library-location') || '0');
+      const latitude = library_location.lat;
+      const longitude = library_location.lng;
 
-    createLibrary({
-      name,
-      description: intro,
-      thumbnailUrl: imageUrl,
-      startTime: formatTime(openAt),
-      endTime: formatTime(closeAt),
-      latitude,
-      longitude,
-      validOperatingHours: true,
-    });
+      createLibrary({
+        name,
+        description: intro,
+        thumbnailUrl,
+        startTime: formatTime(openAt),
+        endTime: formatTime(closeAt),
+        latitude,
+        longitude,
+        validOperatingHours: true,
+      });
 
-    console.log(name, intro, imageUrl, openAt, closeAt, latitude, longitude, true);
+      console.log(name, intro, thumbnailUrl, openAt, closeAt, latitude, longitude, true);
+    } catch (error) {
+      console.error('이미지 업로드 실패:', error);
+      alert('이미지 업로드에 실패했습니다. 다시 시도해 주세요.');
+    }
   };
 
   return (
@@ -67,7 +85,9 @@ export default function LibraryCreatePage() {
             이미지 업로드
           </Button>
           <input ref={fileRef} type='file' accept='image/*' onChange={onFile} className='hidden' />
-          {imageUrl && <img src={imageUrl} alt='도서관 이미지 미리보기' className='h-[15rem] w-full object-cover' />}
+          {previewUrl && (
+            <img src={previewUrl} alt='도서관 이미지 미리보기' className='h-[15rem] w-full object-cover' />
+          )}
         </div>
 
         <Input

@@ -47,4 +47,7 @@ export const END_POINT = {
   SINGLE_CHATS_SEND_MESSAGE: '/singleChats/sendMessage',
   SINGLE_CHATS_ROOMS: '/singleChats/rooms',
   SINGLE_CHATS_ROOM_MESSAGES: (chatId: string) => `/singleChats/rooms/${chatId}/messages`,
+
+  // S3 API
+  S3_PRESIGNED_URL: '/s3/presigned-url',
 };
