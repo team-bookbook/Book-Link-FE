@@ -10,11 +10,9 @@ import { useQuery } from '@tanstack/react-query';
 
 export default function LibraryDetailPage() {
   const { id: libraryId } = useParams<{ id: string }>();
-  const { data: libraryInfo, isLoading } = useQuery(libraryQueries.GET_LIBRARY_DETAIL(libraryId || ''));
+  const { data: libraryInfo } = useQuery(libraryQueries.GET_LIBRARY_DETAIL(libraryId || ''));
 
   const bookData = libraryInfo?.topBooks || [];
-  const isLoadingBooks = isLoading;
-  const isLoadingReviews = false;
 
   const [sliderRef] = useKeenSlider({
     mode: 'free-snap',
@@ -38,7 +36,6 @@ export default function LibraryDetailPage() {
 
   const handleDeleteClick = () => {
     if (window.confirm('도서관을 삭제하시겠습니까?')) {
-      // 삭제 로직 추가
       console.log('도서관 삭제');
     }
   };
@@ -104,13 +101,22 @@ export default function LibraryDetailPage() {
 
     return (
       <div className='flex-col gap-[1rem] px-[2rem]'>
+        <h1 className='caption2 text-gray-900'>우리 도서관을 소개합니다!</h1>
         <h2 className='caption5'>{libraryInfo.description}</h2>
       </div>
     );
   };
 
   const rewardDescription = () => {
-    return null;
+    return (
+      <div className='flex-col gap-[1rem] px-[2rem]'>
+        <h1 className='caption2'>혜택 안내</h1>
+        <span className='flex-items-center gap-[0.8rem]'>
+          <h2 className='catpion4 text-gray-700'>포인트 적립</h2>
+          <h2 className='caption5'>1% BookLink 포인트 적립</h2>
+        </span>
+      </div>
+    );
   };
 
   const bookListSection = () => {
@@ -124,7 +130,6 @@ export default function LibraryDetailPage() {
             navigate(ROUTES.LIBRARY_BOOK(libraryId));
           }
         }}
-        isLoading={isLoadingBooks}
         isEmpty={bookData.length === 0}
       >
         <div>
@@ -156,7 +161,6 @@ export default function LibraryDetailPage() {
             navigate(ROUTES.LIBRARY_REVIEW(libraryId));
           }
         }}
-        isLoading={isLoadingReviews}
         // isEmpty={reviewData.length === 0}
       >
         <div className='flex-col gap-[2rem] px-[2rem]'>

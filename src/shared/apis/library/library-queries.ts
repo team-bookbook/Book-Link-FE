@@ -2,6 +2,7 @@ import { get } from '@apis/base/client';
 import { END_POINT } from '@constants/end-point';
 import { queryKeys } from '@constants/query-keys';
 import type { ILibrary } from '@pages/library/types/library.types';
+import type { IReview } from '@pages/library/types/review.types';
 import { queryOptions } from '@tanstack/react-query';
 
 interface ILibraryParams {
@@ -39,6 +40,15 @@ export const libraryQueries = {
       queryKey: queryKeys.library.detail(id),
       queryFn: async () => {
         const res = await get<ILibrary>(END_POINT.LIBRARY_BY_ID(id));
+        return res;
+      },
+    }),
+
+  GET_LIBRARY_REVIEW: (library_id: string) =>
+    queryOptions<IReview[]>({
+      queryKey: queryKeys.library.reviews(),
+      queryFn: async () => {
+        const res = await get<IReview[]>(END_POINT.REVIEW_BY_LIBRARY_ID(library_id));
         return res;
       },
     }),

@@ -1,14 +1,8 @@
 export interface IReview {
-  id: number;
-  nickname: string;
+  reviewId: string;
+  userId: string;
   rating: number;
-  date: string;
-  content: string;
-  profileImgUrl?: string;
+  comment: string;
 }
 
-export interface IReviewData {
-  reviews: IReview[];
-  isLoading: boolean;
-  error: string | null;
-}
+// 추후 데이터 구조 수정 예정

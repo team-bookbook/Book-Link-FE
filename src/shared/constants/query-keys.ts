@@ -6,6 +6,8 @@ export const queryKeys = {
       [...queryKeys.library.lists(), params] as const,
     details: () => [...queryKeys.library.all, 'detail'] as const,
     detail: (id: string) => [...queryKeys.library.details(), id] as const,
+    reviews: () => [...queryKeys.library.all, 'review'] as const,
+    review: (id: string) => [...queryKeys.library.reviews(), id] as const,
   },
 
   libraryBook: {

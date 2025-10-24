@@ -1,10 +1,9 @@
 export const END_POINT = {
-  // 댓글 API
-  COMMENT: '/comment',
-  COMMENT_BY_ID: (id: number) => `/comment/${id}`,
-  COMMENT_LIKE: (id: number) => `/comment/${id}/like`,
-  COMMENT_REPLIES: (parentId: number) => `/comment/${parentId}/replies`,
-  COMMENT_BY_BOARD: (boardId: number) => `/comment/${boardId}`,
+  // 리뷰 API
+  REVIEW: '/review',
+  REVIEW_BY_LIBRARY_ID: (id: string) => `/review/${id}`,
+  REVIEW_BY_REVIEW_ID: (id: number) => `/review/${id}`,
+  REVIEW_RATING_BY_ID: (id: number) => `/review/rating/${id}`,
 
   // 인증 API
   TOKEN_REISSUE: '/token/reissue',
