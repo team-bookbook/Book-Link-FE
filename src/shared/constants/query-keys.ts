@@ -8,6 +8,7 @@ export const queryKeys = {
     detail: (id: string) => [...queryKeys.library.details(), id] as const,
     reviews: () => [...queryKeys.library.all, 'review'] as const,
     review: (id: string) => [...queryKeys.library.reviews(), id] as const,
+    rating: (id: string) => [...queryKeys.library.all, 'rating', id] as const,
   },
 
   libraryBook: {

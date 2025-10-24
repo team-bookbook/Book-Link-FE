@@ -52,4 +52,13 @@ export const libraryQueries = {
         return res;
       },
     }),
+
+  GET_LIBRARY_REVIEW_AVG: (library_id: string) =>
+    queryOptions<number>({
+      queryKey: queryKeys.library.rating(library_id),
+      queryFn: async () => {
+        const res = await get<number>(END_POINT.REVIEW_RATING_BY_ID(library_id));
+        return res;
+      },
+    }),
 };

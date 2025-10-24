@@ -4,9 +4,9 @@ import { useKeenSlider } from 'keen-slider/react';
 import 'keen-slider/keen-slider.min.css';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { ROUTES } from '@routes/routes-config';
-import LibraryRatingSection from '@pages/library/components/section/section-library-rating';
 import { libraryQueries } from '@apis/library/library-queries';
 import { useQuery } from '@tanstack/react-query';
+import LibraryRating from './components/section/section-library-rating';
 
 export default function LibraryDetailPage() {
   const { id: libraryId } = useParams<{ id: string }>();
@@ -25,10 +25,6 @@ export default function LibraryDetailPage() {
   const location = useLocation();
   const navigate = useNavigate();
   const isMyPage = location.pathname === '/library/my';
-
-  const handleFavoriteClick = () => {
-    console.log('즐겨찾기 버튼 클릭');
-  };
 
   const handleEditClick = () => {
     navigate(ROUTES.LIBRARY_CREATE);
@@ -86,12 +82,7 @@ export default function LibraryDetailPage() {
           <h1 className='title3'>{libraryInfo.name}</h1>
           <h2 className='caption1'>{`${libraryInfo.startTime} - ${libraryInfo.endTime}`}</h2>
         </div>
-        <LibraryRatingSection
-          rating={libraryInfo.stars}
-          reviewCount={0}
-          favoriteCount={libraryInfo.likeCount}
-          onFavoriteClick={handleFavoriteClick}
-        />
+        <LibraryRating libraryId={libraryId || ''} />
       </div>
     );
   };

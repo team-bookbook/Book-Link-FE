@@ -3,7 +3,7 @@ export const END_POINT = {
   REVIEW: '/review',
   REVIEW_BY_LIBRARY_ID: (id: string) => `/review/${id}`,
   REVIEW_BY_REVIEW_ID: (id: number) => `/review/${id}`,
-  REVIEW_RATING_BY_ID: (id: number) => `/review/rating/${id}`,
+  REVIEW_RATING_BY_ID: (id: string) => `/review/rating/${id}`,
 
   // 인증 API
   TOKEN_REISSUE: '/token/reissue',
