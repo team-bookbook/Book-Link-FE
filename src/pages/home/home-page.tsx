@@ -13,6 +13,9 @@ import { FAQ_ITEMS } from '@pages/home/constants/faq';
 import Faq from '@pages/home/components/faq/faq';
 import { ROUTES } from '@routes/routes-config';
 import TopMessageBar from '@pages/home/components/banner/top-message-bar';
+import { useQuery } from '@tanstack/react-query';
+import { memberQueries } from '@apis/member/member-queries';
+import { isAuthenticated } from '@/shared/utils/auth';
 
 export default function HomePage() {
   const navigate = useNavigate();
@@ -29,34 +32,40 @@ export default function HomePage() {
     navigate(ROUTES.GROUP);
   };
 
-  const { loanData, reservationData, groupData, isLoadingLoans, isLoadingReservations, isLoadingGroups, error } =
+  const { data: memberData } = useQuery({
+    ...memberQueries.GET_ME(),
+    enabled: isAuthenticated(),
+  });
+
+  const { loanData, reservationData, groupData, isLoadingLoans, isLoadingReservations, isLoadingGroups } =
     useHomeData();
 
-  console.log(error);
-  const hasData = loanData.length > 0 && groupData.length > 0 && reservationData.length > 0;
-
-  const renderUserGreeting = () => (
-    <div className='flex-col gap-[1.2rem] px-[2rem]'>
-      <p className='title5 px-[0.6rem]'>
-        <span className='text-primary-800'>북북</span>
-        <span className='text-gray-600'>님 안녕하세요!</span>
-      </p>
-      <HomeBanner hasLoan={hasData} title={hasData ? '모순' : undefined} dday={hasData ? 1 : undefined} />
-    </div>
-  );
+  const renderUserGreeting = () => {
+    return (
+      <div className='flex-col gap-[1.2rem] px-[2rem]'>
+        <p className='title5 px-[0.6rem]'>
+          <span className='text-primary-800'>{memberData ? memberData.nickName : '비회원'}</span>
+          <span className='text-gray-600'>님 안녕하세요!</span>
+        </p>
+        <HomeBanner hasLoan={true} title='모순' dday={1} />
+      </div>
+    );
+  };
 
   const renderCurrentPoint = () => {
-    const progressPercentage = 35;
+    const pointBalance = memberData ? memberData.pointBalance : 0;
+    const remainingPoints = 10000 - pointBalance;
+    const progressPercentage = (pointBalance / 10000) * 100;
 
     return (
       <div className='flex-row-center gap-[1.5rem] px-[2rem]'>
         <div className='h-[12.8rem] min-h-[12.8rem] w-full flex-col gap-[1.5rem] rounded-[8px] bg-white p-[2rem]'>
           <div className='flex-row-between'>
             <h1 className='title5 text-gray-900'>보유 포인트</h1>
-            <h1 className='title5 text-secondary-900'>1000p</h1>
+            <h1 className='title5 text-secondary-900'>{pointBalance}p</h1>
           </div>
           <h2 className='body5 text-gray-700'>
-            <span className='text-primary-900'>9000p</span> 더 모으면 상품권으로 교환할 수 있어요!
+            <span className='text-primary-900'>{remainingPoints}p</span> 더 모으면 상품권으로 교환할 수 있어요!
           </h2>
           <div className='relative h-[1.2rem] rounded-[20px] bg-gray-100'>
             <div
@@ -130,7 +139,7 @@ export default function HomePage() {
         {renderUserGreeting()}
         <Divider />
         {renderCurrentPoint()}
-        {hasData ? renderDataSections() : renderIntroduceSections()}
+        {memberData ? renderDataSections() : renderIntroduceSections()}
       </div>
     </>
   );
