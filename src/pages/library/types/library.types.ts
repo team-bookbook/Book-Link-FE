@@ -1,5 +1,4 @@
 export type BookStatus = 'available' | 'rented' | 'reserved';
-export type TBookSort = 'DISTANCE' | 'LATEST' | 'MOST_BORROWED';
 
 export interface ILibraryBook {
   imageUrl: string;

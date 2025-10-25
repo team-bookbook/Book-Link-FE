@@ -1,13 +1,13 @@
 import { BOOK_SORT_OPTIONS, type BookSort } from '@components/dropdown/constants/select-options';
 import SelectDropdown from '@components/dropdown/select-dropdown';
 import Icon from '@components/icon';
-import { useState } from 'react';
 import LibraryBookCard from '@pages/library/components/card/library-book-card';
 import { libraryBookQueries } from '@apis/library/library-book-queries';
 import { useQuery } from '@tanstack/react-query';
 import { v4 as uuidv4 } from 'uuid';
 import useDaumPostcode from '@hooks/use-daum-postcode';
 import type { TLocation } from '@pages/library/types/library.types';
+import { useLocalStorage } from '@hooks/use-local-storage';
 
 interface Coordinates {
   latitude: number;
@@ -21,24 +21,24 @@ interface BookListProps {
 }
 
 export default function BookList({ location, setLocation, convertCoord }: BookListProps) {
-  const [bookSort, setBookSort] = useState<BookSort>('DISTANCE');
+  const [bookSort, setBookSort] = useLocalStorage<BookSort>('bookSort', 'DISTANCE');
+
   const openPostcode = useDaumPostcode();
 
-  const queryParams = {
-    latitude: location.lat,
-    longitude: location.lng,
-    page: 0,
-    size: 10,
-  };
-
-  const { data } = useQuery(libraryBookQueries.GET_LIBRARY_BOOK(queryParams));
-
+  const { data } = useQuery(
+    libraryBookQueries.GET_LIBRARY_BOOK({
+      latitude: location.lat,
+      longitude: location.lng,
+      sortType: bookSort,
+      page: 0,
+      size: 10,
+    })
+  );
   const handleLocationSearch = async () => {
     await openPostcode(async (d) => {
       const address = d.address;
 
       const coords = await convertCoord(address);
-      console.log(coords);
       setLocation({
         address,
         lat: coords.latitude,
