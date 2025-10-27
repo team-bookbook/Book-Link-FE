@@ -9,6 +9,7 @@ import { isAuthenticated } from '@/shared/utils/auth';
 export default function LibraryReviewPage() {
   const { id: libraryId } = useParams<{ id: string }>();
   const { data: reviewData } = useQuery(libraryQueries.GET_LIBRARY_REVIEW(libraryId || ''));
+  const { data: libraryInfo } = useQuery(libraryQueries.GET_LIBRARY_DETAIL(libraryId || ''));
   const { data: memberData } = useQuery({
     ...memberQueries.GET_ME(),
     enabled: isAuthenticated(),
@@ -20,7 +21,7 @@ export default function LibraryReviewPage() {
 
   return (
     <div className='flex-col gap-[2rem] px-[2rem] pt-[3rem]'>
-      <LibraryRating libraryId={libraryId || ''} />
+      <LibraryRating libraryId={libraryId || ''} likeCount={libraryInfo?.likeCount} />
       <div className='flex-col gap-[2rem]'>
         {reviewData.map((review) => (
           <ReviewCard key={review.reviewId} review={review} isMy={memberData?.id === review.userId} />

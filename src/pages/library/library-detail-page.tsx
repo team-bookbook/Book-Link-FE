@@ -82,7 +82,7 @@ export default function LibraryDetailPage() {
           <h1 className='title3'>{libraryInfo.name}</h1>
           <h2 className='caption1'>{`${libraryInfo.startTime} - ${libraryInfo.endTime}`}</h2>
         </div>
-        <LibraryRating libraryId={libraryId || ''} />
+        <LibraryRating libraryId={libraryId || ''} likeCount={libraryInfo.likeCount} />
       </div>
     );
   };

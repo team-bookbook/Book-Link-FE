@@ -27,10 +27,8 @@ export default function LibraryCreatePage() {
     const f = e.currentTarget.files?.[0];
     if (!f) return;
 
-    // 선택한 파일 저장
     setSelectedFile(f);
 
-    // 미리보기를 위한 data URL 생성
     const reader = new FileReader();
     reader.onload = () => {
       const url = typeof reader.result === 'string' ? reader.result : '';

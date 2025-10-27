@@ -17,11 +17,11 @@ export default function LibraryCard({ library }: LibraryCardProps) {
   const header = () => {
     return (
       <div className='flex gap-[1rem] rounded-tl-[10px] rounded-tr-[10px] p-[1rem]'>
-        <div className='bl-[1rem] flex-row-center h-[4rem] w-[4rem] shrink-0 overflow-hidden rounded-full bg-white'>
+        <div className='bl-[1rem] flex-row-center h-[4rem] w-[4rem] shrink-0 overflow-hidden rounded-full bg-gray-100'>
           {library.thumbnailUrl ? (
             <img src={library.thumbnailUrl} alt={library.name} className='h-full w-full object-cover' />
           ) : (
-            <Icon name='logo-alt' size={2} className='text-gray-400' />
+            <div className='h-full w-full' />
           )}
         </div>
         <div className='flex-col'>
@@ -40,11 +40,11 @@ export default function LibraryCard({ library }: LibraryCardProps) {
       className='min-h-[48.1rem] cursor-pointer flex-col gap-[1.5rem] rounded-[10px] bg-gray-50'
     >
       {header()}
-      <div className='flex-row-center h-[31.7rem] w-full overflow-hidden bg-gray-50'>
+      <div className='flex-row-center h-[31.7rem] w-full overflow-hidden bg-gray-100'>
         {library.thumbnailUrl ? (
           <img src={library.thumbnailUrl} alt={library.name} className='h-full w-full object-cover' />
         ) : (
-          <Icon name='logo-alt' size={6} className='text-gray-400' />
+          <div className='h-full w-full' />
         )}
       </div>
       <div className='flex-col gap-[1rem] rounded-br-[10px] rounded-bl-[10px] px-[1rem]'>

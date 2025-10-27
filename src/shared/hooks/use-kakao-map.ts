@@ -67,7 +67,7 @@ export const useKakaoMaps = () => {
     }
 
     const existingScript = document.querySelector(
-      'script[src*="dapi.kakao.com/v2/maps/sdk.js"]'
+      'script[src*="https://dapi.kakao.com/v2/maps/sdk.js"]'
     ) as HTMLScriptElement | null;
 
     if (existingScript) {
@@ -88,8 +88,13 @@ export const useKakaoMaps = () => {
       return;
     }
 
+    const apiKey = import.meta.env.VITE_KAKAO_MAP_API_KEY;
+    console.log('Kakao API Key loaded:', apiKey ? 'YES' : 'NO', apiKey?.substring(0, 8) + '...');
+
     const script = document.createElement('script');
-    script.src = `//dapi.kakao.com/v2/maps/sdk.js?appkey=${import.meta.env.VITE_KAKAO_MAP_API_KEY}&libraries=services&autoload=false`;
+    script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${apiKey}&libraries=services&autoload=false`;
+    script.async = true;
+    console.log('Loading Kakao SDK from:', script.src);
 
     script.onload = () => {
       window.kakao.maps.load(() => {
