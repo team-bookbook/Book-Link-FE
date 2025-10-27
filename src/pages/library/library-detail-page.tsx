@@ -2,11 +2,13 @@ import BookCard from '@pages/home/components/card/book-card';
 import SectionLayout from '@components/section-layout';
 import { useKeenSlider } from 'keen-slider/react';
 import 'keen-slider/keen-slider.min.css';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { ROUTES } from '@routes/routes-config';
 import { libraryQueries } from '@apis/library/library-queries';
-import { useQuery } from '@tanstack/react-query';
+import { libraryMutations } from '@apis/library/library-mutations';
+import { useQuery, useMutation } from '@tanstack/react-query';
 import LibraryRating from './components/section/section-library-rating';
+import { modal } from '@libs/modal';
 
 export default function LibraryDetailPage() {
   const { id: libraryId } = useParams<{ id: string }>();
@@ -22,17 +24,33 @@ export default function LibraryDetailPage() {
     },
   });
 
-  const location = useLocation();
   const navigate = useNavigate();
-  const isMyPage = location.pathname === '/library/my';
+
+  const deleteMutation = useMutation(libraryMutations.DELETE_LIBRARY());
 
   const handleEditClick = () => {
-    navigate(ROUTES.LIBRARY_CREATE);
+    if (!libraryId) return;
+    navigate(`${ROUTES.LIBRARY_CREATE}?id=${libraryId}`);
   };
 
-  const handleDeleteClick = () => {
-    if (window.confirm('도서관을 삭제하시겠습니까?')) {
-      console.log('도서관 삭제');
+  const handleDeleteClick = async () => {
+    if (!libraryId) return;
+
+    const result = await modal.confirm({
+      title: '도서관을 삭제하시겠습니까?',
+      description: '삭제된 도서관은 복구할 수 없습니다.',
+      confirmText: '삭제',
+      cancelText: '취소',
+      confirmVariant: 'danger',
+    });
+
+    if (result.ok) {
+      try {
+        await deleteMutation.mutateAsync(libraryId);
+        navigate(`${ROUTES.LIBRARY}/?tab=libraries`);
+      } catch (error) {
+        console.error('도서관 삭제 실패:', error);
+      }
     }
   };
 
@@ -62,22 +80,20 @@ export default function LibraryDetailPage() {
         }
       >
         {/* 내 페이지인 경우 */}
-        {isMyPage && (
-          <div className='absolute top-[3rem] right-[2rem] flex gap-[0.3rem]'>
-            <button
-              onClick={handleEditClick}
-              className='flex-row-center caption5 cursor-pointer rounded-[2px] bg-gray-100 px-[0.7rem] text-gray-600'
-            >
-              수정하기
-            </button>
-            <button
-              onClick={handleDeleteClick}
-              className='flex-row-center caption5 text-system-error cursor-pointer rounded-[2px] bg-gray-100 px-[0.7rem]'
-            >
-              삭제하기
-            </button>
-          </div>
-        )}
+        <div className='absolute top-[3rem] right-[2rem] flex gap-[0.3rem]'>
+          <button
+            onClick={handleEditClick}
+            className='flex-row-center caption5 cursor-pointer rounded-[2px] bg-gray-100 px-[0.7rem] text-gray-600'
+          >
+            수정하기
+          </button>
+          <button
+            onClick={handleDeleteClick}
+            className='flex-row-center caption5 text-system-error cursor-pointer rounded-[2px] bg-gray-100 px-[0.7rem]'
+          >
+            삭제하기
+          </button>
+        </div>
         <div className='flex-col gap-[0.4rem]'>
           <h1 className='title3'>{libraryInfo.name}</h1>
           <h2 className='caption1'>{`${libraryInfo.startTime} - ${libraryInfo.endTime}`}</h2>

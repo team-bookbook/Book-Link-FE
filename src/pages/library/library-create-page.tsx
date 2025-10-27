@@ -1,14 +1,23 @@
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import Button from '@components/button/button';
 import ButtonFrame from '@components/button/button-frame';
 import Input from '@components/input/input';
 import TimePicker, { type HMValue } from '@components/time-picker/time-picker';
 import { libraryMutations } from '@apis/library/library-mutations';
+import { libraryQueries } from '@apis/library/library-queries';
 import { uploadImage } from '@apis/s3/s3-api';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
+import { useSearchParams, useNavigate } from 'react-router-dom';
+import { ROUTES } from '@routes/routes-config';
 
 export default function LibraryCreatePage() {
   const fileRef = useRef<HTMLInputElement | null>(null);
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const libraryId = searchParams.get('id');
+  const isEditMode = !!libraryId;
+
+  // Todo : 도서관 id를 가지고 있지 않은 아이디로 접근 시 반환 필요
 
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState('');
@@ -17,7 +26,27 @@ export default function LibraryCreatePage() {
   const [closeAt, setCloseAt] = useState<HMValue | undefined>(undefined);
   const [intro, setIntro] = useState('');
 
+  const { data: libraryInfo } = useQuery({
+    ...libraryQueries.GET_LIBRARY_DETAIL(libraryId || ''),
+    enabled: isEditMode,
+  });
+
   const { mutate: createLibrary } = useMutation(libraryMutations.POST_LIBRARY());
+  const { mutate: updateLibrary } = useMutation(libraryMutations.PUT_LIBRARY());
+
+  useEffect(() => {
+    if (isEditMode && libraryInfo) {
+      setName(libraryInfo.name);
+      setIntro(libraryInfo.description);
+      setPreviewUrl(libraryInfo.thumbnailUrl);
+
+      const [startHour, startMinute] = libraryInfo.startTime.split(':').map(Number);
+      const [endHour, endMinute] = libraryInfo.endTime.split(':').map(Number);
+
+      setOpenAt({ hour: startHour, minute: startMinute });
+      setCloseAt({ hour: endHour, minute: endMinute });
+    }
+  }, [isEditMode, libraryInfo]);
 
   const canSubmit = name.trim().length > 0 && !!openAt && !!closeAt && intro.trim().length > 10;
 
@@ -47,27 +76,68 @@ export default function LibraryCreatePage() {
     if (!openAt || !closeAt) return;
 
     try {
-      let thumbnailUrl = '';
+      let thumbnailUrl = previewUrl;
+
+      // 새로운 파일이 선택된 경우에만 업로드
       if (selectedFile) {
         thumbnailUrl = await uploadImage(selectedFile);
-        console.log(thumbnailUrl);
+        console.log('새 이미지 업로드:', thumbnailUrl);
       }
-      const library_location = JSON.parse(localStorage.getItem('library-location') || '0');
-      const latitude = library_location.lat;
-      const longitude = library_location.lng;
 
-      createLibrary({
-        name,
-        description: intro,
-        thumbnailUrl,
-        startTime: formatTime(openAt),
-        endTime: formatTime(closeAt),
-        latitude,
-        longitude,
-        validOperatingHours: true,
-      });
+      if (isEditMode && libraryId) {
+        // 수정 모드
+        updateLibrary(
+          {
+            libraryId,
+            name,
+            description: intro,
+            thumbnailUrl,
+            startTime: formatTime(openAt),
+            endTime: formatTime(closeAt),
+            validOperatingHours: true,
+          },
+          {
+            onSuccess: () => {
+              alert('도서관이 수정되었습니다.');
+              navigate(ROUTES.LIBRARY_DETAIL(libraryId));
+            },
+            onError: (error) => {
+              console.error('도서관 수정 실패:', error);
+              alert('도서관 수정에 실패했습니다. 다시 시도해 주세요.');
+            },
+          }
+        );
+      } else {
+        // 생성 모드
+        const library_location = JSON.parse(localStorage.getItem('library-location') || '0');
+        const latitude = library_location.lat;
+        const longitude = library_location.lng;
 
-      console.log(name, intro, thumbnailUrl, openAt, closeAt, latitude, longitude, true);
+        createLibrary(
+          {
+            name,
+            description: intro,
+            thumbnailUrl,
+            startTime: formatTime(openAt),
+            endTime: formatTime(closeAt),
+            latitude,
+            longitude,
+            validOperatingHours: true,
+          },
+          {
+            onSuccess: () => {
+              alert('도서관이 생성되었습니다.');
+              navigate(ROUTES.LIBRARY);
+            },
+            onError: (error) => {
+              console.error('도서관 생성 실패:', error);
+              alert('도서관 생성에 실패했습니다. 다시 시도해 주세요.');
+            },
+          }
+        );
+
+        console.log(name, intro, thumbnailUrl, openAt, closeAt, latitude, longitude, true);
+      }
     } catch (error) {
       console.error('이미지 업로드 실패:', error);
       alert('이미지 업로드에 실패했습니다. 다시 시도해 주세요.');
@@ -121,7 +191,7 @@ export default function LibraryCreatePage() {
 
       <ButtonFrame>
         <Button fullWidth roundStyle='rounded-[12px]' className='py-[1.2rem]' disabled={!canSubmit} onClick={submit}>
-          등록하기
+          {isEditMode ? '수정하기' : '등록하기'}
         </Button>
       </ButtonFrame>
     </div>
