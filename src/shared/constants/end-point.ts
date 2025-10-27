@@ -49,4 +49,7 @@ export const END_POINT = {
 
   // S3 API
   S3_PRESIGNED_URL: '/s3/presigned-url',
+
+  // 회원 API
+  MEMBER_ME: '/member/me',
 };

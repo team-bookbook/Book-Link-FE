@@ -23,6 +23,11 @@ export const queryKeys = {
       sortType?: string;
     }) => [...queryKeys.libraryBook.lists(), params] as const,
   },
+
+  member: {
+    all: ['member'] as const,
+    me: () => [...queryKeys.member.all, 'me'] as const,
+  },
 } as const;
 
 export const mutationKeys = {

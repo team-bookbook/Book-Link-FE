@@ -1,7 +1,8 @@
 import { get } from '@apis/base/client';
+import type { BookSort } from '@components/dropdown/constants/select-options';
 import { END_POINT } from '@constants/end-point';
 import { queryKeys } from '@constants/query-keys';
-import type { ILibraryBook, TBookSort } from '@pages/library/types/library.types';
+import type { ILibraryBook } from '@pages/library/types/library.types';
 import { queryOptions } from '@tanstack/react-query';
 
 interface ILibraryBookParams {
@@ -10,7 +11,7 @@ interface ILibraryBookParams {
   page: number;
   size: number;
   bookName?: string;
-  sortType?: TBookSort;
+  sortType?: BookSort;
 }
 
 interface IgetLibraryBook {

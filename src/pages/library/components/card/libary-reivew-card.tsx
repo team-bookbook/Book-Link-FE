@@ -3,9 +3,10 @@ import type { IReview } from '@pages/library/types/review.types';
 
 interface ReviewCardProps {
   review: IReview;
+  isMy?: boolean;
 }
 
-export default function ReviewCard({ review }: ReviewCardProps) {
+export default function ReviewCard({ review, isMy }: ReviewCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [needsExpansion, setNeedsExpansion] = useState(false);
   const contentRef = useRef<HTMLDivElement>(null);
@@ -33,6 +34,7 @@ export default function ReviewCard({ review }: ReviewCardProps) {
               )} */}
             </div>
             <h2 className='caption3 text-gray-600'>닉네임</h2>
+            {isMy && <h3>내가 작성한것</h3>}
           </div>
           <div className='flex-items-center gap-[0.3rem]'>
             <span className='text-system-error text-[1.1rem]'>★</span>

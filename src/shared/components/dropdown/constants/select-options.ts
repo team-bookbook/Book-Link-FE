@@ -1,4 +1,3 @@
-export type LibSort = 'recent' | 'popular' | 'distance';
 export type BookSort = 'DISTANCE' | 'LATEST' | 'MOST_BORROWED';
 export type RentStatus = 'pending' | 'confirmed' | 'stopped';
 export type BookCategory = 'all' | '000' | '100' | '200' | '300' | '400' | '500' | '600' | '700' | '800' | '900';
@@ -14,12 +13,6 @@ export type BookCategoryLabel =
   | '언어(어학)'
   | '문학'
   | '역사';
-
-export const LIB_SORT_OPTIONS: ReadonlyArray<{ value: LibSort; label: string }> = [
-  { value: 'distance', label: '거리순' },
-  { value: 'recent', label: '최신순' },
-  { value: 'popular', label: '인기순' },
-];
 
 export const BOOK_SORT_OPTIONS: ReadonlyArray<{ value: BookSort; label: string }> = [
   { value: 'DISTANCE', label: '거리순' },
