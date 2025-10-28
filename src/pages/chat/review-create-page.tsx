@@ -4,7 +4,7 @@ import { useState } from 'react';
 import ButtonFrame from '@components/button/button-frame';
 import Button from '@components/button/button';
 import Icon from '@components/icon';
-import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
 import { libraryMutations } from '@apis/library/library-mutations';
 import { memberQueries } from '@apis/member/member-queries';
 import { useQuery, useMutation } from '@tanstack/react-query';
@@ -14,8 +14,6 @@ export default function ReviewCreatePage() {
   const { id } = useParams();
   const [searchParams] = useSearchParams();
   const reviewType = searchParams.get('type') as 'library' | 'user';
-  const navigate = useNavigate();
-
   const { data: memberData } = useQuery({
     ...memberQueries.GET_ME(),
     enabled: isAuthenticated(),
@@ -39,7 +37,7 @@ export default function ReviewCreatePage() {
       },
       {
         onSuccess: () => {
-          navigate(-1);
+          console.log('요청 완료');
         },
       }
     );
@@ -52,7 +50,7 @@ export default function ReviewCreatePage() {
       <TopLabel isPE={false} />
       <div className='px-[2rem]'>
         <h1 className='body5 text-gray-900'>
-          {memberData?.nickname || '사용자'} 님,
+          {memberData?.nickName || '사용자'} 님,
           <br />
           {reviewType === 'library' ? '도서관 이용 경험은 어떠셨나요?' : '님과의 거래 경험은 어떠셨나요?'}
         </h1>
