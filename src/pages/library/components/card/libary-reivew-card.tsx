@@ -1,12 +1,14 @@
 import { useState, useRef, useEffect } from 'react';
 import type { IReview } from '@pages/library/types/review.types';
+import Icon from '@components/icon';
 
 interface ReviewCardProps {
   review: IReview;
   isMy?: boolean;
+  handleReviewManage?: () => void;
 }
 
-export default function ReviewCard({ review, isMy }: ReviewCardProps) {
+export default function ReviewCard({ review, handleReviewManage }: ReviewCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [needsExpansion, setNeedsExpansion] = useState(false);
   const contentRef = useRef<HTMLDivElement>(null);
@@ -19,6 +21,8 @@ export default function ReviewCard({ review, isMy }: ReviewCardProps) {
       setNeedsExpansion(lines > 3);
     }
   }, [review.comment]);
+
+  // Todo, 아이디 식별을 통해 내가 작성한 리뷰인지에 대한 확인 필요
 
   return (
     <div className='flex-col gap-[1.5rem]'>
@@ -34,7 +38,6 @@ export default function ReviewCard({ review, isMy }: ReviewCardProps) {
               )} */}
             </div>
             <h2 className='caption3 text-gray-600'>닉네임</h2>
-            {isMy && <h3>내가 작성한것</h3>}
           </div>
           <div className='flex-items-center gap-[0.3rem]'>
             <span className='text-system-error text-[1.1rem]'>★</span>
@@ -43,6 +46,7 @@ export default function ReviewCard({ review, isMy }: ReviewCardProps) {
             <span className='caption5 text-gray-700'>2023.05.01</span>
           </div>
         </div>
+        <Icon onClick={handleReviewManage} name='more' className='cursor-pointer text-gray-900' size={2} />
       </div>
       <div className='flex-col gap-[0.5rem]'>
         <div ref={contentRef} className={`body5 ${isExpanded ? '' : 'line-clamp-3'}`}>

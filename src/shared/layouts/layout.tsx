@@ -30,6 +30,9 @@ export default function Layout() {
     const pattern = typeof ROUTES.CHAT_ROOM === 'function' ? ROUTES.CHAT_ROOM(':id') : `${ROUTES.CHAT}/:id`;
     return matchPath({ path: pattern, end: true }, pathname) != null;
   }, [pathname]);
+  const isReviewCreate = useMemo(() => {
+    return matchPath({ path: ROUTES.REVIEW_CREATE(':id') }, pathname) != null;
+  }, [pathname]);
   const isAuthOrOnboarding = useMemo(
     () =>
       isUnder(pathname, ROUTES.LOGIN) ||
@@ -37,8 +40,9 @@ export default function Layout() {
       isUnder(pathname, ROUTES.NOTIFICATION) ||
       isUnder(pathname, ROUTES.LIBRARY_CREATE) ||
       isUnder(pathname, ROUTES.BOOK_CREATE) ||
+      isReviewCreate ||
       isOnboarding,
-    [pathname, isOnboarding]
+    [pathname, isOnboarding, isReviewCreate]
   );
 
   // 헤더는 온보딩에서만 숨김

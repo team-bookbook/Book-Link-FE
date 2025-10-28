@@ -46,7 +46,7 @@ export const libraryQueries = {
 
   GET_LIBRARY_REVIEW: (library_id: string) =>
     queryOptions<IReview[]>({
-      queryKey: queryKeys.library.reviews(),
+      queryKey: queryKeys.library.review(library_id),
       queryFn: async () => {
         const res = await get<IReview[]>(END_POINT.REVIEW_BY_LIBRARY_ID(library_id));
         return res;

@@ -2,7 +2,7 @@ export const END_POINT = {
   // 리뷰 API
   REVIEW: '/review',
   REVIEW_BY_LIBRARY_ID: (id: string) => `/review/${id}`,
-  REVIEW_BY_REVIEW_ID: (id: number) => `/review/${id}`,
+  REVIEW_BY_REVIEW_ID: (id: string) => `/review/${id}`,
   REVIEW_RATING_BY_ID: (id: string) => `/review/rating/${id}`,
 
   // 인증 API

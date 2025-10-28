@@ -26,6 +26,20 @@ export interface IUpdateLibraryParams {
   validOperatingHours: boolean;
 }
 
+export interface ICreateReviewParams {
+  reviewerId: string;
+  targetId: string;
+  targetType: 'LIBRARY' | 'USER';
+  rating: number;
+  comment: string;
+}
+
+export interface IUpdateReviewParams {
+  reviewId: string;
+  rating: number;
+  comment: string;
+}
+
 export const libraryMutations = {
   POST_LIBRARY: () =>
     mutationOptions<string, Error, ICreateLibraryParams>({
@@ -67,6 +81,53 @@ export const libraryMutations = {
         }),
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: queryKeys.library.lists() });
+      },
+    }),
+
+  POST_LIBRARY_REVIEW: () =>
+    mutationOptions<void, Error, ICreateReviewParams>({
+      mutationKey: mutationKeys.library.reviewCreate,
+      mutationFn: (data) =>
+        post<void>(END_POINT.REVIEW, data, {
+          headers: {
+            'Trace-Id': uuidv4(),
+          },
+        }),
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: queryKeys.library.reviews() });
+      },
+    }),
+
+  PUT_LIBRARY_REVIEW: () =>
+    mutationOptions<boolean, Error, IUpdateReviewParams>({
+      mutationKey: mutationKeys.library.reviewUpdate,
+      mutationFn: ({ reviewId, rating, comment }) =>
+        put<boolean>(
+          END_POINT.REVIEW_BY_REVIEW_ID(reviewId),
+          { rating, comment },
+          {
+            headers: {
+              'Trace-Id': uuidv4(),
+            },
+          }
+        ),
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: queryKeys.library.reviews() });
+        // 추후 좋아요 쿼리키 생성시 초기화
+      },
+    }),
+
+  DELETE_LIBRARY_REVIEW: () =>
+    mutationOptions<void, Error, string>({
+      mutationKey: mutationKeys.library.reviewDelete,
+      mutationFn: (reviewId) =>
+        del<void>(END_POINT.REVIEW_BY_REVIEW_ID(reviewId), {
+          headers: {
+            'Trace-Id': uuidv4(),
+          },
+        }),
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: queryKeys.library.reviews() });
       },
     }),
 };

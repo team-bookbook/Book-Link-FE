@@ -13,6 +13,7 @@ export type BookCategoryLabel =
   | '언어(어학)'
   | '문학'
   | '역사';
+export type ReviewManage = 'modify' | 'delete';
 
 export const BOOK_SORT_OPTIONS: ReadonlyArray<{ value: BookSort; label: string }> = [
   { value: 'DISTANCE', label: '거리순' },
@@ -38,4 +39,9 @@ export const BOOK_CATEGORY_OPTIONS: ReadonlyArray<{ value: BookCategory; label: 
   { value: '700', label: '언어(어학)' },
   { value: '800', label: '문학' },
   { value: '900', label: '역사' },
+];
+
+export const REVIEW_MANAGE_OPTIONS: ReadonlyArray<{ value: ReviewManage; label: string }> = [
+  { value: 'modify', label: '수정하기' },
+  { value: 'delete', label: '삭제하기' },
 ];

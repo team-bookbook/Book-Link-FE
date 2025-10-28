@@ -26,6 +26,7 @@ const LibraryBookPage = lazy(() => import('@pages/library/library-book-page'));
 const LibraryReviewPage = lazy(() => import('@pages/library/library-review-page'));
 const PrivacyPage = lazy(() => import('@pages/setting/privacy-page'));
 const TermsOfService = lazy(() => import('@pages/setting/terms-of-service-page'));
+const ReivewCreatePage = lazy(() => import('@pages/chat/review-create-page'));
 
 export const router = createBrowserRouter([
   {
@@ -55,6 +56,7 @@ export const router = createBrowserRouter([
       { path: ROUTES.LIBRARY_DETAIL(':id'), element: <LibraryDetailPage /> },
       { path: ROUTES.LIBRARY_BOOK(':id'), element: <LibraryBookPage /> },
       { path: ROUTES.LIBRARY_REVIEW(':id'), element: <LibraryReviewPage /> },
+      { path: ROUTES.REVIEW_CREATE(':id'), element: <ReivewCreatePage /> },
     ],
   },
 ]);
