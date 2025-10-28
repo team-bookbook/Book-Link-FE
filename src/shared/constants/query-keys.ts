@@ -31,6 +31,9 @@ export const queryKeys = {
 } as const;
 
 export const mutationKeys = {
+  auth: {
+    login: ['auth', 'login'] as const,
+  },
   library: {
     create: ['library', 'create'] as const,
     update: ['library', 'update'] as const,
