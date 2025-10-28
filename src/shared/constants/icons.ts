@@ -42,6 +42,7 @@ export const ICONS = [
   'scan',
   'search',
   'send',
+  'star',
   'toast-error',
   'toast-info',
   'toast-success',

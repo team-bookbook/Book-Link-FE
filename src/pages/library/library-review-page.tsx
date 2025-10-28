@@ -28,6 +28,7 @@ export default function LibraryReviewPage() {
 
   const handleReviewManage = (reviewId: string) => {
     setSelectedReviewId(reviewId);
+    console.log(reviewId);
     open();
   };
 

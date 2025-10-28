@@ -26,6 +26,14 @@ export interface IUpdateLibraryParams {
   validOperatingHours: boolean;
 }
 
+export interface ICreateReviewParams {
+  reviewerId: string;
+  targetId: string;
+  targetType: 'LIBRARY' | 'USER';
+  rating: number;
+  comment: string;
+}
+
 export interface IUpdateReviewParams {
   reviewId: string;
   rating: number;
@@ -73,6 +81,20 @@ export const libraryMutations = {
         }),
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: queryKeys.library.lists() });
+      },
+    }),
+
+  POST_LIBRARY_REVIEW: () =>
+    mutationOptions<void, Error, ICreateReviewParams>({
+      mutationKey: mutationKeys.library.reviewCreate,
+      mutationFn: (data) =>
+        post<void>(END_POINT.REVIEW, data, {
+          headers: {
+            'Trace-Id': uuidv4(),
+          },
+        }),
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: queryKeys.library.reviews() });
       },
     }),
 
