@@ -94,4 +94,18 @@ export const libraryMutations = {
         // 추후 좋아요 쿼리키 생성시 초기화
       },
     }),
+
+  DELETE_LIBRARY_REVIEW: () =>
+    mutationOptions<void, Error, string>({
+      mutationKey: mutationKeys.library.reviewDelete,
+      mutationFn: (reviewId) =>
+        del<void>(END_POINT.REVIEW_BY_REVIEW_ID(reviewId), {
+          headers: {
+            'Trace-Id': uuidv4(),
+          },
+        }),
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: queryKeys.library.reviews() });
+      },
+    }),
 };

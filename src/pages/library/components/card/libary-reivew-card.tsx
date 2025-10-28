@@ -1,21 +1,17 @@
 import { useState, useRef, useEffect } from 'react';
 import type { IReview } from '@pages/library/types/review.types';
 import Icon from '@components/icon';
-import SelectBottomSheet from '@components/bottom-sheet/select-bottom-sheet';
-import useBottomSheet from '@components/bottom-sheet/hooks/use-bottom-sheet';
-import { REVIEW_MANAGE_OPTIONS } from '@components/dropdown/constants/select-options';
 
 interface ReviewCardProps {
   review: IReview;
   isMy?: boolean;
+  handleReviewManage?: () => void;
 }
 
-export default function ReviewCard({ review }: ReviewCardProps) {
+export default function ReviewCard({ review, handleReviewManage }: ReviewCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [needsExpansion, setNeedsExpansion] = useState(false);
   const contentRef = useRef<HTMLDivElement>(null);
-  const { isOpen, open, close } = useBottomSheet();
-  const [selectedOption, setSelectedOption] = useState<string>('');
 
   useEffect(() => {
     if (contentRef.current) {
@@ -50,7 +46,7 @@ export default function ReviewCard({ review }: ReviewCardProps) {
             <span className='caption5 text-gray-700'>2023.05.01</span>
           </div>
         </div>
-        <Icon onClick={open} name='more' className='text-gray-900' size={2} ariaHidden />
+        <Icon onClick={handleReviewManage} name='more' className='cursor-pointer text-gray-900' size={2} />
       </div>
       <div className='flex-col gap-[0.5rem]'>
         <div ref={contentRef} className={`body5 ${isExpanded ? '' : 'line-clamp-3'}`}>
@@ -65,14 +61,6 @@ export default function ReviewCard({ review }: ReviewCardProps) {
           </button>
         )}
       </div>
-      <SelectBottomSheet
-        open={isOpen}
-        onClose={close}
-        options={REVIEW_MANAGE_OPTIONS}
-        value={selectedOption}
-        onChange={setSelectedOption}
-        // onPick={}
-      />
     </div>
   );
 }
