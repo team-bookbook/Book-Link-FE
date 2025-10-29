@@ -25,4 +25,5 @@ export const ROUTES = {
   LIBRARY_BOOK: (id = ':libraryId') => `/library/${id}/book`,
   LIBRARY_REVIEW: (id = ':libraryId') => `/library/${id}/review`,
   REVIEW_CREATE: (id = ':Id') => `/review-create/${id}`,
+  PASSWORD_RESET: '/password-reset',
 };

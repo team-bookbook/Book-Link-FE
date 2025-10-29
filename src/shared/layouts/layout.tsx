@@ -40,6 +40,7 @@ export default function Layout() {
       isUnder(pathname, ROUTES.NOTIFICATION) ||
       isUnder(pathname, ROUTES.LIBRARY_CREATE) ||
       isUnder(pathname, ROUTES.BOOK_CREATE) ||
+      isUnder(pathname, ROUTES.PASSWORD_RESET) ||
       isReviewCreate ||
       isOnboarding,
     [pathname, isOnboarding, isReviewCreate]
