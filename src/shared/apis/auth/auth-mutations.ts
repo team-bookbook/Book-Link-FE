@@ -13,10 +13,29 @@ export interface ILoginResponse {
   refreshToken: string;
 }
 
+export interface SignupApiRequest {
+  email: string;
+  password: string;
+  name: string;
+  nickname: string;
+  address: string;
+  phone: string;
+  profileImage?: string;
+}
+
+export interface SignupApiResponse {
+  data: boolean;
+}
+
 export const authMutations = {
   POST_LOGIN: () =>
     mutationOptions<ILoginResponse, Error, ILoginParams>({
       mutationKey: mutationKeys.auth.login,
       mutationFn: (data) => post<ILoginResponse>(END_POINT.AUTH_LOGIN, data),
+    }),
+  POST_SIGNUP: () =>
+    mutationOptions<SignupApiResponse, Error, SignupApiRequest>({
+      mutationKey: mutationKeys.auth.signup,
+      mutationFn: (data) => post<SignupApiResponse>(END_POINT.AUTH_SIGNUP, data),
     }),
 };

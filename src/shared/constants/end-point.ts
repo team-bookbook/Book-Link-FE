@@ -7,6 +7,7 @@ export const END_POINT = {
 
   // 인증 API
   AUTH_LOGIN: '/auth/login',
+  AUTH_SIGNUP: '/member/signup',
   TOKEN_REISSUE: '/token/reissue',
 
   // 포인트 API

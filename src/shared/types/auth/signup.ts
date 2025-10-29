@@ -41,6 +41,11 @@ export const passwordSchema = z
     message: '비밀번호가 일치하지 않습니다.',
   });
 
+export const loginSchema = z.object({
+  email: z.string().trim().email('이메일 형식을 확인해주세요.'),
+  password: z.string().min(1, '비밀번호를 입력해주세요.'),
+});
+
 export const signupSchema = nameNickSchema.and(emailSchema).and(addressSchema).and(phoneSchema).and(passwordSchema);
 
 export type NameNick = z.infer<typeof nameNickSchema>;
@@ -49,4 +54,5 @@ export type EmailCode = z.infer<typeof emailCodeSchema>;
 export type Address = z.infer<typeof addressSchema>;
 export type Phone = z.infer<typeof phoneSchema>;
 export type Passwords = z.infer<typeof passwordSchema>;
+export type LoginPayload = z.infer<typeof loginSchema>;
 export type SignupPayload = z.infer<typeof signupSchema>;

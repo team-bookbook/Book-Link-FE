@@ -33,6 +33,7 @@ export const queryKeys = {
 export const mutationKeys = {
   auth: {
     login: ['auth', 'login'] as const,
+    signup: ['auth', 'signup'] as const,
   },
   library: {
     create: ['library', 'create'] as const,
