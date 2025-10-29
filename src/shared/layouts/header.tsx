@@ -4,9 +4,12 @@ import Icon from '@components/icon';
 import SearchBar from '@components/search-bar';
 import { ROUTES } from '@routes/routes-config';
 import { useMemo } from 'react';
+import { modal } from '@libs/modal';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { authMutations } from '@apis/auth/auth-mutations';
 
 type LeftKind = 'none' | 'back' | 'logo' | 'close';
-type ActionId = 'search' | 'cart' | 'share' | 'kebab' | 'bell' | 'close' | 'logout';
+export type ActionId = 'search' | 'cart' | 'share' | 'kebab' | 'bell' | 'close' | 'logout';
 
 type TextCTA = { kind: 'link'; label: string; to: string } | { kind: 'button'; label: string; onClick: () => void };
 
@@ -62,17 +65,49 @@ export default function Header({
 }: HeaderProps) {
   const nav = useNavigate();
   const { pathname } = useLocation();
+  const queryClient = useQueryClient();
   const isSetting = useMemo(() => isUnder(pathname, ROUTES.SETTING), [pathname]);
   const isBoard = useMemo(() => isUnder(pathname, ROUTES.BOARD), [pathname]);
   const NoShadow = isSetting || isBoard;
 
-  const handleAction = (id: ActionId) => {
+  const logoutMutation = useMutation({
+    ...authMutations.POST_LOGOUT(),
+    onSuccess: () => {
+      // 로그아웃 시 모든 캐시 초기화
+      queryClient.clear();
+    },
+  });
+
+  const handleAction = async (id: ActionId) => {
     if (id === 'bell') {
       nav(ROUTES.NOTIFICATION);
       return;
     }
     if (id === 'close' && !onAction) {
       nav(-1);
+      return;
+    }
+    if (id === 'logout' && !onAction) {
+      const result = await modal.confirm({
+        title: '로그아웃 하시겠습니까?',
+        confirmText: '로그아웃',
+        cancelText: '취소',
+      });
+
+      if (result.ok) {
+        try {
+          await logoutMutation.mutateAsync();
+          localStorage.removeItem('accessToken');
+          localStorage.removeItem('refreshToken');
+          nav(ROUTES.LOGIN);
+        } catch (error) {
+          console.error('로그아웃 실패:', error);
+          // 실패해도 로컬 토큰 제거 및 로그인 페이지 이동
+          localStorage.removeItem('accessToken');
+          localStorage.removeItem('refreshToken');
+          nav(ROUTES.LOGIN);
+        }
+      }
       return;
     }
     onAction?.(id);

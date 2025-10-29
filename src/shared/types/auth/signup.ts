@@ -27,19 +27,27 @@ export const phoneSchema = z.object({
     .regex(/^0\d{1,2}-\d{3,4}-\d{4}$/, '예: 010-1234-5678'),
 });
 
+const passwordValidation = z
+  .string()
+  .min(8, '8자 이상 입력해 주세요.')
+  .regex(/[A-Za-z]/, '영문을 포함해 주세요.')
+  .regex(/\d/, '숫자를 포함해 주세요.');
+
 export const passwordSchema = z
   .object({
-    password: z
-      .string()
-      .min(8, '8자 이상 입력해 주세요.')
-      .regex(/[A-Za-z]/, '영문을 포함해 주세요.')
-      .regex(/\d/, '숫자를 포함해 주세요.'),
+    password: passwordValidation,
     passwordConfirm: z.string().min(1, '비밀번호 확인을 입력해 주세요.'),
   })
   .refine((v) => v.password === v.passwordConfirm, {
     path: ['passwordConfirm'],
     message: '비밀번호가 일치하지 않습니다.',
   });
+
+export const loginSchema = emailSchema.and(
+  z.object({
+    password: passwordValidation,
+  })
+);
 
 export const signupSchema = nameNickSchema.and(emailSchema).and(addressSchema).and(phoneSchema).and(passwordSchema);
 
@@ -49,4 +57,5 @@ export type EmailCode = z.infer<typeof emailCodeSchema>;
 export type Address = z.infer<typeof addressSchema>;
 export type Phone = z.infer<typeof phoneSchema>;
 export type Passwords = z.infer<typeof passwordSchema>;
+export type LoginPayload = z.infer<typeof loginSchema>;
 export type SignupPayload = z.infer<typeof signupSchema>;

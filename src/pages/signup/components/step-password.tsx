@@ -4,44 +4,52 @@ import Button from '@components/button/button';
 import ButtonFrame from '@components/button/button-frame';
 import { useFunnel } from '@libs/funnel';
 import { useSignupData } from '@pages/signup/signup-data-context';
-import { submitSignup } from '@apis/auth';
+import { useMutation } from '@tanstack/react-query';
+import { authMutations, type SignupApiRequest } from '@apis/auth/auth-mutations';
 
 function isStrong(pw: string) {
   return pw.length >= 8 && /[A-Za-z]/u.test(pw) && /\d/u.test(pw);
 }
 
 export default function StepPassword() {
-  const { data, setData } = useSignupData();
+  const { data, setData, reset } = useSignupData();
   const { goNext } = useFunnel();
 
   const [touched, setTouched] = useState<{ pw: boolean; pw2: boolean }>({ pw: false, pw2: false });
-  const [submitting, setSubmitting] = useState(false);
+
+  const signupMutation = useMutation(authMutations.POST_SIGNUP());
 
   const pwValid = isStrong(data.password);
   const match = data.password.length > 0 && data.password === data.passwordConfirm;
-  const canSubmit = pwValid && match && !submitting;
+  const canSubmit = pwValid && match && !signupMutation.isPending;
 
-  const onSubmit = async () => {
+  const onSubmit = () => {
     if (!canSubmit) {
       setTouched({ pw: true, pw2: true });
       return;
     }
-    setSubmitting(true);
-    try {
-      await submitSignup({
-        name: data.name,
-        nickname: data.nickname,
-        email: data.email,
-        zip: data.zip,
-        addr1: data.addr1,
-        addr2: data.addr2,
-        phone: data.phone,
-        password: data.password,
-      });
-      goNext();
-    } finally {
-      setSubmitting(false);
-    }
+
+    const address = [data.zip, data.addr1, data.addr2].filter(Boolean).join(' ');
+
+    const payload: SignupApiRequest = {
+      email: data.email,
+      password: data.password,
+      name: data.name,
+      nickname: data.nickname,
+      address: address,
+      phone: data.phone,
+    };
+
+    signupMutation.mutate(payload, {
+      onSuccess: () => {
+        reset(); // localStorage 정리
+        goNext();
+      },
+      onError: (error) => {
+        console.error('회원가입 실패:', error);
+        // TODO: 에러 메시지 표시 (Toast 등)
+      },
+    });
   };
 
   return (
@@ -78,9 +86,13 @@ export default function StepPassword() {
 
       <ButtonFrame>
         <Button fullWidth className='py-[1.2rem]' onClick={onSubmit} disabled={!canSubmit}>
-          가입하기
+          {signupMutation.isPending ? '가입 중...' : '가입하기'}
         </Button>
       </ButtonFrame>
+
+      {signupMutation.isError && (
+        <div className='px-[2rem] pb-[1rem] text-center text-red-500'>회원가입에 실패했습니다. 다시 시도해주세요.</div>
+      )}
     </div>
   );
 }

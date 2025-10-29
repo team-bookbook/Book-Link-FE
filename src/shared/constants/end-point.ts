@@ -6,6 +6,9 @@ export const END_POINT = {
   REVIEW_RATING_BY_ID: (id: string) => `/review/rating/${id}`,
 
   // 인증 API
+  AUTH_LOGIN: '/auth/login',
+  AUTH_LOGOUT: '/auth/logout',
+  AUTH_SIGNUP: '/member/signup',
   TOKEN_REISSUE: '/token/reissue',
 
   // 포인트 API
