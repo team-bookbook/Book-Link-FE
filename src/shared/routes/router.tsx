@@ -28,6 +28,7 @@ const PrivacyPage = lazy(() => import('@pages/setting/privacy-page'));
 const TermsOfService = lazy(() => import('@pages/setting/terms-of-service-page'));
 const ReivewCreatePage = lazy(() => import('@pages/chat/review-create-page'));
 const PasswordResetPage = lazy(() => import('@pages/setting/password-reset-page'));
+const EditProfilePage = lazy(() => import('@pages/setting/edit-profile-page'));
 
 export const router = createBrowserRouter([
   {
@@ -59,6 +60,7 @@ export const router = createBrowserRouter([
       { path: ROUTES.LIBRARY_REVIEW(':id'), element: <LibraryReviewPage /> },
       { path: ROUTES.REVIEW_CREATE(':id'), element: <ReivewCreatePage /> },
       { path: ROUTES.PASSWORD_RESET, element: <PasswordResetPage /> },
+      { path: ROUTES.EDIT_PROFILE, element: <EditProfilePage /> },
     ],
   },
 ]);

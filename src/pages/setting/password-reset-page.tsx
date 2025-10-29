@@ -1,12 +1,11 @@
 import Input from '@components/input/input';
 import Button from '@components/button/button';
 import ButtonFrame from '@components/button/button-frame';
-import passwordIcon from '@images/password-reset.svg';
 import { useState } from 'react';
 import { passwordSchema } from '@/shared/types/auth/signup';
+import Icon from '@components/icon';
 
 function PasswordResetPage() {
-  const imgSrc = passwordIcon;
   const [password, setPassword] = useState('');
   const [passwordConfirm, setPasswordConfirm] = useState('');
   const [passwordError, setPasswordError] = useState('');
@@ -36,7 +35,7 @@ function PasswordResetPage() {
     <div>
       <div className='flex-col gap-[1.5rem] px-[2rem] pt-[2.5rem]'>
         <div className='flex-col-center mb-[1.5rem] pt-[1rem]'>
-          <img src={imgSrc} alt={'패스워드 리셋 아이콘'} className='h-[7rem] w-[7rem] shrink-0' loading='lazy' />
+          <Icon name='pw-lock' className='mb-[1.5rem] text-gray-300' size={9} ariaHidden />
           <div className='flex-col-center gap-[1rem]'>
             <h1 className='body1 text-gray-900'>비밀번호 재설정</h1>
             <h2 className='body5 text-gray-500'>BookLink에서 새롭게 사용할 비밀번호를 입력해 주세요.</h2>

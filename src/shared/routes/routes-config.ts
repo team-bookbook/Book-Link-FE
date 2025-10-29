@@ -26,4 +26,5 @@ export const ROUTES = {
   LIBRARY_REVIEW: (id = ':libraryId') => `/library/${id}/review`,
   REVIEW_CREATE: (id = ':Id') => `/review-create/${id}`,
   PASSWORD_RESET: '/password-reset',
+  EDIT_PROFILE: '/edit-profile',
 };
