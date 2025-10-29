@@ -27,13 +27,15 @@ export const phoneSchema = z.object({
     .regex(/^0\d{1,2}-\d{3,4}-\d{4}$/, '예: 010-1234-5678'),
 });
 
+const passwordValidation = z
+  .string()
+  .min(8, '8자 이상 입력해 주세요.')
+  .regex(/[A-Za-z]/, '영문을 포함해 주세요.')
+  .regex(/\d/, '숫자를 포함해 주세요.');
+
 export const passwordSchema = z
   .object({
-    password: z
-      .string()
-      .min(8, '8자 이상 입력해 주세요.')
-      .regex(/[A-Za-z]/, '영문을 포함해 주세요.')
-      .regex(/\d/, '숫자를 포함해 주세요.'),
+    password: passwordValidation,
     passwordConfirm: z.string().min(1, '비밀번호 확인을 입력해 주세요.'),
   })
   .refine((v) => v.password === v.passwordConfirm, {
@@ -41,10 +43,11 @@ export const passwordSchema = z
     message: '비밀번호가 일치하지 않습니다.',
   });
 
-export const loginSchema = z.object({
-  email: z.string().trim().email('이메일 형식을 확인해주세요.'),
-  password: z.string().min(1, '비밀번호를 입력해주세요.'),
-});
+export const loginSchema = emailSchema.and(
+  z.object({
+    password: passwordValidation,
+  })
+);
 
 export const signupSchema = nameNickSchema.and(emailSchema).and(addressSchema).and(phoneSchema).and(passwordSchema);
 

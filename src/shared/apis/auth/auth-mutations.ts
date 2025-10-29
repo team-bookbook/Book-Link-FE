@@ -10,7 +10,6 @@ export interface ILoginParams {
 
 export interface ILoginResponse {
   accessToken: string;
-  refreshToken: string;
 }
 
 export interface SignupApiRequest {
@@ -32,6 +31,11 @@ export const authMutations = {
     mutationOptions<ILoginResponse, Error, ILoginParams>({
       mutationKey: mutationKeys.auth.login,
       mutationFn: (data) => post<ILoginResponse>(END_POINT.AUTH_LOGIN, data),
+    }),
+  POST_LOGOUT: () =>
+    mutationOptions<void, Error, void>({
+      mutationKey: mutationKeys.auth.logout,
+      mutationFn: () => post<void>(END_POINT.AUTH_LOGOUT, {}),
     }),
   POST_SIGNUP: () =>
     mutationOptions<SignupApiResponse, Error, SignupApiRequest>({

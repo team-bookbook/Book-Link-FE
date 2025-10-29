@@ -8,36 +8,32 @@ import { authMutations } from '@apis/auth/auth-mutations';
 import { useMutation } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '@routes/routes-config';
+import { loginSchema, emailSchema } from '@/shared/types/auth/signup';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
-  const [emailError, setEmailError] = useState<'format' | 'login' | null>(null);
+  const [emailError, setEmailError] = useState('');
   const [pw, setPw] = useState('');
-  const [pwError, setPwError] = useState(false);
+  const [pwError, setPwError] = useState('');
+  const [loginError, setLoginError] = useState('');
   const navigate = useNavigate();
 
   const loginMutation = useMutation(authMutations.POST_LOGIN());
 
-  const validateEmail = (value: string) => {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
-  };
-
-  const getEmailErrorMessage = () => {
-    if (emailError === 'format') return '이메일 형식을 확인해주세요.';
-    if (emailError === 'login') return '이메일 또는 비밀번호를 확인해주세요.';
-    return '';
-  };
-
   const submit = () => {
-    const isEmailValid = validateEmail(email);
-    const isPwValid = pw.length > 0;
+    const result = loginSchema.safeParse({ email, password: pw });
 
-    setEmailError(isEmailValid ? null : 'format');
-    setPwError(!isPwValid);
-
-    if (!isEmailValid || !isPwValid) {
+    if (!result.success) {
+      const errors = result.error.flatten().fieldErrors;
+      setEmailError(errors.email?.[0] || '');
+      setPwError(errors.password?.[0] || '');
+      setLoginError('');
       return;
     }
+
+    setEmailError('');
+    setPwError('');
+    setLoginError('');
 
     loginMutation.mutate(
       {
@@ -47,13 +43,11 @@ export default function LoginPage() {
       {
         onSuccess: (data) => {
           localStorage.setItem('accessToken', data.accessToken);
-          localStorage.setItem('refreshToken', data.refreshToken);
           navigate(ROUTES.HOME);
         },
         onError: (error) => {
           console.error('로그인 실패:', error);
-          setEmailError('login');
-          setPwError(false);
+          setLoginError('이메일 또는 비밀번호를 확인해주세요.');
         },
       }
     );
@@ -72,19 +66,23 @@ export default function LoginPage() {
             value={email}
             onChange={(e) => {
               setEmail(e.currentTarget.value);
-              if (emailError) setEmailError(null);
+              if (emailError) setEmailError('');
+              if (loginError) setLoginError('');
             }}
             onBlur={() => {
-              if (email && !validateEmail(email)) {
-                setEmailError('format');
+              if (email) {
+                const result = emailSchema.shape.email.safeParse(email);
+                if (!result.success) {
+                  setEmailError(result.error?.message || '');
+                }
               }
             }}
             inputMode='email'
             autoCapitalize='none'
             autoCorrect='off'
             autoComplete='email'
-            isError={!!emailError}
-            validationMessage={getEmailErrorMessage()}
+            isError={!!emailError || !!loginError}
+            validationMessage={emailError || loginError}
           />
 
           <Input
@@ -95,11 +93,12 @@ export default function LoginPage() {
             passwordToggle
             onChange={(e) => {
               setPw(e.currentTarget.value);
-              if (pwError) setPwError(false);
+              if (pwError) setPwError('');
+              if (loginError) setLoginError('');
             }}
             autoComplete='current-password'
-            isError={pwError}
-            validationMessage={pwError ? '비밀번호를 입력해주세요.' : ''}
+            isError={!!pwError}
+            validationMessage={pwError}
           />
         </div>
 
