@@ -11,7 +11,7 @@ import { CART_STORAGE_KEY, CART_LABELS } from '@pages/library/constants/cart';
 export default function CartPage() {
   const [cartBooks, setCartBooks] = useState<ILibraryBook[]>([]);
   const [dueDate, setDueDate] = useState('');
-  const nav = useNavigate();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const data = sessionStorage.getItem(CART_STORAGE_KEY);
@@ -69,7 +69,7 @@ export default function CartPage() {
         </div>
       </div>
       <div className='px-[2rem]'>
-        <Button fullWidth={true} onClick={() => nav('/chat/1')}>
+        <Button fullWidth={true} onClick={() => navigate('/chat/1')}>
           {CART_LABELS.rentalRequest}
         </Button>
       </div>

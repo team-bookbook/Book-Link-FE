@@ -9,7 +9,7 @@ import { BOOK_DETAIL_LABELS } from '@pages/library/constants/book-detail';
 export default function BookDetailPage() {
   const { bookId } = useParams<{ bookId: string }>();
   const [book, setBook] = useState<IBookDetail | null>(null);
-  const nav = useNavigate();
+  const navigate = useNavigate();
   // const { addToCart } = useCart();
 
   useEffect(() => {
@@ -111,7 +111,7 @@ export default function BookDetailPage() {
   const bottomBar = () => {
     return (
       <div className='bg-gray-white shadow-bottom-fixed fixed bottom-0 left-1/2 z-50 w-full max-w-[43rem] -translate-x-1/2 px-[2rem] pt-[1.2rem] pb-[2.5rem]'>
-        <Button fullWidth={true} onClick={() => nav('/chat/1')}>
+        <Button fullWidth={true} onClick={() => navigate('/chat/1')}>
           {BOOK_DETAIL_LABELS.rentalRequest}
         </Button>
       </div>

@@ -63,7 +63,7 @@ export default function Header({
   safeTop = true,
   className,
 }: HeaderProps) {
-  const nav = useNavigate();
+  const navigate = useNavigate();
   const { pathname } = useLocation();
   const queryClient = useQueryClient();
   const isSetting = useMemo(() => isUnder(pathname, ROUTES.SETTING), [pathname]);
@@ -80,11 +80,11 @@ export default function Header({
 
   const handleAction = async (id: ActionId) => {
     if (id === 'bell') {
-      nav(ROUTES.NOTIFICATION);
+      navigate(ROUTES.NOTIFICATION);
       return;
     }
     if (id === 'close' && !onAction) {
-      nav(-1);
+      navigate(-1);
       return;
     }
     if (id === 'logout' && !onAction) {
@@ -99,13 +99,13 @@ export default function Header({
           await logoutMutation.mutateAsync();
           localStorage.removeItem('accessToken');
           localStorage.removeItem('refreshToken');
-          nav(ROUTES.LOGIN);
+          navigate(ROUTES.LOGIN);
         } catch (error) {
           console.error('로그아웃 실패:', error);
           // 실패해도 로컬 토큰 제거 및 로그인 페이지 이동
           localStorage.removeItem('accessToken');
           localStorage.removeItem('refreshToken');
-          nav(ROUTES.LOGIN);
+          navigate(ROUTES.LOGIN);
         }
       }
       return;
@@ -135,7 +135,7 @@ export default function Header({
             <button
               className='cursor-pointer text-gray-900 hover:opacity-80'
               aria-label='뒤로가기'
-              onClick={() => nav(-1)}
+              onClick={() => navigate(-1)}
             >
               <Icon name='back' size={2.4} ariaHidden />
             </button>

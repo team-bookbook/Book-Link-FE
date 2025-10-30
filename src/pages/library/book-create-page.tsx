@@ -6,6 +6,7 @@ import Icon from '@components/icon';
 import useImageUpload from '@hooks/use-image-upload';
 import { useMutation } from '@tanstack/react-query';
 import { bookMutations } from '@apis/book/book-mutations';
+import { toast } from '@libs/toast';
 
 export default function BookCreatePage() {
   const { fileRef, images, openFilePicker, handleFileChange, removeImage } = useImageUpload({ mode: 'multiple' });
@@ -34,17 +35,15 @@ export default function BookCreatePage() {
         category: category.trim(),
         originalPrice: Number(price.trim()) || 0,
         publishedDate: new Date().toISOString().split('T')[0],
-        isbn: isbn.trim(),
+        isbn: '1313',
         ISBN: isbn.trim(),
       },
       {
-        onSuccess: (data) => {
-          console.log('도서 등록 성공:', data);
-          // TODO: 성공 후 처리 (예: 페이지 이동)
+        onSuccess: () => {
+          toast.success('도서 등록이 완료되었어요');
         },
         onError: (error) => {
           console.error('도서 등록 실패:', error);
-          // TODO: 에러 처리
         },
       }
     );
