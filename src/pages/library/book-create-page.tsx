@@ -7,6 +7,11 @@ import useImageUpload from '@hooks/use-image-upload';
 import { useMutation } from '@tanstack/react-query';
 import { bookMutations } from '@apis/book/book-mutations';
 import { toast } from '@libs/toast';
+import { useNavigate } from 'react-router-dom';
+import useBottomSheet from '@components/bottom-sheet/hooks/use-bottom-sheet';
+import SelectBottomSheet from '@components/bottom-sheet/select-bottom-sheet';
+import { BOOK_CATEGORY_CREATE_OPTIONS } from '@components/dropdown/constants/select-options';
+import { ROUTES } from '@routes/routes-config';
 
 export default function BookCreatePage() {
   const { fileRef, images, openFilePicker, handleFileChange, removeImage } = useImageUpload({ mode: 'multiple' });
@@ -20,9 +25,15 @@ export default function BookCreatePage() {
   const [deposit, setDeposit] = useState('');
   const [isbn, setIsbn] = useState('');
 
+  const { isOpen, open, close } = useBottomSheet();
   const { mutate: createBook } = useMutation(bookMutations.POST_BOOK());
 
   const canSubmit = images.length >= 3 && title.trim().length > 0;
+  const navigate = useNavigate();
+
+  const categoryLabel = category
+    ? BOOK_CATEGORY_CREATE_OPTIONS.find((option) => option.value === category)?.label || '카테고리'
+    : '카테고리';
 
   const submit = () => {
     if (!canSubmit) return;
@@ -41,6 +52,7 @@ export default function BookCreatePage() {
       {
         onSuccess: () => {
           toast.success('도서 등록이 완료되었어요');
+          navigate(ROUTES.LIBRARY);
         },
         onError: (error) => {
           console.error('도서 등록 실패:', error);
@@ -124,13 +136,7 @@ export default function BookCreatePage() {
           onChange={(e) => setPrice(e.currentTarget.value.replace(/[^\d]/g, ''))}
         />
 
-        <Input
-          id='book-category'
-          label='카테고리'
-          placeholder='카테고리를 입력해 주세요.'
-          value={category}
-          onChange={(e) => setCategory(e.currentTarget.value)}
-        />
+        <Input id='book-category' label='카테고리' value={categoryLabel} endIcon='dropdown' readOnly onClick={open} />
 
         <Input
           id='book-isbn'
@@ -169,6 +175,14 @@ export default function BookCreatePage() {
           도서 등록
         </Button>
       </ButtonFrame>
+
+      <SelectBottomSheet
+        open={isOpen}
+        onClose={close}
+        options={BOOK_CATEGORY_CREATE_OPTIONS}
+        value={category}
+        onChange={setCategory}
+      />
     </div>
   );
 }
