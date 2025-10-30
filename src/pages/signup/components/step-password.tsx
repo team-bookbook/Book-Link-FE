@@ -29,15 +29,15 @@ export default function StepPassword() {
       return;
     }
 
-    const address = [data.zip, data.addr1, data.addr2].filter(Boolean).join(' ');
+    const address = [data.zip.trim(), data.addr1.trim(), data.addr2.trim()].filter(Boolean).join(' ');
 
     const payload: SignupApiRequest = {
-      email: data.email,
-      password: data.password,
-      name: data.name,
-      nickname: data.nickname,
+      email: data.email.trim(),
+      password: data.password.trim(),
+      name: data.name.trim(),
+      nickname: data.nickname.trim(),
       address: address,
-      phone: data.phone,
+      phone: data.phone.trim(),
     };
 
     signupMutation.mutate(payload, {

@@ -27,7 +27,6 @@ export const uploadToS3 = async (presignedUrl: string, file: File): Promise<void
 
 export const uploadImage = async (file: File): Promise<string> => {
   const data = await getPresignedUrl(file.name);
-
   await uploadToS3(data.url, file);
 
   const S3_BUCKET_URL = 'https://bookbook-booklink.s3.ap-northeast-2.amazonaws.com';

@@ -4,6 +4,8 @@ import ButtonFrame from '@components/button/button-frame';
 import Input from '@components/input/input';
 import Icon from '@components/icon';
 import useImageUpload from '@hooks/use-image-upload';
+import { useMutation } from '@tanstack/react-query';
+import { bookMutations } from '@apis/book/book-mutations';
 
 export default function BookCreatePage() {
   const { fileRef, images, openFilePicker, handleFileChange, removeImage } = useImageUpload({ mode: 'multiple' });
@@ -15,22 +17,37 @@ export default function BookCreatePage() {
   const [category, setCategory] = useState('');
   const [desc, setDesc] = useState('');
   const [deposit, setDeposit] = useState('');
+  const [isbn, setIsbn] = useState('');
+
+  const { mutate: createBook } = useMutation(bookMutations.POST_BOOK());
 
   const canSubmit = images.length >= 3 && title.trim().length > 0;
 
   const submit = () => {
     if (!canSubmit) return;
-    const payload = {
-      images: images.map((p) => p.url),
-      title: title.trim(),
-      author: author.trim(),
-      publisher: publisher.trim(),
-      price: price.trim(),
-      category: category.trim(),
-      description: desc.trim(),
-      deposit: deposit.trim(),
-    };
-    console.log('create book payload ->', payload);
+
+    createBook(
+      {
+        title: title.trim(),
+        author: author.trim(),
+        publisher: publisher.trim(),
+        category: category.trim(),
+        originalPrice: Number(price.trim()) || 0,
+        publishedDate: new Date().toISOString().split('T')[0],
+        isbn: isbn.trim(),
+        ISBN: isbn.trim(),
+      },
+      {
+        onSuccess: (data) => {
+          console.log('도서 등록 성공:', data);
+          // TODO: 성공 후 처리 (예: 페이지 이동)
+        },
+        onError: (error) => {
+          console.error('도서 등록 실패:', error);
+          // TODO: 에러 처리
+        },
+      }
+    );
   };
 
   return (
@@ -114,6 +131,14 @@ export default function BookCreatePage() {
           placeholder='카테고리를 입력해 주세요.'
           value={category}
           onChange={(e) => setCategory(e.currentTarget.value)}
+        />
+
+        <Input
+          id='book-isbn'
+          label='ISBN'
+          placeholder='ISBN을 입력해 주세요.'
+          value={isbn}
+          onChange={(e) => setIsbn(e.currentTarget.value)}
         />
 
         <Input

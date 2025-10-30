@@ -37,8 +37,8 @@ export default function LoginPage() {
 
     loginMutation.mutate(
       {
-        email,
-        password: pw,
+        email: email.trim(),
+        password: pw.trim(),
       },
       {
         onSuccess: (data) => {
