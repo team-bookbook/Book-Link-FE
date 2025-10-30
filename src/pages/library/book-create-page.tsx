@@ -1,15 +1,13 @@
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 import Button from '@components/button/button';
 import ButtonFrame from '@components/button/button-frame';
 import Input from '@components/input/input';
 import Icon from '@components/icon';
-
-type Preview = { id: string; url: string };
+import useImageUpload from '@hooks/use-image-upload';
 
 export default function BookCreatePage() {
-  const fileRef = useRef<HTMLInputElement | null>(null);
+  const { fileRef, images, openFilePicker, handleFileChange, removeImage } = useImageUpload({ mode: 'multiple' });
 
-  const [images, setImages] = useState<Preview[]>([]);
   const [title, setTitle] = useState('');
   const [author, setAuthor] = useState('');
   const [publisher, setPublisher] = useState('');
@@ -19,29 +17,6 @@ export default function BookCreatePage() {
   const [deposit, setDeposit] = useState('');
 
   const canSubmit = images.length >= 3 && title.trim().length > 0;
-
-  const onPick = () => fileRef.current?.click();
-
-  const onFiles = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.currentTarget.files ?? []);
-    if (!files.length) return;
-
-    Promise.all(
-      files.map(
-        (f) =>
-          new Promise<Preview>((resolve) => {
-            const reader = new FileReader();
-            reader.onload = () =>
-              resolve({
-                id: `${f.name}-${f.lastModified}-${Math.random().toString(36).slice(2)}`,
-                url: typeof reader.result === 'string' ? reader.result : '',
-              });
-            reader.readAsDataURL(f);
-          })
-      )
-    ).then((previews) => setImages((prev) => [...prev, ...previews]));
-    e.currentTarget.value = '';
-  };
 
   const submit = () => {
     if (!canSubmit) return;
@@ -64,18 +39,30 @@ export default function BookCreatePage() {
         <div className='flex-col gap-[0.8rem]'>
           <label className='body5'>책 이미지 (최소 3장으로 앞, 뒤, 내부 사진 업로드)</label>
 
-          <Button variant='primary' fullWidth className='py-[1.2rem]' onClick={onPick} roundStyle='rounded-[12px]'>
+          <Button
+            variant='primary'
+            fullWidth
+            className='py-[1.2rem]'
+            onClick={openFilePicker}
+            roundStyle='rounded-[12px]'
+          >
             이미지 업로드
           </Button>
-          <input ref={fileRef} type='file' accept='image/*' multiple onChange={onFiles} className='hidden' />
-
-          {!!images.length && (
+          <input ref={fileRef} type='file' accept='image/*' multiple onChange={handleFileChange} className='hidden' />
+          {images.length > 0 && (
             <div className='grid grid-cols-2 gap-[0.8rem]'>
               {images.map((img) => (
                 <div
                   key={img.id}
-                  className='grid h-[15rem] w-full place-items-center overflow-hidden rounded-[12px] bg-gray-100'
+                  className='relative grid h-[15rem] w-full place-items-center overflow-hidden rounded-[12px] bg-gray-100'
                 >
+                  <Icon
+                    name='cancel'
+                    size={1.5}
+                    className='absolute top-[1rem] right-[1rem] cursor-pointer text-gray-400'
+                    ariaHidden
+                    onClick={() => removeImage(img.id)}
+                  ></Icon>
                   {img.url ? (
                     <img src={img.url} alt='' className='h-full w-full object-cover' />
                   ) : (
@@ -85,7 +72,6 @@ export default function BookCreatePage() {
               ))}
             </div>
           )}
-
           <p className='body5 text-primary-700'>처음에 등록한 사진이 목록에 노출됩니다.</p>
         </div>
 
@@ -156,7 +142,7 @@ export default function BookCreatePage() {
 
       <ButtonFrame>
         <Button fullWidth roundStyle='rounded-[12px]' className='py-[1.2rem]' disabled={!canSubmit} onClick={submit}>
-          대여 요청
+          도서 등록
         </Button>
       </ButtonFrame>
     </div>

@@ -1,51 +1,48 @@
 import Button from '@components/button/button';
 import Icon from '@components/icon';
-import { useRef } from 'react';
+import { useEffect } from 'react';
 import { EDIT_PROFILE_TEXT } from '../constants/edit-profile.constants';
-
-type Preview = { id: string; url: string };
+import useImageUpload, { type ImagePreview } from '@hooks/use-image-upload';
 
 interface ProfileImageSectionProps {
-  image: Preview | null;
-  onImageChange: (image: Preview | null) => void;
+  image: ImagePreview | null;
+  onImageChange: (image: ImagePreview | null) => void;
 }
 
 function ProfileImageSection({ image, onImageChange }: ProfileImageSectionProps) {
-  const fileRef = useRef<HTMLInputElement | null>(null);
+  const { fileRef, images, openFilePicker, handleFileChange, resetImages, setImages } = useImageUpload({
+    mode: 'single',
+  });
 
-  const onPickImage = () => fileRef.current?.click();
+  const currentImage = images[0] || null;
+  const previewUrl = currentImage?.url || '';
+
+  useEffect(() => {
+    if (image?.url) {
+      setImages([image]);
+    }
+  }, [image, setImages]);
+
+  useEffect(() => {
+    if (currentImage) {
+      onImageChange(currentImage);
+    }
+  }, [currentImage, onImageChange]);
 
   const onResetToDefault = () => {
+    resetImages();
     onImageChange(null);
     // TODO: 기본 이미지로 변경 API 호출
-  };
-
-  const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.currentTarget.files;
-    if (!files || files.length === 0) return;
-
-    const file = files[0];
-
-    const reader = new FileReader();
-    reader.onload = () => {
-      onImageChange({
-        id: `${file.name}-${file.lastModified}-${Math.random().toString(36).slice(2)}`,
-        url: typeof reader.result === 'string' ? reader.result : '',
-      });
-    };
-    reader.readAsDataURL(file);
-
-    e.currentTarget.value = '';
   };
 
   return (
     <div className='flex-col'>
       <h2 className='body5 mb-[1rem] text-gray-900'>{EDIT_PROFILE_TEXT.PROFILE_IMAGE}</h2>
       <div className='flex-col-center'>
-        <input ref={fileRef} type='file' accept='image/*' onChange={onFileChange} className='hidden' />
+        <input ref={fileRef} type='file' accept='image/*' onChange={handleFileChange} className='hidden' />
         <div className='relative mb-[1.5rem] h-[8rem] w-[8rem] overflow-hidden rounded-full'>
-          {image ? (
-            <img src={image.url} alt='사용자 프로필 사진' className='h-full w-full object-cover' />
+          {previewUrl ? (
+            <img src={previewUrl} alt='사용자 프로필 사진' className='h-full w-full object-cover' />
           ) : (
             <Icon name='cat-profile' className='mb-[1.5rem] text-gray-300' size={8} ariaHidden />
           )}
@@ -56,7 +53,7 @@ function ProfileImageSection({ image, onImageChange }: ProfileImageSectionProps)
         <Button fullWidth variant='outline' className='min-h-[3.6rem] py-[1.2rem]' onClick={onResetToDefault}>
           {EDIT_PROFILE_TEXT.RESET_TO_DEFAULT}
         </Button>
-        <Button fullWidth variant='outline' className='min-h-[3.6rem] py-[1.2rem]' onClick={onPickImage}>
+        <Button fullWidth variant='outline' className='min-h-[3.6rem] py-[1.2rem]' onClick={openFilePicker}>
           {EDIT_PROFILE_TEXT.CHANGE_IMAGE}
         </Button>
       </div>
