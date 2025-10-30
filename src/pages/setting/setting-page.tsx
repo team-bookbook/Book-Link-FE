@@ -2,13 +2,15 @@ import { isAuthenticated } from '@/shared/utils/auth';
 import { memberQueries } from '@apis/member/member-queries';
 import Icon from '@components/icon';
 import { useQuery } from '@tanstack/react-query';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 export default function SettingPage() {
   const { data: memberData } = useQuery({
     ...memberQueries.GET_ME(),
     enabled: isAuthenticated(),
   });
+
+  const navigate = useNavigate();
 
   return (
     <div className='bg-gray-50 text-gray-900'>
@@ -18,7 +20,11 @@ export default function SettingPage() {
             <Icon name='cat-profile' size={6} className='text-gray-200' ariaHidden />
             <div className='min-w-0 flex-1'>
               <p className='title5'>{memberData ? memberData.name : '북북'}</p>
-              <button type='button' className='flex cursor-pointer items-center gap-[0.4rem] text-gray-500'>
+              <button
+                type='button'
+                className='flex cursor-pointer items-center gap-[0.4rem] text-gray-500'
+                onClick={() => navigate('/edit-profile')}
+              >
                 <span className='caption3'>내 정보 수정</span>
                 <Icon name='dropdown' rotate={270} size={1.6} className='text-gray-400' ariaHidden />
               </button>

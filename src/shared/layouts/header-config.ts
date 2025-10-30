@@ -125,6 +125,12 @@ const cartRule: Rule = (path) =>
     ? { left: 'back', title: '장바구니' }
     : undefined;
 
+// 비밀번호 재설정
+const passwordResetRule: Rule = (path) =>
+  ROUTES.PASSWORD_RESET && matchPath({ path: ROUTES.PASSWORD_RESET, end: true }, path)
+    ? { left: 'back', title: '비밀번호 재설정' }
+    : undefined;
+
 // 기본
 const fallbackRule = (): HeaderProps => ({
   left: 'back',
@@ -153,6 +159,7 @@ const RULES: ReadonlyArray<Rule> = [
   cartRule,
   privacyRule,
   serviceRule,
+  passwordResetRule,
 ];
 
 export function getHeaderForRoute(pathname: string, search: string): HeaderProps {

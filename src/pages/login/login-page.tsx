@@ -73,7 +73,7 @@ export default function LoginPage() {
               if (email) {
                 const result = emailSchema.shape.email.safeParse(email);
                 if (!result.success) {
-                  setEmailError(result.error?.message || '');
+                  setEmailError(result.error.issues[0]?.message || '');
                 }
               }
             }}

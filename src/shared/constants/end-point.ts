@@ -55,4 +55,5 @@ export const END_POINT = {
 
   // 회원 API
   MEMBER_ME: '/member/me',
+  MEMBER_UPDATE: '/member/update',
 };

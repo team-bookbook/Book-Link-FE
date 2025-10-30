@@ -44,4 +44,7 @@ export const mutationKeys = {
     reviewUpdate: ['library', 'review', 'update'] as const,
     reviewDelete: ['library', 'review', 'delete'] as const,
   },
+  member: {
+    update: ['member', 'update'] as const,
+  },
 } as const;
