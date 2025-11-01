@@ -32,6 +32,7 @@ export const ICONS = [
   'my-comment',
   'my-docs',
   'notification',
+  'notification-book',
   'plus',
   'point',
   'profile',

@@ -28,6 +28,11 @@ export const queryKeys = {
     all: ['member'] as const,
     me: () => [...queryKeys.member.all, 'me'] as const,
   },
+
+  notification: {
+    all: ['notification'] as const,
+    lists: () => [...queryKeys.notification.all, 'list'] as const,
+  },
 } as const;
 
 export const mutationKeys = {

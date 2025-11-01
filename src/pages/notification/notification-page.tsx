@@ -1,13 +1,14 @@
 import { useState } from 'react';
 import PillTab from '@components/tab/pill-tab';
 import EmptyState from '@components/empty/empty-state';
+import NotificationCard from './components/notification-card';
 
 type TabKey = 'all' | 'chat' | 'book' | 'board';
 
 export default function NotificationPage() {
   const [tab, setTab] = useState<TabKey>('all');
 
-  const isEmpty = true;
+  const isEmpty = false;
 
   return (
     <div>
@@ -23,7 +24,17 @@ export default function NotificationPage() {
       />
 
       <div className='mt-[1.6rem]'>
-        {tab === 'all' && (isEmpty ? <EmptyState kind='notification' /> : <div>알림 전체 보기</div>)}
+        {tab === 'all' &&
+          (isEmpty ? (
+            <EmptyState kind='notification' />
+          ) : (
+            <div className='bg-gray-50 px-[2rem]'>
+              <NotificationCard />
+              <NotificationCard />
+              <NotificationCard />
+              <NotificationCard />
+            </div>
+          ))}
 
         {tab === 'chat' && (isEmpty ? <EmptyState kind='notification' /> : <div>채팅 알림</div>)}
 
