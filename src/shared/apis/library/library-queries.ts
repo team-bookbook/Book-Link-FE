@@ -42,6 +42,7 @@ export const libraryQueries = {
         const res = await get<ILibrary>(END_POINT.LIBRARY_BY_ID(id));
         return res;
       },
+      enabled: !!id,
     }),
 
   GET_LIBRARY_REVIEW: (library_id: string) =>
@@ -51,6 +52,7 @@ export const libraryQueries = {
         const res = await get<IReview[]>(END_POINT.REVIEW_BY_LIBRARY_ID(library_id));
         return res;
       },
+      enabled: !!library_id,
     }),
 
   GET_LIBRARY_REVIEW_AVG: (library_id: string) =>
@@ -60,5 +62,6 @@ export const libraryQueries = {
         const res = await get<number>(END_POINT.REVIEW_RATING_BY_ID(library_id));
         return res;
       },
+      enabled: !!library_id,
     }),
 };
