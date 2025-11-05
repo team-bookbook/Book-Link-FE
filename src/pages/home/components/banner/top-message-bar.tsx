@@ -39,25 +39,23 @@ export default function TopMessageBar({ threshold = 300 }: TopMessageBarProps) {
   }, [visible, threshold]);
 
   return (
-    <>
-      <div
-        aria-hidden={!visible}
-        className={cn(
-          'fixed top-[6rem] left-1/2 min-h-[4.5rem] w-full max-w-[43rem] -translate-x-1/2 bg-[#FAEAEA]',
-          'z-1',
-          'px-[1.6rem] py-[1.2rem]',
-          'transition-all duration-300 ease-out',
-          !visible ? 'pointer-events-none -translate-y-full opacity-0' : 'translate-y-0 opacity-100'
-        )}
-        tabIndex={-1}
-      >
-        <div className='flex-row-center'>
-          <p className='text-system-error body5 flex-row-center gap-[0.4rem]'>
-            <Icon name='clock' size={2} />
-            <span className='button4'>모순</span> 도서 반납까지 D-1 남았어요!
-          </p>
-        </div>
+    <div
+      aria-hidden={!visible}
+      className={cn(
+        'fixed top-[6rem] left-1/2 min-h-[4.5rem] w-full max-w-[43rem] -translate-x-1/2 bg-[#FAEAEA]',
+        'z-1',
+        'px-[1.6rem] py-[1.2rem]',
+        'transition-all duration-300 ease-out',
+        !visible ? 'pointer-events-none -translate-y-full opacity-0' : 'translate-y-0 opacity-100'
+      )}
+      tabIndex={-1}
+    >
+      <div className='flex-row-center'>
+        <p className='text-system-error body5 flex-row-center gap-[0.4rem]'>
+          <Icon name='clock' size={2} />
+          <span className='button4'>모순</span> 도서 반납까지 D-1 남았어요!
+        </p>
       </div>
-    </>
+    </div>
   );
 }
