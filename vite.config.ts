@@ -30,6 +30,7 @@ export default defineConfig(({ mode }) => {
         '@images': path.resolve(__dirname, 'src/shared/assets/images'),
         '@icons': path.resolve(__dirname, 'src/shared/assets/icons'),
         '@types': path.resolve(__dirname, 'src/shared/types'),
+        '@utils': path.resolve(__dirname, 'src/shared/utils'),
         '@': path.resolve(__dirname, 'src'),
       },
     },

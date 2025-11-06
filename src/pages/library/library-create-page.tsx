@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import Button from '@components/button/button';
 import ButtonFrame from '@components/button/button-frame';
 import Input from '@components/input/input';
@@ -9,9 +9,9 @@ import { uploadImage } from '@apis/s3/s3-api';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { ROUTES } from '@routes/routes-config';
+import useImageUpload from '@hooks/use-image-upload';
 
 export default function LibraryCreatePage() {
-  const fileRef = useRef<HTMLInputElement | null>(null);
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const libraryId = searchParams.get('id');
@@ -19,12 +19,15 @@ export default function LibraryCreatePage() {
 
   // Todo : 도서관 id를 가지고 있지 않은 아이디로 접근 시 반환 필요
 
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [previewUrl, setPreviewUrl] = useState('');
+  const { fileRef, images, openFilePicker, handleFileChange, setImages } = useImageUpload({ mode: 'single' });
   const [name, setName] = useState('');
   const [openAt, setOpenAt] = useState<HMValue | undefined>(undefined);
   const [closeAt, setCloseAt] = useState<HMValue | undefined>(undefined);
   const [intro, setIntro] = useState('');
+
+  // 단일 이미지 모드에서 첫 번째 이미지 사용
+  const previewUrl = images[0]?.url || '';
+  const selectedFile = images[0]?.file || null;
 
   const { data: libraryInfo } = useQuery({
     ...libraryQueries.GET_LIBRARY_DETAIL(libraryId || ''),
@@ -38,7 +41,7 @@ export default function LibraryCreatePage() {
     if (isEditMode && libraryInfo) {
       setName(libraryInfo.name);
       setIntro(libraryInfo.description);
-      setPreviewUrl(libraryInfo.thumbnailUrl);
+      setImages([{ id: 'existing', url: libraryInfo.thumbnailUrl }]);
 
       const [startHour, startMinute] = libraryInfo.startTime.split(':').map(Number);
       const [endHour, endMinute] = libraryInfo.endTime.split(':').map(Number);
@@ -46,25 +49,9 @@ export default function LibraryCreatePage() {
       setOpenAt({ hour: startHour, minute: startMinute });
       setCloseAt({ hour: endHour, minute: endMinute });
     }
-  }, [isEditMode, libraryInfo]);
+  }, [isEditMode, libraryInfo, setImages]);
 
   const canSubmit = name.trim().length > 0 && !!openAt && !!closeAt && intro.trim().length > 10;
-
-  const onPickImage = () => fileRef.current?.click();
-
-  const onFile = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const f = e.currentTarget.files?.[0];
-    if (!f) return;
-
-    setSelectedFile(f);
-
-    const reader = new FileReader();
-    reader.onload = () => {
-      const url = typeof reader.result === 'string' ? reader.result : '';
-      setPreviewUrl(url);
-    };
-    reader.readAsDataURL(f);
-  };
 
   const formatTime = (time: HMValue): string => {
     const hours = String(time.hour).padStart(2, '0');
@@ -78,19 +65,18 @@ export default function LibraryCreatePage() {
     try {
       let thumbnailUrl = previewUrl;
 
-      // 새로운 파일이 선택된 경우에만 업로드
       if (selectedFile) {
         thumbnailUrl = await uploadImage(selectedFile);
         console.log('새 이미지 업로드:', thumbnailUrl);
       }
 
       if (isEditMode && libraryId) {
-        // 수정 모드
+        // 수정 요청
         updateLibrary(
           {
             libraryId,
-            name,
-            description: intro,
+            name: name.trim(),
+            description: intro.trim(),
             thumbnailUrl,
             startTime: formatTime(openAt),
             endTime: formatTime(closeAt),
@@ -108,15 +94,15 @@ export default function LibraryCreatePage() {
           }
         );
       } else {
-        // 생성 모드
+        // 생성 요청
         const library_location = JSON.parse(localStorage.getItem('library-location') || '0');
         const latitude = library_location.lat;
         const longitude = library_location.lng;
 
         createLibrary(
           {
-            name,
-            description: intro,
+            name: name.trim(),
+            description: intro.trim(),
             thumbnailUrl,
             startTime: formatTime(openAt),
             endTime: formatTime(closeAt),
@@ -149,10 +135,16 @@ export default function LibraryCreatePage() {
       <div className='mx-auto w-full space-y-[3.5rem] px-[2rem] pt-[2.5rem] pb-[10rem]'>
         <div className='flex-col gap-[0.8rem]'>
           <label className='body5'>도서관 이미지</label>
-          <Button variant='primary' fullWidth className='py-[1.2rem]' roundStyle='rounded-[12px]' onClick={onPickImage}>
+          <Button
+            variant='primary'
+            fullWidth
+            className='py-[1.2rem]'
+            roundStyle='rounded-[12px]'
+            onClick={openFilePicker}
+          >
             이미지 업로드
           </Button>
-          <input ref={fileRef} type='file' accept='image/*' onChange={onFile} className='hidden' />
+          <input ref={fileRef} type='file' accept='image/*' onChange={handleFileChange} className='hidden' />
           {previewUrl && (
             <img src={previewUrl} alt='도서관 이미지 미리보기' className='h-[15rem] w-full object-cover' />
           )}

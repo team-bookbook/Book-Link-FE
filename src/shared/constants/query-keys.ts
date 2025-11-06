@@ -24,6 +24,12 @@ export const queryKeys = {
     }) => [...queryKeys.libraryBook.lists(), params] as const,
   },
 
+  book: {
+    all: ['book'] as const,
+    details: () => [...queryKeys.book.all, 'detail'] as const,
+    detail: (isbn: string) => [...queryKeys.book.details(), isbn] as const,
+  },
+
   member: {
     all: ['member'] as const,
     me: () => [...queryKeys.member.all, 'me'] as const,
@@ -48,5 +54,14 @@ export const mutationKeys = {
     reviewCreate: ['library', 'review', 'create'] as const,
     reviewUpdate: ['library', 'review', 'update'] as const,
     reviewDelete: ['library', 'review', 'delete'] as const,
+  },
+  libraryBook: {
+    create: ['library-book', 'create'] as const,
+  },
+  member: {
+    update: ['member', 'update'] as const,
+  },
+  book: {
+    create: ['book', 'create'] as const,
   },
 } as const;

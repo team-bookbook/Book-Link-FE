@@ -37,8 +37,8 @@ export default function LoginPage() {
 
     loginMutation.mutate(
       {
-        email,
-        password: pw,
+        email: email.trim(),
+        password: pw.trim(),
       },
       {
         onSuccess: (data) => {
@@ -73,7 +73,7 @@ export default function LoginPage() {
               if (email) {
                 const result = emailSchema.shape.email.safeParse(email);
                 if (!result.success) {
-                  setEmailError(result.error?.message || '');
+                  setEmailError(result.error.issues[0]?.message || '');
                 }
               }
             }}
