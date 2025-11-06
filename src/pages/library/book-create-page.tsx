@@ -1,19 +1,32 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Button from '@components/button/button';
 import ButtonFrame from '@components/button/button-frame';
 import Input from '@components/input/input';
 import Icon from '@components/icon';
 import useImageUpload from '@hooks/use-image-upload';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { bookMutations } from '@apis/book/book-mutations';
+import { libraryBookMutations } from '@apis/library/library-book-mutations';
+import { uploadImage } from '@apis/s3/s3-api';
 import { toast } from '@libs/toast';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import useBottomSheet from '@components/bottom-sheet/hooks/use-bottom-sheet';
 import SelectBottomSheet from '@components/bottom-sheet/select-bottom-sheet';
 import { BOOK_CATEGORY_CREATE_OPTIONS } from '@components/dropdown/constants/select-options';
 import { ROUTES } from '@routes/routes-config';
+import type { IBookInfo } from '@apis/book/book-queries';
+
+interface LocationState {
+  isbn: string;
+  bookInfo?: IBookInfo | null;
+}
 
 export default function BookCreatePage() {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const state = location.state as LocationState | null;
+
   const { fileRef, images, openFilePicker, handleFileChange, removeImage } = useImageUpload({ mode: 'multiple' });
 
   const [title, setTitle] = useState('');
@@ -24,41 +37,125 @@ export default function BookCreatePage() {
   const [desc, setDesc] = useState('');
   const [deposit, setDeposit] = useState('');
   const [isbn, setIsbn] = useState('');
+  const [copies, setCopies] = useState('1');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const { isOpen, open, close } = useBottomSheet();
   const { mutate: createBook } = useMutation(bookMutations.POST_BOOK());
+  const { mutate: createLibraryBook } = useMutation(libraryBookMutations.POST_LIBRARY_BOOK(queryClient));
 
   const canSubmit = images.length >= 3 && title.trim().length > 0;
-  const navigate = useNavigate();
+
+  // location.state에서 받은 bookInfo로 폼 미리 채우기
+  useEffect(() => {
+    if (state?.isbn) {
+      setIsbn(state.isbn);
+    }
+
+    if (state?.bookInfo) {
+      const bookInfo = state.bookInfo;
+      setTitle(bookInfo.title);
+      setAuthor(bookInfo.author);
+      setPublisher(bookInfo.publisher);
+      setCategory(bookInfo.category);
+      setPrice(bookInfo.originalPrice.toString());
+    }
+  }, [state]);
 
   const categoryLabel = category
     ? BOOK_CATEGORY_CREATE_OPTIONS.find((option) => option.value === category)?.label || '카테고리'
     : '카테고리';
 
-  const submit = () => {
-    if (!canSubmit) return;
+  const submit = async () => {
+    if (!canSubmit || isSubmitting) return;
 
-    createBook(
-      {
-        title: title.trim(),
-        author: author.trim(),
-        publisher: publisher.trim(),
-        category: category.trim(),
-        originalPrice: Number(price.trim()) || 0,
-        publishedDate: new Date().toISOString().split('T')[0],
-        isbn: '1313',
-        ISBN: isbn.trim(),
-      },
-      {
-        onSuccess: () => {
-          toast.success('도서 등록이 완료되었어요');
-          navigate(ROUTES.LIBRARY);
-        },
-        onError: (error) => {
-          console.error('도서 등록 실패:', error);
-        },
+    try {
+      setIsSubmitting(true);
+
+      // 1. 이미지 S3에 업로드
+      const uploadedImageUrls = await Promise.all(
+        images.map(async (img) => {
+          if (img.file) {
+            return await uploadImage(img.file);
+          }
+          return '';
+        })
+      );
+
+      const previewImages = JSON.stringify(uploadedImageUrls.filter((url) => url !== ''));
+
+      // 2. bookInfo가 없는 경우 (새 도서 등록)
+      if (!state?.bookInfo) {
+        // 2-1. POST /api/book (도서 등록)
+        createBook(
+          {
+            title: title.trim(),
+            author: author.trim(),
+            publisher: publisher.trim(),
+            category: category.trim(),
+            originalPrice: Number(price.trim()) || 0,
+            publishedDate: new Date().toISOString().split('T')[0],
+            isbn: '1313',
+            ISBN: isbn.trim(),
+          },
+          {
+            onSuccess: async (bookResponse) => {
+              // 2-2. POST /api/library-book (도서관 도서 등록)
+              createLibraryBook(
+                {
+                  id: bookResponse.bookId,
+                  copies: Number(copies) || 1,
+                  deposit: Number(deposit.trim()) || 0,
+                  previewImages: previewImages,
+                },
+                {
+                  onSuccess: () => {
+                    toast.success('도서 등록이 완료되었어요');
+                    navigate(ROUTES.LIBRARY);
+                  },
+                  onError: (error) => {
+                    console.error('도서관 도서 등록 실패:', error);
+                    toast.error('도서관 도서 등록에 실패했어요');
+                    setIsSubmitting(false);
+                  },
+                }
+              );
+            },
+            onError: (error) => {
+              console.error('도서 등록 실패:', error);
+              toast.error('도서 등록에 실패했어요');
+              setIsSubmitting(false);
+            },
+          }
+        );
+      } else {
+        // 3. bookInfo가 있는 경우 (기존 도서)
+        // 3-1. POST /api/library-book (도서관 도서 등록)
+        createLibraryBook(
+          {
+            id: state.bookInfo.id,
+            copies: Number(copies) || 1,
+            deposit: Number(deposit.trim()) || 0,
+            previewImages: previewImages,
+          },
+          {
+            onSuccess: () => {
+              toast.success('도서 등록이 완료되었어요');
+              navigate(ROUTES.LIBRARY);
+            },
+            onError: (error) => {
+              console.error('도서관 도서 등록 실패:', error);
+              toast.error('도서관 도서 등록에 실패했어요');
+              setIsSubmitting(false);
+            },
+          }
+        );
       }
-    );
+    } catch (error) {
+      console.error('이미지 업로드 실패:', error);
+      toast.error('이미지 업로드에 실패했어요');
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -157,6 +254,15 @@ export default function BookCreatePage() {
           onChange={(e) => setDesc(e.currentTarget.value)}
           length={desc.length}
         />
+        <Input
+          id='book-copies'
+          label='도서 수량'
+          placeholder='도서 수량을 입력해 주세요.'
+          inputMode='numeric'
+          value={copies}
+          onChange={(e) => setCopies(e.currentTarget.value.replace(/[^\d]/g, ''))}
+        />
+
         <div className='flex-col gap-[0.8rem]'>
           <Input
             id='book-deposit'
@@ -171,8 +277,14 @@ export default function BookCreatePage() {
       </div>
 
       <ButtonFrame>
-        <Button fullWidth roundStyle='rounded-[12px]' className='py-[1.2rem]' disabled={!canSubmit} onClick={submit}>
-          도서 등록
+        <Button
+          fullWidth
+          roundStyle='rounded-[12px]'
+          className='py-[1.2rem]'
+          disabled={!canSubmit || isSubmitting}
+          onClick={submit}
+        >
+          {isSubmitting ? '등록 중...' : '도서 등록'}
         </Button>
       </ButtonFrame>
 

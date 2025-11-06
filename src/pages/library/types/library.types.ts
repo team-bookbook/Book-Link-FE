@@ -56,3 +56,17 @@ export type TLocation = {
   lat: number;
   lng: number;
 };
+
+export interface IBookScanData {
+  isbn: string;
+  bookInfo?: {
+    id: string;
+    title: string;
+    author: string;
+    publisher: string;
+    category: string;
+    originalPrice: number;
+    publishedDate: string;
+    foundInNationalLibrary: boolean;
+  };
+}
