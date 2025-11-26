@@ -43,7 +43,7 @@ export default function LibraryList({ queryParams }: LibaryListProps) {
         </div>
       </div>
       <div className='flex-col gap-[2rem] px-[2rem]'>
-        {data?.map((library) => (
+        {data?.content?.map((library) => (
           <LibraryCard key={uuidv4()} library={library} />
         ))}
       </div>

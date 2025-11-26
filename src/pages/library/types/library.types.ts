@@ -31,6 +31,15 @@ export interface IBookDetail {
   longitude?: number;
 }
 
+export interface ITopReview {
+  reviewId: string;
+  profileImage: string;
+  nickname: string;
+  rating: number;
+  comment: string;
+  createdAt: string;
+}
+
 export interface ILibrary {
   id: string;
   name: string;
@@ -49,6 +58,18 @@ export interface ILibrary {
     publisher: string;
     category: string;
   }>;
+  distanceKm: number;
+  topReviews: ITopReview[];
+}
+
+export interface IPaginatedLibraryResponse {
+  totalElements: number;
+  totalPages: number;
+  currentPage: number;
+  pageSize: number;
+  content: ILibrary[];
+  hasNext: boolean;
+  hasPrevious: boolean;
 }
 
 export type TLocation = {
