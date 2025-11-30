@@ -20,6 +20,7 @@ interface IMember {
   pointBalance: number;
   createdAt: string;
   profileImage: string;
+  libraryId?: string;
 }
 
 export const memberQueries = {

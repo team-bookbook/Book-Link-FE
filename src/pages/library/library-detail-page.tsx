@@ -7,12 +7,22 @@ import { ROUTES } from '@routes/routes-config';
 import { libraryQueries } from '@apis/library/library-queries';
 import { libraryMutations } from '@apis/library/library-mutations';
 import { useQuery, useMutation } from '@tanstack/react-query';
-import LibraryRating from './components/section/section-library-rating';
 import { modal } from '@libs/modal';
+import { memberQueries } from '@apis/member/member-queries';
+import { isAuthenticated } from '@utils/auth';
 
 export default function LibraryDetailPage() {
   const { id: libraryId } = useParams<{ id: string }>();
+  const navigate = useNavigate();
+
   const { data: libraryInfo } = useQuery(libraryQueries.GET_LIBRARY_DETAIL(libraryId || ''));
+
+  const { data: memberData } = useQuery({
+    ...memberQueries.GET_ME(),
+    enabled: isAuthenticated(),
+  });
+
+  console.log(libraryInfo);
 
   const bookData = libraryInfo?.topBooks || [];
 
@@ -23,8 +33,6 @@ export default function LibraryDetailPage() {
       spacing: 10,
     },
   });
-
-  const navigate = useNavigate();
 
   const deleteMutation = useMutation(libraryMutations.DELETE_LIBRARY());
 
@@ -80,25 +88,27 @@ export default function LibraryDetailPage() {
         }
       >
         {/* 내 페이지인 경우 */}
-        <div className='absolute top-[3rem] right-[2rem] flex gap-[0.3rem]'>
-          <button
-            onClick={handleEditClick}
-            className='flex-row-center caption5 cursor-pointer rounded-[2px] bg-gray-100 px-[0.7rem] text-gray-600'
-          >
-            수정하기
-          </button>
-          <button
-            onClick={handleDeleteClick}
-            className='flex-row-center caption5 text-system-error cursor-pointer rounded-[2px] bg-gray-100 px-[0.7rem]'
-          >
-            삭제하기
-          </button>
-        </div>
+        {memberData?.libraryId === libraryId && (
+          <div className='absolute top-[3rem] right-[2rem] flex gap-[0.3rem]'>
+            <button
+              onClick={handleEditClick}
+              className='flex-row-center caption5 cursor-pointer rounded-[2px] bg-gray-100 px-[0.7rem] text-gray-600'
+            >
+              수정하기
+            </button>
+            <button
+              onClick={handleDeleteClick}
+              className='flex-row-center caption5 text-system-error cursor-pointer rounded-[2px] bg-gray-100 px-[0.7rem]'
+            >
+              삭제하기
+            </button>
+          </div>
+        )}
         <div className='flex-col gap-[0.4rem]'>
           <h1 className='title3'>{libraryInfo.name}</h1>
           <h2 className='caption1'>{`${libraryInfo.startTime} - ${libraryInfo.endTime}`}</h2>
         </div>
-        <LibraryRating libraryId={libraryId || ''} likeCount={libraryInfo.likeCount} />
+        {/* <LibraryRating libraryId={libraryId || ''} likeCount={libraryInfo.likeCount} /> */}
       </div>
     );
   };
