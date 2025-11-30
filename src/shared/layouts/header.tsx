@@ -7,6 +7,7 @@ import { useMemo } from 'react';
 import { modal } from '@libs/modal';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { authMutations } from '@apis/auth/auth-mutations';
+import { removeAccessToken } from '../utils/auth';
 
 type LeftKind = 'none' | 'back' | 'logo' | 'close';
 export type ActionId = 'search' | 'cart' | 'share' | 'kebab' | 'bell' | 'close' | 'logout';
@@ -97,14 +98,11 @@ export default function Header({
       if (result.ok) {
         try {
           await logoutMutation.mutateAsync();
-          localStorage.removeItem('accessToken');
-          localStorage.removeItem('refreshToken');
+          removeAccessToken();
           nav(ROUTES.LOGIN);
         } catch (error) {
           console.error('로그아웃 실패:', error);
-          // 실패해도 로컬 토큰 제거 및 로그인 페이지 이동
-          localStorage.removeItem('accessToken');
-          localStorage.removeItem('refreshToken');
+          removeAccessToken();
           nav(ROUTES.LOGIN);
         }
       }
