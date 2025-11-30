@@ -26,6 +26,10 @@ export interface SignupApiResponse {
   data: boolean;
 }
 
+export interface ITokenReissueResponse {
+  accessToken: string;
+}
+
 export const authMutations = {
   POST_LOGIN: () =>
     mutationOptions<ILoginResponse, Error, ILoginParams>({
@@ -41,5 +45,10 @@ export const authMutations = {
     mutationOptions<SignupApiResponse, Error, SignupApiRequest>({
       mutationKey: mutationKeys.auth.signup,
       mutationFn: (data) => post<SignupApiResponse>(END_POINT.AUTH_SIGNUP, data),
+    }),
+  POST_TOKEN_REISSUE: () =>
+    mutationOptions<ITokenReissueResponse, Error, void>({
+      mutationKey: mutationKeys.auth.reissue,
+      mutationFn: () => post<ITokenReissueResponse>(END_POINT.TOKEN_REISSUE, {}),
     }),
 };
