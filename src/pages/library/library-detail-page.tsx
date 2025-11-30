@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import BookCard from '@pages/home/components/card/book-card';
 import SectionLayout from '@components/section-layout';
 import { useKeenSlider } from 'keen-slider/react';
@@ -12,9 +13,21 @@ import { modal } from '@libs/modal';
 
 export default function LibraryDetailPage() {
   const { id: libraryId } = useParams<{ id: string }>();
-  const { data: libraryInfo } = useQuery(libraryQueries.GET_LIBRARY_DETAIL(libraryId || ''));
+  const navigate = useNavigate();
+
+  // 내 도서관 여부 확인
+  const isMyLibrary = libraryId === 'my';
+
+  const { data: libraryInfo, isLoading } = useQuery(libraryQueries.GET_LIBRARY_DETAIL(libraryId || ''));
 
   const bookData = libraryInfo?.topBooks || [];
+
+  // my 도서관이 없으면 생성 페이지로 리다이렉트
+  useEffect(() => {
+    if (isMyLibrary && !isLoading && !libraryInfo) {
+      navigate(ROUTES.LIBRARY_CREATE);
+    }
+  }, [isMyLibrary, isLoading, libraryInfo, navigate]);
 
   const [sliderRef] = useKeenSlider({
     mode: 'free-snap',
@@ -23,8 +36,6 @@ export default function LibraryDetailPage() {
       spacing: 10,
     },
   });
-
-  const navigate = useNavigate();
 
   const deleteMutation = useMutation(libraryMutations.DELETE_LIBRARY());
 
@@ -79,21 +90,23 @@ export default function LibraryDetailPage() {
             : { backgroundColor: 'rgb(229, 231, 235)' }
         }
       >
-        {/* 내 페이지인 경우 */}
-        <div className='absolute top-[3rem] right-[2rem] flex gap-[0.3rem]'>
-          <button
-            onClick={handleEditClick}
-            className='flex-row-center caption5 cursor-pointer rounded-[2px] bg-gray-100 px-[0.7rem] text-gray-600'
-          >
-            수정하기
-          </button>
-          <button
-            onClick={handleDeleteClick}
-            className='flex-row-center caption5 text-system-error cursor-pointer rounded-[2px] bg-gray-100 px-[0.7rem]'
-          >
-            삭제하기
-          </button>
-        </div>
+        {/* 내 페이지인 경우에만 수정/삭제 버튼 표시 */}
+        {isMyLibrary && (
+          <div className='absolute top-[3rem] right-[2rem] flex gap-[0.3rem]'>
+            <button
+              onClick={handleEditClick}
+              className='flex-row-center caption5 cursor-pointer rounded-[2px] bg-gray-100 px-[0.7rem] text-gray-600'
+            >
+              수정하기
+            </button>
+            <button
+              onClick={handleDeleteClick}
+              className='flex-row-center caption5 text-system-error cursor-pointer rounded-[2px] bg-gray-100 px-[0.7rem]'
+            >
+              삭제하기
+            </button>
+          </div>
+        )}
         <div className='flex-col gap-[0.4rem]'>
           <h1 className='title3'>{libraryInfo.name}</h1>
           <h2 className='caption1'>{`${libraryInfo.startTime} - ${libraryInfo.endTime}`}</h2>

@@ -104,7 +104,6 @@ const createHttpClient = (baseURL: string) => {
 
 const baseURL = import.meta.env.DEV ? '/api' : import.meta.env.VITE_API_BASE_URL;
 export const httpClient = createHttpClient(baseURL);
-console.log(baseURL);
 
 export async function get<T>(...args: Parameters<typeof httpClient.get>): Promise<T> {
   return httpClient.get<T>(...args).then((res) => res.data);

@@ -38,6 +38,7 @@ export default function StepPassword() {
       nickname: data.nickname.trim(),
       address: address,
       phone: data.phone.trim(),
+      profileImage: 'https://example.com/profile.jpg',
     };
 
     signupMutation.mutate(payload, {
