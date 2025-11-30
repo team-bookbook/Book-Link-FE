@@ -98,13 +98,10 @@ export default function Header({
         try {
           await logoutMutation.mutateAsync();
           localStorage.removeItem('accessToken');
-          localStorage.removeItem('refreshToken');
           navigate(ROUTES.LOGIN);
         } catch (error) {
           console.error('로그아웃 실패:', error);
-          // 실패해도 로컬 토큰 제거 및 로그인 페이지 이동
           localStorage.removeItem('accessToken');
-          localStorage.removeItem('refreshToken');
           navigate(ROUTES.LOGIN);
         }
       }

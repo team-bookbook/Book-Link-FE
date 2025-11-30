@@ -9,6 +9,7 @@ import { useMutation } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '@routes/routes-config';
 import { loginSchema, emailSchema } from '@/shared/types/auth/signup';
+import { setAccessToken } from '@/shared/utils/auth';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -42,7 +43,7 @@ export default function LoginPage() {
       },
       {
         onSuccess: (data) => {
-          localStorage.setItem('accessToken', data.accessToken);
+          setAccessToken(data.accessToken);
           navigate(ROUTES.HOME);
         },
         onError: (error) => {
