@@ -1,5 +1,6 @@
 import 'keen-slider/keen-slider.min.css';
 import { useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
 import { useHomeData } from '@pages/home/hooks/useHomeData';
 import HomeBanner from '@pages/home/components/banner/home-banner';
 import HomeReservation from '@pages/home/components/section/home-reservation';
@@ -19,6 +20,13 @@ import { isAuthenticated } from '@/shared/utils/auth';
 
 export default function HomePage() {
   const navigate = useNavigate();
+
+  // 비로그인 상태면 온보딩 페이지로 리다이렉트
+  useEffect(() => {
+    if (!isAuthenticated()) {
+      navigate(ROUTES.ONBOARDING, { replace: true });
+    }
+  }, [navigate]);
 
   const handleLoanViewAll = () => {
     navigate(ROUTES.RENTAL);
