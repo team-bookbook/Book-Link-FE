@@ -43,12 +43,12 @@ export default function PostCard({
 
       <div className='flex flex-wrap items-center gap-[0.5rem]'>
         <div className='flex items-center gap-[0.3rem]'>
-          <Icon name='comment' size={1.6} ariaHidden />
+          <Icon name='comment' size={1.6} ariaHidden className='text-primary-900' />
           <span className='caption5'>{commentCount}</span>
         </div>
 
         <div className='flex items-center gap-[0.3rem]'>
-          <Icon name='heart' size={1.6} ariaHidden />
+          <Icon name='heart' size={1.6} ariaHidden className='text-system-error' />
           <span className='caption5'>{likeCount}</span>
         </div>
 
