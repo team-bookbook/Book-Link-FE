@@ -1,12 +1,19 @@
 import { useState } from 'react';
+import { useParams } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 import Icon from '@components/icon';
 import CommentBottomSheet from '@components/bottom-sheet/comment-bottom-sheet';
 import type { CommentItem } from '@components/bottom-sheet/types/comment';
+import { boardQueries } from '@apis/board/board-queries';
 
 export default function BoardDetailPage() {
+  const { id } = useParams<{ id: string }>();
   const [isCommentDrawerOpen, setIsCommentDrawerOpen] = useState(false);
 
-  // Mock data - 실제로는 API에서 가져올 데이터
+  console.log(id);
+
+  const { data: boardDetail, isLoading } = useQuery(boardQueries.GET_BOARD_DETAIL(id!));
+
   const comments: CommentItem[] = [
     {
       id: '550e8400-e29b-41d4-a716-446655440000',
@@ -65,29 +72,65 @@ export default function BoardDetailPage() {
     return true;
   };
 
+  // 날짜 포맷팅 (ISO -> YYYY.MM.DD)
+  const formatDate = (isoDate: string): string => {
+    const date = new Date(isoDate);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}.${month}.${day}`;
+  };
+
+  if (isLoading) {
+    return (
+      <main className='flex-col gap-[1.5rem] px-[1.5rem] py-[2.5rem]'>
+        <div className='body5 py-[4rem] text-center text-gray-500'>로딩 중...</div>
+      </main>
+    );
+  }
+
+  if (!boardDetail) {
+    return (
+      <main className='flex-col gap-[1.5rem] px-[1.5rem] py-[2.5rem]'>
+        <div className='body5 py-[4rem] text-center text-gray-500'>게시글을 찾을 수 없습니다.</div>
+      </main>
+    );
+  }
+
   return (
     <main className='flex-col gap-[1.5rem] px-[1.5rem] py-[2.5rem]'>
       <header className='flex gap-[1rem]'>
-        <img className='h-[4rem] w-[4rem] rounded-full bg-gray-100'></img>
+        <div className='h-[4rem] w-[4rem] shrink-0 rounded-full bg-gray-100' />
         <div className='flex-col gap-[0.2rem]'>
-          <h1 className='caption1'>닉네임</h1>
-          <p className='caption5 rounded-[2px] bg-gray-100 px-[7px] text-gray-600'>2025.09.21</p>
+          <h1 className='caption1'>{boardDetail.writerName}</h1>
+          <p className='caption5 rounded-[2px] bg-gray-100 px-[7px] text-gray-600'>
+            {formatDate(boardDetail.createdAt)}
+            {boardDetail.isUpdated && ' (수정됨)'}
+          </p>
         </div>
       </header>
-      <section className='body4 min-h-[400px] border-b-1 border-gray-200 p-[1.5rem] text-gray-900'>
-        description....
+
+      <section className='flex-col gap-[1rem]'>
+        {/* <h2 className='title4 text-gray-900'>{boardDetail.title}</h2> */}
+        <div
+          className='body4 min-h-[400px] border-b-1 border-gray-200 py-[1.5rem] text-gray-900'
+          style={{ whiteSpace: 'pre-line' }}
+        >
+          {boardDetail.content}
+        </div>
       </section>
+
       {/* 댓글 섹션 */}
       <section>
         {!isCommentDrawerOpen && (
           <button type='button' onClick={handleCommentSectionClick} className='flex w-full cursor-pointer gap-[1rem]'>
             <span className='flex-items-center gap-[2px]'>
               <Icon name='comment' size={2.4} className='text-primary-900'></Icon>
-              <p className='caption1'>{comments.length}</p>
+              <p className='caption1'>{boardDetail.commentCount}</p>
             </span>
             <span className='flex-items-center gap-[2px]'>
               <Icon name='heart' size={2} className='text-system-error'></Icon>
-              <p className='caption1'>3</p>
+              <p className='caption1'>{boardDetail.likeCount}</p>
             </span>
           </button>
         )}

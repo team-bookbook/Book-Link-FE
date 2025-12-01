@@ -30,6 +30,7 @@ export default function PostCard({
         'bg-gray-white w-full border-t border-gray-200',
         'px-[2rem] py-[1.5rem] text-gray-900',
         'flex-col justify-start gap-[1rem]',
+        'cursor-pointer',
         className
       )}
     >
