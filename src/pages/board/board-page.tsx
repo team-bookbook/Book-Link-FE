@@ -71,16 +71,6 @@ const MOCK_POSTS: Post[] = [
     author: '작성자이름',
     category: 'all',
   },
-  {
-    id: 'p4',
-    title: '게시글 제목',
-    content: '내용이 여기에 들어갑니다. 내용이 여기에 들어갑니다. 내용이 여기에 들어갑니다. 내용이 여기에 들어갑니다.',
-    commentCount: 9,
-    likeCount: 9,
-    date: '2025.09.21',
-    author: '작성자이름',
-    category: 'all',
-  },
 ];
 
 const MOCK_GROUPS: IGroupCard[] = [
@@ -149,7 +139,7 @@ export default function BoardPage() {
         items={COMMUNITY_TABS}
         value={topTab}
         onChange={(k) => setTopTab(k as 'community' | 'reading')}
-        className={cn('sticky', showFloatingSearch ? 'top-[6.6rem]' : 'top-0')}
+        className={cn('sticky', showFloatingSearch ? 'top-[6.5rem]' : 'top-0')}
       />
 
       {showFloatingSearch && (

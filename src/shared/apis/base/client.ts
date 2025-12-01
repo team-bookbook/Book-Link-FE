@@ -1,5 +1,7 @@
-import axios, { type AxiosError } from 'axios';
+import axios, { type AxiosError, type InternalAxiosRequestConfig } from 'axios';
 import { ERROR_CODES, ERROR_MESSAGES, HTTP_STATUS } from '@constants/http';
+import { END_POINT } from '@constants/end-point';
+import { getAccessToken, removeAccessToken, setAccessToken } from '@/shared/utils/auth';
 
 export interface ApiResponse<T = unknown> {
   success: boolean;
@@ -60,6 +62,7 @@ const createHttpClient = (baseURL: string) => {
   const instance = axios.create({
     baseURL,
     timeout: 10000,
+    withCredentials: true,
     headers: {
       'Content-Type': 'application/json',
     },
@@ -67,7 +70,7 @@ const createHttpClient = (baseURL: string) => {
 
   instance.interceptors.request.use(
     (config) => {
-      const token = localStorage.getItem('accessToken');
+      const token = getAccessToken();
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;
       }
@@ -88,10 +91,25 @@ const createHttpClient = (baseURL: string) => {
       return response;
     },
     async (error: AxiosError<ApiResponse>) => {
+      const originalRequest = error.config as InternalAxiosRequestConfig & { _retry?: boolean };
       const status = error.response?.status;
 
-      if (status === HTTP_STATUS.UNAUTHORIZED) {
-        // 401 오류처리
+      if (status === HTTP_STATUS.UNAUTHORIZED && !originalRequest._retry) {
+        originalRequest._retry = true;
+
+        try {
+          const response = await instance.post<ApiResponse<string>>(END_POINT.TOKEN_REISSUE, {});
+          const newAccessToken = response.data.data;
+
+          if (newAccessToken) {
+            setAccessToken(newAccessToken);
+            originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+            return instance(originalRequest);
+          }
+        } catch (refreshError) {
+          removeAccessToken();
+          return Promise.reject(refreshError);
+        }
       }
 
       const apiError = handleError(error);

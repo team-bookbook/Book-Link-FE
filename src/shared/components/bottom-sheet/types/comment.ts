@@ -1,5 +1,5 @@
 export type ReplyItem = {
-  id: number;
+  id: string;
   avatarUrl?: string;
   author: string;
   dateText: string;
@@ -7,10 +7,13 @@ export type ReplyItem = {
   likeCount: number;
   liked?: boolean;
   disabled?: boolean;
+  isUpdated?: boolean;
+  isMine?: boolean;
+  createdAt?: string;
 };
 
 export type CommentItem = {
-  id: number;
+  id: string;
   avatarUrl?: string;
   author: string;
   dateText: string;
@@ -22,6 +25,9 @@ export type CommentItem = {
   replies?: ReplyItem[];
   liked?: boolean;
   disabled?: boolean;
+  isUpdated?: boolean;
+  isMine?: boolean;
+  createdAt?: string;
 };
 
 export type ToggleLikeKind = 'comment' | 'reply';
@@ -30,11 +36,11 @@ export type CommentProps = {
   open: boolean;
   onClose: () => void;
   comments: readonly CommentItem[];
-  onToggleLike?: (kind: ToggleLikeKind, id: number, parentId?: number) => void;
-  onReplyClick?: (parentId: number) => void;
+  onToggleLike?: (kind: ToggleLikeKind, id: string, parentId?: string) => void;
+  onReplyClick?: (parentId: string) => void;
   onSend?: (text: string) => boolean | void | Promise<boolean | void>;
-  onSendReply?: (parentId: number, text: string) => boolean | void | Promise<boolean | void>;
-  onLoadReplies?: (parentId: number) => Promise<ReplyItem[] | void> | void;
+  onSendReply?: (parentId: string, text: string) => boolean | void | Promise<boolean | void>;
+  onLoadReplies?: (parentId: string) => Promise<ReplyItem[] | void> | void;
   indicatorStroke?: boolean;
   emptyText?: string;
   title?: string;
