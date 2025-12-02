@@ -15,7 +15,7 @@ export default function CommentBottomSheet(props: CommentProps) {
     onSendReply,
     onLoadReplies,
     indicatorStroke = true,
-    emptyText = '첫 댓글을 남겨보세요.',
+    emptyText = '첫 댓글을 남겨보세요!',
   } = props;
 
   const [text, setText] = useState('');

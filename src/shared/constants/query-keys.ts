@@ -38,6 +38,12 @@ export const queryKeys = {
     likes: () => [...queryKeys.board.all, 'like'] as const,
     like: (id: string) => [...queryKeys.board.likes(), id] as const,
   },
+
+  comment: {
+    all: ['comment'] as const,
+    lists: () => [...queryKeys.comment.all, 'list'] as const,
+    list: (boardId: string) => [...queryKeys.comment.lists(), boardId] as const,
+  },
 } as const;
 
 export const mutationKeys = {

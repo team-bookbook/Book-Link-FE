@@ -61,4 +61,7 @@ export const END_POINT = {
   BOARD: '/board',
   BOARD_BY_ID: (boardId: string) => `/board/${boardId}`,
   BOARD_LIKE: (boardId: string) => `/board/${boardId}/like`,
+
+  // 댓글 API
+  COMMENT_BY_BOARD_ID: (boardId: string) => `/comment/${boardId}`,
 };

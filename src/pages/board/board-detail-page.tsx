@@ -1,9 +1,8 @@
-import { useState, useMemo } from 'react';
+import { useMemo } from 'react';
 import { useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import Icon from '@components/icon';
 import CommentBottomSheet from '@components/bottom-sheet/comment-bottom-sheet';
-import type { CommentItem } from '@components/bottom-sheet/types/comment';
 import { boardQueries } from '@apis/board/board-queries';
 import { useHeaderOverride } from '@contexts/header-context';
 import type { ActionId } from '@layouts/header';
@@ -11,15 +10,18 @@ import SelectBottomSheet from '@components/bottom-sheet/select-bottom-sheet';
 import { REVIEW_MANAGE_OPTIONS } from '@components/dropdown/constants/select-options';
 import { useBoardLike } from './hooks/use-board-like';
 import { useBoardManagement } from './hooks/use-board-management';
+import { useBoardComments } from './hooks/use-board-comments';
 
 export default function BoardDetailPage() {
   const { id } = useParams<{ id: string }>();
-  const [isCommentDrawerOpen, setIsCommentDrawerOpen] = useState(false);
 
   const { data: boardDetail, isLoading } = useQuery(boardQueries.GET_BOARD_DETAIL(id!));
   const { isLiked, toggleLike } = useBoardLike(id!);
   const { isManageBottomSheetOpen, selectedManageOption, openManageSheet, closeManageSheet, handleManageOptionChange } =
     useBoardManagement(id!);
+  const { comments, isDrawerOpen, openDrawer, closeDrawer, handleToggleLike, handleSendComment } = useBoardComments(
+    id!
+  );
 
   const headerConfig = useMemo(() => {
     if (!boardDetail) return null;
@@ -38,59 +40,6 @@ export default function BoardDetailPage() {
   }, [boardDetail, openManageSheet]);
 
   useHeaderOverride(headerConfig);
-
-  const comments: CommentItem[] = [
-    {
-      id: '550e8400-e29b-41d4-a716-446655440000',
-      author: '홍길동',
-      content: '좋은 글이네요!',
-      dateText: '1시간 전',
-      createdAt: '2025-12-01T05:22:40.043Z',
-      isUpdated: true,
-      likeCount: 5,
-      liked: true,
-      isMine: true,
-      replyCount: 0,
-    },
-    {
-      id: '550e8400-e29b-41d4-a716-446655440001',
-      author: '김철수',
-      content: '저도 같은 생각입니다. 정말 유익한 정보네요.',
-      dateText: '2시간 전',
-      createdAt: '2025-12-01T06:15:20.043Z',
-      isUpdated: false,
-      likeCount: 3,
-      liked: false,
-      isMine: false,
-      replyCount: 0,
-    },
-    {
-      id: '550e8400-e29b-41d4-a716-446655440002',
-      author: '이영희',
-      content: '공감합니다. 다음에도 이런 내용 기대할게요!',
-      dateText: '3시간 전',
-      createdAt: '2025-12-01T07:30:15.043Z',
-      isUpdated: false,
-      likeCount: 8,
-      liked: true,
-      isMine: false,
-      replyCount: 0,
-    },
-  ];
-
-  const handleCommentSectionClick = () => {
-    setIsCommentDrawerOpen(true);
-  };
-
-  const handleCommentToggleLike = (kind: 'comment' | 'reply', id: string, parentId?: string) => {
-    // TODO: 댓글 좋아요 API 연동
-    console.log('Toggle comment like:', { kind, id, parentId });
-  };
-
-  const handleSendComment = async (text: string) => {
-    console.log('Send comment:', text);
-    return true;
-  };
 
   // 날짜 포맷팅 (ISO -> YYYY.MM.DD)
   const formatDate = (isoDate: string): string => {
@@ -142,29 +91,27 @@ export default function BoardDetailPage() {
 
       {/* 댓글 섹션 */}
       <section>
-        {!isCommentDrawerOpen && (
-          <div className='flex w-full gap-[1rem]'>
-            <button type='button' onClick={handleCommentSectionClick} className='cursor-pointer'>
-              <span className='flex-items-center gap-[2px]'>
-                <Icon name='comment' size={2.4} className='text-primary-900'></Icon>
-                <p className='caption1'>{boardDetail.commentCount}</p>
-              </span>
-            </button>
-            <button type='button' onClick={toggleLike} className='cursor-pointer'>
-              <span className='flex-items-center gap-[2px]'>
-                <Icon name={isLiked ? 'heart-fill' : 'heart'} size={2.4} className='text-system-error'></Icon>
-                <p className='caption1'>{boardDetail.likeCount}</p>
-              </span>
-            </button>
-          </div>
-        )}
+        <div className='flex w-full gap-[1rem]'>
+          <button type='button' onClick={openDrawer} className='cursor-pointer'>
+            <span className='flex-items-center gap-[2px]'>
+              <Icon name='comment' size={2.4} className='text-primary-900'></Icon>
+              <p className='caption1'>{boardDetail.commentCount}</p>
+            </span>
+          </button>
+          <button type='button' onClick={toggleLike} className='cursor-pointer'>
+            <span className='flex-items-center gap-[2px]'>
+              <Icon name={isLiked ? 'heart-fill' : 'heart'} size={2.4} className='text-system-error'></Icon>
+              <p className='caption1'>{boardDetail.likeCount}</p>
+            </span>
+          </button>
+        </div>
       </section>
 
       <CommentBottomSheet
-        open={isCommentDrawerOpen}
-        onClose={() => setIsCommentDrawerOpen(false)}
+        open={isDrawerOpen}
+        onClose={closeDrawer}
         comments={comments}
-        onToggleLike={handleCommentToggleLike}
+        onToggleLike={handleToggleLike}
         onSend={handleSendComment}
       />
 
