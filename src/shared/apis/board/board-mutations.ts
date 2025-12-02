@@ -62,4 +62,36 @@ export const boardMutations = {
         queryClient.removeQueries({ queryKey: queryKeys.board.detail(id) });
       },
     }),
+
+  POST_BOARD_LIKE: (id: string) =>
+    mutationOptions<boolean, Error, void>({
+      mutationKey: mutationKeys.board.like,
+      mutationFn: () =>
+        post<boolean>(END_POINT.BOARD_LIKE(id), undefined, {
+          headers: {
+            'Trace-Id': uuidv4(),
+          },
+        }),
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: queryKeys.board.like(id) });
+        queryClient.invalidateQueries({ queryKey: queryKeys.board.detail(id) });
+        queryClient.invalidateQueries({ queryKey: queryKeys.board.lists() });
+      },
+    }),
+
+  DELETE_BOARD_LIKE: (id: string) =>
+    mutationOptions<boolean, Error, void>({
+      mutationKey: mutationKeys.board.like,
+      mutationFn: () =>
+        del<boolean>(END_POINT.BOARD_LIKE(id), {
+          headers: {
+            'Trace-Id': uuidv4(),
+          },
+        }),
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: queryKeys.board.like(id) });
+        queryClient.invalidateQueries({ queryKey: queryKeys.board.detail(id) });
+        queryClient.invalidateQueries({ queryKey: queryKeys.board.lists() });
+      },
+    }),
 };

@@ -45,6 +45,10 @@ function LayoutContent() {
   const isReviewCreate = useMemo(() => {
     return matchPath({ path: ROUTES.REVIEW_CREATE(':id') }, pathname) != null;
   }, [pathname]);
+  const isBoardCreate = useMemo(() => {
+    return matchPath({ path: ROUTES.BOARD_DETAIL(':id') }, pathname) != null;
+  }, [pathname]);
+
   const isNoneFooter = useMemo(
     () =>
       isUnder(pathname, ROUTES.LOGIN) ||
@@ -56,7 +60,8 @@ function LayoutContent() {
       isUnder(pathname, ROUTES.EDIT_PROFILE) ||
       isUnder(pathname, ROUTES.BOARD_CREATE) ||
       isReviewCreate ||
-      isOnboarding,
+      isOnboarding ||
+      isBoardCreate,
     [pathname]
   );
 

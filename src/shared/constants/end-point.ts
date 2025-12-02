@@ -60,4 +60,5 @@ export const END_POINT = {
   // 게시판 API
   BOARD: '/board',
   BOARD_BY_ID: (boardId: string) => `/board/${boardId}`,
+  BOARD_LIKE: (boardId: string) => `/board/${boardId}/like`,
 };

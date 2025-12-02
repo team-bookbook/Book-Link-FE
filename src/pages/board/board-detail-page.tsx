@@ -21,7 +21,10 @@ export default function BoardDetailPage() {
   const [selectedManageOption, setSelectedManageOption] = useState<ReviewManage | null>(null);
 
   const { data: boardDetail, isLoading } = useQuery(boardQueries.GET_BOARD_DETAIL(id!));
+  const { data: isLiked = false } = useQuery(boardQueries.GET_BOARD_LIKE(id!));
   const { mutate: deleteBoard } = useMutation(boardMutations.DELETE_BOARD(id!));
+  const { mutate: addLike } = useMutation(boardMutations.POST_BOARD_LIKE(id!));
+  const { mutate: removeLike } = useMutation(boardMutations.DELETE_BOARD_LIKE(id!));
 
   const handleKebabClick = useCallback(() => {
     setIsManageBottomSheetOpen(true);
@@ -122,13 +125,34 @@ export default function BoardDetailPage() {
     setIsCommentDrawerOpen(false);
   };
 
-  const handleToggleLike = (kind: 'comment' | 'reply', id: string, parentId?: string) => {
-    // TODO: API 연동 - 좋아요 토글
-    console.log('Toggle like:', { kind, id, parentId });
+  const handleBoardLikeClick = useCallback(() => {
+    if (isLiked) {
+      removeLike(undefined, {
+        onSuccess: () => {
+          toast.success('게시글 좋아요를 취소했습니다');
+        },
+        onError: () => {
+          toast.error('좋아요 취소에 실패했습니다');
+        },
+      });
+    } else {
+      addLike(undefined, {
+        onSuccess: () => {
+          toast.success('게시글에 좋아요를 눌렀습니다!');
+        },
+        onError: () => {
+          toast.error('좋아요에 실패했습니다');
+        },
+      });
+    }
+  }, [isLiked, addLike, removeLike]);
+
+  const handleCommentToggleLike = (kind: 'comment' | 'reply', id: string, parentId?: string) => {
+    // TODO: 댓글 좋아요 API 연동
+    console.log('Toggle comment like:', { kind, id, parentId });
   };
 
   const handleSendComment = async (text: string) => {
-    // TODO: API 연동 - 댓글 작성
     console.log('Send comment:', text);
     return true;
   };
@@ -184,16 +208,20 @@ export default function BoardDetailPage() {
       {/* 댓글 섹션 */}
       <section>
         {!isCommentDrawerOpen && (
-          <button type='button' onClick={handleCommentSectionClick} className='flex w-full cursor-pointer gap-[1rem]'>
-            <span className='flex-items-center gap-[2px]'>
-              <Icon name='comment' size={2.4} className='text-primary-900'></Icon>
-              <p className='caption1'>{boardDetail.commentCount}</p>
-            </span>
-            <span className='flex-items-center gap-[2px]'>
-              <Icon name='heart' size={2} className='text-system-error'></Icon>
-              <p className='caption1'>{boardDetail.likeCount}</p>
-            </span>
-          </button>
+          <div className='flex w-full gap-[1rem]'>
+            <button type='button' onClick={handleCommentSectionClick} className='cursor-pointer'>
+              <span className='flex-items-center gap-[2px]'>
+                <Icon name='comment' size={2.4} className='text-primary-900'></Icon>
+                <p className='caption1'>{boardDetail.commentCount}</p>
+              </span>
+            </button>
+            <button type='button' onClick={handleBoardLikeClick} className='cursor-pointer'>
+              <span className='flex-items-center gap-[2px]'>
+                <Icon name={isLiked ? 'heart-fill' : 'heart'} size={2.4} className='text-system-error'></Icon>
+                <p className='caption1'>{boardDetail.likeCount}</p>
+              </span>
+            </button>
+          </div>
         )}
       </section>
 
@@ -201,7 +229,7 @@ export default function BoardDetailPage() {
         open={isCommentDrawerOpen}
         onClose={handleCloseDrawer}
         comments={comments}
-        onToggleLike={handleToggleLike}
+        onToggleLike={handleCommentToggleLike}
         onSend={handleSendComment}
       />
 

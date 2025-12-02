@@ -35,6 +35,8 @@ export const queryKeys = {
     list: (params: { title?: string; category?: string }) => [...queryKeys.board.lists(), params] as const,
     details: () => [...queryKeys.board.all, 'detail'] as const,
     detail: (id: string) => [...queryKeys.board.details(), id] as const,
+    likes: () => [...queryKeys.board.all, 'like'] as const,
+    like: (id: string) => [...queryKeys.board.likes(), id] as const,
   },
 } as const;
 
@@ -60,5 +62,6 @@ export const mutationKeys = {
     create: ['board', 'create'] as const,
     update: ['board', 'update'] as const,
     delete: ['board', 'delete'] as const,
+    like: ['board', 'like'] as const,
   },
 } as const;

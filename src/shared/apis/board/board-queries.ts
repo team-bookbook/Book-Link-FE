@@ -50,4 +50,13 @@ export const boardQueries = {
         return res;
       },
     }),
+
+  GET_BOARD_LIKE: (id: string) =>
+    queryOptions<boolean>({
+      queryKey: queryKeys.board.like(id),
+      queryFn: async () => {
+        const res = await get<boolean>(END_POINT.BOARD_LIKE(id));
+        return res;
+      },
+    }),
 };
