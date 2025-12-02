@@ -36,6 +36,16 @@ const boardRule: Rule = (path) =>
     ? { title: '게시판', actions: ['search', 'bell'], notificationCount: 8, safeTop: true }
     : undefined;
 
+// 커뮤니티 게시글 상세
+const boardDetailRule: Rule = (path) =>
+  matchPath({ path: ROUTES.BOARD_DETAIL() }, path) ? { left: 'back', title: '게시글 상세' } : undefined;
+
+// 커뮤니티 게시글 작성
+const boardCreateRule: Rule = (path) =>
+  matchPath({ path: ROUTES.BOARD_CREATE, end: true }, path)
+    ? { title: '커뮤니티 글 작성', actions: ['close'], safeTop: true }
+    : undefined;
+
 // 라이브러리 기본
 const libraryRootRule: Rule = (path) => {
   if (!matchPath({ path: ROUTES.LIBRARY, end: true }, path)) return undefined;
@@ -160,6 +170,8 @@ const RULES: ReadonlyArray<Rule> = [
   privacyRule,
   serviceRule,
   passwordResetRule,
+  boardCreateRule,
+  boardDetailRule,
 ];
 
 export function getHeaderForRoute(pathname: string, search: string): HeaderProps {

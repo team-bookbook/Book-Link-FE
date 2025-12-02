@@ -8,6 +8,7 @@ import { ROUTES } from '@routes/routes-config';
 import { cn } from '@libs/cn';
 import CircleButton from '@components/button/circle-button';
 import useFloatingButtonGuard from '@hooks/use-floating-button';
+import { HeaderProvider, useHeaderContext } from '@contexts/header-context';
 
 type FloatingBtn =
   | { name: 'back'; onClick: () => void }
@@ -22,8 +23,17 @@ function isUnder(pathname: string, root: string) {
 }
 
 export default function Layout() {
+  return (
+    <HeaderProvider>
+      <LayoutContent />
+    </HeaderProvider>
+  );
+}
+
+function LayoutContent() {
   const { pathname, search } = useLocation();
   const navigate = useNavigate();
+  const { override } = useHeaderContext();
 
   const isOnboarding = useMemo(() => isUnder(pathname, ROUTES.ONBOARDING), [pathname]);
   const isChat = useMemo(() => isUnder(pathname, ROUTES.CHAT), [pathname]);
@@ -53,10 +63,21 @@ export default function Layout() {
   // 헤더는 온보딩에서만 숨김
   const showHeader = !isOnboarding;
 
-  const headerProps = useMemo(
+  // override가 있으면 override 사용, 없으면 기본 헤더 설정 사용
+  const baseHeaderProps = useMemo(
     () => (showHeader ? getHeaderForRoute(pathname, search) : null),
     [pathname, search, showHeader]
   );
+
+  const headerProps = useMemo(() => {
+    if (!showHeader) return null;
+    if (override) {
+      return {
+        ...override,
+      };
+    }
+    return baseHeaderProps;
+  }, [showHeader, override, baseHeaderProps]);
 
   const currentTab = useMemo(() => {
     const params = new URLSearchParams(search);

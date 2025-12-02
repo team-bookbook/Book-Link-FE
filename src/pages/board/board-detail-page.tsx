@@ -1,18 +1,66 @@
-import { useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useState, useMemo, useCallback } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import Icon from '@components/icon';
 import CommentBottomSheet from '@components/bottom-sheet/comment-bottom-sheet';
 import type { CommentItem } from '@components/bottom-sheet/types/comment';
 import { boardQueries } from '@apis/board/board-queries';
+import { useHeaderOverride } from '@contexts/header-context';
+import type { ActionId } from '@layouts/header';
+import { modal } from '@libs/modal';
+import { toast } from '@libs/toast';
 
 export default function BoardDetailPage() {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const [isCommentDrawerOpen, setIsCommentDrawerOpen] = useState(false);
 
-  console.log(id);
-
   const { data: boardDetail, isLoading } = useQuery(boardQueries.GET_BOARD_DETAIL(id!));
+
+  // useCallback으로 핸들러 메모이제이션
+  const handleKebabClick = useCallback(async () => {
+    const result = await modal.confirm({
+      title: '게시글 관리',
+      confirmText: '삭제',
+      cancelText: '수정',
+    });
+
+    if (result.ok) {
+      // 삭제
+      const confirmDelete = await modal.confirm({
+        title: '게시글 삭제',
+        confirmText: '삭제',
+        cancelText: '취소',
+      });
+
+      if (confirmDelete.ok) {
+        // TODO: 삭제 API 연동
+        toast.success('게시글이 삭제되었습니다');
+        navigate('/board');
+      }
+    } else {
+      // 수정
+      navigate(`/board/${id}/edit`);
+    }
+  }, [id, navigate]);
+
+  const headerConfig = useMemo(() => {
+    if (!boardDetail) return null;
+
+    return {
+      left: 'back' as const,
+      safeTop: true,
+      title: boardDetail.title,
+      actions: boardDetail.isOwner ? ['kebab' as const] : [],
+      onAction: (action: ActionId) => {
+        if (action === 'kebab') {
+          handleKebabClick();
+        }
+      },
+    };
+  }, [boardDetail, handleKebabClick]);
+
+  useHeaderOverride(headerConfig);
 
   const comments: CommentItem[] = [
     {
@@ -110,10 +158,10 @@ export default function BoardDetailPage() {
         </div>
       </header>
 
-      <section className='flex-col gap-[1rem]'>
-        {/* <h2 className='title4 text-gray-900'>{boardDetail.title}</h2> */}
+      <section className='flex-col gap-[1rem] pt-5'>
+        <h2 className='title4 text-gray-900'>{boardDetail.title}</h2>
         <div
-          className='body4 min-h-[400px] border-b-1 border-gray-200 py-[1.5rem] text-gray-900'
+          className='body4 min-h-[400px] border-b-1 border-gray-200 text-gray-700'
           style={{ whiteSpace: 'pre-line' }}
         >
           {boardDetail.content}
