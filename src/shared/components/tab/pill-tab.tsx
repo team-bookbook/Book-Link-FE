@@ -8,13 +8,14 @@ export type PillTabProps = {
   onChange: (key: string) => void;
   className?: string; // 컨테이너 클래스
   scrollable?: boolean;
+  label?: string;
 };
 
 const ACTIVE_BG_CLASS = 'bg-secondary-900';
 const INACTIVE_TEXT_CLASS = 'text-gray-400';
 const INACTIVE_OUTLINE_CLASS = 'outline-offset-[-1px] outline outline-gray-100';
 
-export default function PillTab({ items, value, onChange, className }: PillTabProps) {
+export default function PillTab({ items, value, onChange, className, label }: PillTabProps) {
   return (
     <div
       role='tablist'
@@ -22,10 +23,13 @@ export default function PillTab({ items, value, onChange, className }: PillTabPr
       className={cn(
         'w-full',
         'scrollbar-hide overflow-x-auto whitespace-nowrap',
-        'h-[5.7rem] px-[2rem] py-[1rem]',
+        'min-h-[5.7rem] px-[2rem] py-[1rem]',
+        'flex-col gap-[0.8rem]',
         className
       )}
     >
+      {label && <label className='body5 mb-[0.8rem]'>{label}</label>}
+
       <div className='flex w-full items-center gap-[0.6rem]'>
         {items.map((it) => {
           const active = it.key === value;

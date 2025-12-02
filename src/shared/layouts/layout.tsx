@@ -13,6 +13,8 @@ type FloatingBtn =
   | { name: 'back'; onClick: () => void }
   | { name: 'scan'; onClick: () => void }
   | { name: 'cart'; onClick: () => void }
+  | { name: 'create'; onClick: () => void }
+  | { name: 'add'; onClick: () => void }
   | null;
 
 function isUnder(pathname: string, root: string) {
@@ -33,7 +35,7 @@ export default function Layout() {
   const isReviewCreate = useMemo(() => {
     return matchPath({ path: ROUTES.REVIEW_CREATE(':id') }, pathname) != null;
   }, [pathname]);
-  const isAuthOrOnboarding = useMemo(
+  const isNoneFooter = useMemo(
     () =>
       isUnder(pathname, ROUTES.LOGIN) ||
       isUnder(pathname, ROUTES.SIGNUP) ||
@@ -42,9 +44,10 @@ export default function Layout() {
       isUnder(pathname, ROUTES.BOOK_CREATE) ||
       isUnder(pathname, ROUTES.PASSWORD_RESET) ||
       isUnder(pathname, ROUTES.EDIT_PROFILE) ||
+      isUnder(pathname, ROUTES.BOARD_CREATE) ||
       isReviewCreate ||
       isOnboarding,
-    [pathname, isOnboarding, isReviewCreate]
+    [pathname]
   );
 
   // 헤더는 온보딩에서만 숨김
@@ -60,9 +63,12 @@ export default function Layout() {
     return params.get('tab') ?? 'books';
   }, [search]);
 
-  const floatingBtn: FloatingBtn = isAuthOrOnboarding
+  const floatingBtn: FloatingBtn = isNoneFooter
     ? null
     : (() => {
+        if (isUnder(pathname, ROUTES.BOARD)) {
+          return { name: 'add', onClick: () => navigate(ROUTES.BOARD_CREATE) };
+        }
         if (isUnder(pathname, ROUTES.HOME)) {
           return { name: 'back', onClick: () => window.scrollTo({ top: 0, behavior: 'smooth' }) };
         }
@@ -83,7 +89,7 @@ export default function Layout() {
     <div
       className={cn(
         'bg-gray-white min-h-dvh flex-col text-gray-900',
-        isAuthOrOnboarding ? 'h-dvh overflow-hidden' : 'h-full'
+        isNoneFooter ? 'h-dvh overflow-hidden' : 'h-full'
       )}
     >
       {showHeader && headerProps && <Header {...headerProps} />}
@@ -92,10 +98,10 @@ export default function Layout() {
         <div className='mx-auto w-full'>
           <Outlet />
         </div>
-        {!isAuthOrOnboarding && !isChat && !isCart && <Footer />}
+        {!isNoneFooter && !isChat && !isCart && <Footer />}
       </main>
 
-      {!isAuthOrOnboarding && !isChatRoom && <BottomNav />}
+      {!isNoneFooter && !isChatRoom && <BottomNav />}
 
       {floatingBtn && (
         <div
@@ -111,9 +117,11 @@ export default function Layout() {
                 <CircleButton name='back' onClick={floatingBtn.onClick} ariaLabel='맨 위로' />
               ) : floatingBtn.name === 'scan' ? (
                 <CircleButton name='scan' onClick={floatingBtn.onClick} ariaLabel='책 스캔' />
-              ) : (
+              ) : floatingBtn.name === 'cart' ? (
                 <CircleButton name='cart' onClick={floatingBtn.onClick} ariaLabel='장바구니' />
-              )}
+              ) : floatingBtn.name === 'add' ? (
+                <CircleButton name='add' onClick={floatingBtn.onClick} ariaLabel='게시글 추가' />
+              ) : null}
             </div>
           </div>
         </div>

@@ -2,7 +2,7 @@ import { cn } from '@libs/cn';
 import Icon from '@components/icon';
 import React from 'react';
 
-type CircleButtonName = 'cart' | 'back' | 'scan';
+type CircleButtonName = 'cart' | 'back' | 'scan' | 'add';
 
 type Props = {
   name: CircleButtonName;
@@ -13,7 +13,10 @@ type Props = {
   ariaLabel?: string;
 };
 
-const iconName = (n: CircleButtonName) => n;
+const iconName = (n: CircleButtonName) => {
+  if (n === 'add') return 'plus';
+  return n;
+};
 
 const base = 'cursor-pointer flex-row-center rounded-full w-[4rem] h-[4rem] shadow-scroll-fixed';
 
@@ -21,7 +24,7 @@ export default function CircleButton({ name, className = '', onClick, rotate, ic
   const r: 90 | 180 | 270 | undefined = name === 'back' ? (rotate ?? 90) : undefined;
 
   const palette =
-    name === 'scan'
+    name === 'scan' || name === 'add'
       ? 'bg-primary-900 text-gray-white'
       : 'bg-gray-white text-gray-900 outline outline-gray-200 outline-offset-[-1px]';
 

@@ -12,40 +12,25 @@ import { useQuery } from '@tanstack/react-query';
 import { boardQueries } from '@apis/board/board-queries';
 import { formatDate } from '@/shared/utils/formatDate';
 
-type TabItem = { key: string; label: string };
+export type TabItem = { key: string; label: string };
 
 const COMMUNITY_TABS: TabItem[] = [
   { key: 'community', label: '커뮤니티' },
   { key: 'reading', label: '독서 모임' },
 ];
 
-const CATEGORIES: TabItem[] = [
-  { key: 'all', label: '전체' },
-  { key: 'recommend', label: '책 추천' },
-  { key: 'daily', label: '일상' },
-  { key: 'gather', label: '모임 모집' },
+export const CATEGORIES: TabItem[] = [
+  { key: 'ALL', label: '전체' },
+  { key: 'RECOMMEND', label: '책 추천' },
+  { key: 'GENERAL', label: '일상' },
+  { key: 'GATHER', label: '모임 모집' },
 ];
 
-// UI 카테고리를 API 카테고리로 변환
-const mapCategoryToApi = (category: string): string | undefined => {
-  switch (category) {
-    case 'recommend':
-      return 'RECOMMEND';
-    case 'daily':
-      return 'GENERAL';
-    case 'gather':
-      return 'POPULAR';
-    case 'all':
-    default:
-      return undefined;
-  }
-};
-
-type SortType = 'latest' | 'popular';
+type SortType = 'LATEST' | 'POPULAR';
 
 const SORT_OPTIONS: ReadonlyArray<{ value: SortType; label: string }> = [
-  { value: 'latest', label: '최신순' },
-  { value: 'popular', label: '인기순' },
+  { value: 'LATEST', label: '최신순' },
+  { value: 'POPULAR', label: '인기순' },
 ];
 
 const MOCK_GROUPS: IGroupCard[] = [
@@ -86,8 +71,8 @@ const MOCK_GROUPS: IGroupCard[] = [
 export default function BoardPage() {
   const navigate = useNavigate();
   const [topTab, setTopTab] = useState<'community' | 'reading'>('community');
-  const [category, setCategory] = useState<string>('all');
-  const [sort, setSort] = useState<SortType>('latest');
+  const [category, setCategory] = useState<string>('ALL');
+  const [sort, setSort] = useState<SortType>('LATEST');
   const [searchKeyword, setSearchKeyword] = useState<string>('');
 
   const searchAnchorRef = useRef<HTMLDivElement | null>(null);
@@ -103,16 +88,15 @@ export default function BoardPage() {
     return () => io.disconnect();
   }, []);
 
-  const apiCategory = mapCategoryToApi(category);
   const { data: boardPosts = [], isLoading } = useQuery(
     boardQueries.GET_BOARD_LIST({
       title: searchKeyword || undefined,
-      category: apiCategory,
+      category: category === 'ALL' ? undefined : category,
     })
   );
 
   const filteredPosts = useMemo(() => {
-    if (sort === 'popular') {
+    if (sort === 'POPULAR') {
       return [...boardPosts].sort((a, b) => b.likeCount - a.likeCount);
     }
     return boardPosts;
