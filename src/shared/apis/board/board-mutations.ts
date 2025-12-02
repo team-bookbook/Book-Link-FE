@@ -1,4 +1,4 @@
-import { post } from '@apis/base/client';
+import { post, del } from '@apis/base/client';
 import { END_POINT } from '@constants/end-point';
 import { mutationKeys, queryKeys } from '@constants/query-keys';
 import queryClient from '@libs/query-client';
@@ -24,6 +24,21 @@ export const boardMutations = {
         }),
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: queryKeys.board.lists() });
+      },
+    }),
+
+  DELETE_BOARD: (id: string) =>
+    mutationOptions<boolean, Error, void>({
+      mutationKey: mutationKeys.board.delete,
+      mutationFn: () =>
+        del<boolean>(END_POINT.BOARD_BY_ID(id), {
+          headers: {
+            'Trace-Id': uuidv4(),
+          },
+        }),
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: queryKeys.board.lists() });
+        queryClient.removeQueries({ queryKey: queryKeys.board.detail(id) });
       },
     }),
 };

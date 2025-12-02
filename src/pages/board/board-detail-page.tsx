@@ -1,48 +1,61 @@
 import { useState, useMemo, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation } from '@tanstack/react-query';
 import Icon from '@components/icon';
 import CommentBottomSheet from '@components/bottom-sheet/comment-bottom-sheet';
 import type { CommentItem } from '@components/bottom-sheet/types/comment';
 import { boardQueries } from '@apis/board/board-queries';
+import { boardMutations } from '@apis/board/board-mutations';
 import { useHeaderOverride } from '@contexts/header-context';
 import type { ActionId } from '@layouts/header';
 import { modal } from '@libs/modal';
 import { toast } from '@libs/toast';
+import SelectBottomSheet from '@components/bottom-sheet/select-bottom-sheet';
+import { REVIEW_MANAGE_OPTIONS, type ReviewManage } from '@components/dropdown/constants/select-options';
 
 export default function BoardDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [isCommentDrawerOpen, setIsCommentDrawerOpen] = useState(false);
+  const [isManageBottomSheetOpen, setIsManageBottomSheetOpen] = useState(false);
+  const [selectedManageOption, setSelectedManageOption] = useState<ReviewManage | null>(null);
 
   const { data: boardDetail, isLoading } = useQuery(boardQueries.GET_BOARD_DETAIL(id!));
+  const { mutate: deleteBoard } = useMutation(boardMutations.DELETE_BOARD(id!));
 
-  // useCallback으로 핸들러 메모이제이션
-  const handleKebabClick = useCallback(async () => {
-    const result = await modal.confirm({
-      title: '게시글 관리',
-      confirmText: '삭제',
-      cancelText: '수정',
-    });
+  const handleKebabClick = useCallback(() => {
+    setIsManageBottomSheetOpen(true);
+  }, []);
 
-    if (result.ok) {
-      // 삭제
-      const confirmDelete = await modal.confirm({
-        title: '게시글 삭제',
-        confirmText: '삭제',
-        cancelText: '취소',
-      });
+  const handleManageOptionChange = useCallback(
+    async (option: string) => {
+      setSelectedManageOption(option as 'modify' | 'delete');
+      setIsManageBottomSheetOpen(false);
 
-      if (confirmDelete.ok) {
-        // TODO: 삭제 API 연동
-        toast.success('게시글이 삭제되었습니다');
-        navigate('/board');
+      if (option === 'modify') {
+        navigate(`/board/${id}/edit`);
+      } else if (option === 'delete') {
+        const confirmDelete = await modal.confirm({
+          title: '정말 삭제하시겠습니까?',
+          confirmText: '확인',
+          cancelText: '취소',
+        });
+
+        if (confirmDelete.ok) {
+          deleteBoard(undefined, {
+            onSuccess: () => {
+              toast.success('게시글이 삭제되었습니다');
+              navigate('/board');
+            },
+            onError: () => {
+              toast.error('게시글 삭제에 실패했습니다');
+            },
+          });
+        }
       }
-    } else {
-      // 수정
-      navigate(`/board/${id}/edit`);
-    }
-  }, [id, navigate]);
+    },
+    [id, navigate, deleteBoard]
+  );
 
   const headerConfig = useMemo(() => {
     if (!boardDetail) return null;
@@ -190,6 +203,14 @@ export default function BoardDetailPage() {
         comments={comments}
         onToggleLike={handleToggleLike}
         onSend={handleSendComment}
+      />
+
+      <SelectBottomSheet
+        open={isManageBottomSheetOpen}
+        onClose={() => setIsManageBottomSheetOpen(false)}
+        options={REVIEW_MANAGE_OPTIONS}
+        value={selectedManageOption}
+        onChange={handleManageOptionChange}
       />
     </main>
   );
