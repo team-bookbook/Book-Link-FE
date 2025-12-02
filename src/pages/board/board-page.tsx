@@ -1,4 +1,5 @@
-import { useMemo, useState, useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import PostCard from '@pages/board/components/post-card';
 import type { IGroupCard } from '@pages/home/types/home.types';
 import PillTab from '@components/tab/pill-tab';
@@ -7,80 +8,27 @@ import UnderlineTab from '@components/tab/underline-tab';
 import SelectDropdown from '@components/dropdown/select-dropdown';
 import GroupCard from '@pages/home/components/card/group-card';
 import { cn } from '@libs/cn';
+import { useQuery } from '@tanstack/react-query';
+import { boardQueries, type SortType } from '@apis/board/board-queries';
+import { formatDate } from '@/shared/utils/formatDate';
 
-type TabItem = { key: string; label: string };
+export type TabItem = { key: string; label: string };
 
 const COMMUNITY_TABS: TabItem[] = [
   { key: 'community', label: '커뮤니티' },
   { key: 'reading', label: '독서 모임' },
 ];
 
-const CATEGORIES: TabItem[] = [
-  { key: 'all', label: '전체' },
-  { key: 'recommend', label: '책 추천' },
-  { key: 'daily', label: '일상' },
-  { key: 'gather', label: '모임 모집' },
+export const CATEGORIES: TabItem[] = [
+  { key: 'ALL', label: '전체' },
+  { key: 'RECOMMEND', label: '책 추천' },
+  { key: 'GENERAL', label: '일상' },
+  { key: 'GATHER', label: '모임 모집' },
 ];
-
-type Post = {
-  id: string;
-  title: string;
-  content: string;
-  commentCount: number;
-  likeCount: number;
-  date: string;
-  author: string;
-  category: string;
-};
-
-type SortType = 'latest' | 'popular';
 
 const SORT_OPTIONS: ReadonlyArray<{ value: SortType; label: string }> = [
-  { value: 'latest', label: '최신순' },
-  { value: 'popular', label: '인기순' },
-];
-
-const MOCK_POSTS: Post[] = [
-  {
-    id: 'p1',
-    title: '게시글 제목',
-    content: '내용이 여기에 들어갑니다. 내용이 여기에 들어갑니다. 내용이 여기에 들어갑니다. 내용이 여기에 들어갑니다.',
-    commentCount: 9,
-    likeCount: 9,
-    date: '2025.09.21',
-    author: '작성자이름',
-    category: 'all',
-  },
-  {
-    id: 'p2',
-    title: '게시글 제목',
-    content: '내용이 여기에 들어갑니다. 내용이 여기에 들어갑니다. 내용이 여기에 들어갑니다. 내용이 여기에 들어갑니다.',
-    commentCount: 9,
-    likeCount: 9,
-    date: '2025.09.21',
-    author: '작성자이름',
-    category: 'all',
-  },
-  {
-    id: 'p3',
-    title: '게시글 제목',
-    content: '내용이 여기에 들어갑니다. 내용이 여기에 들어갑니다. 내용이 여기에 들어갑니다. 내용이 여기에 들어갑니다.',
-    commentCount: 9,
-    likeCount: 9,
-    date: '2025.09.21',
-    author: '작성자이름',
-    category: 'all',
-  },
-  {
-    id: 'p4',
-    title: '게시글 제목',
-    content: '내용이 여기에 들어갑니다. 내용이 여기에 들어갑니다. 내용이 여기에 들어갑니다. 내용이 여기에 들어갑니다.',
-    commentCount: 9,
-    likeCount: 9,
-    date: '2025.09.21',
-    author: '작성자이름',
-    category: 'all',
-  },
+  { value: 'LATEST', label: '최신순' },
+  { value: 'POPULAR', label: '인기순' },
 ];
 
 const MOCK_GROUPS: IGroupCard[] = [
@@ -119,14 +67,31 @@ const MOCK_GROUPS: IGroupCard[] = [
 ];
 
 export default function BoardPage() {
-  const [topTab, setTopTab] = useState<'community' | 'reading'>('community');
-  const [category, setCategory] = useState<string>('all');
-  const [sort, setSort] = useState<SortType>('latest');
+  const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const topTab = (searchParams.get('tab') as 'community' | 'reading') || 'community';
+  const category = searchParams.get('category') || 'ALL';
+  const sort = (searchParams.get('sort') as SortType) || 'LATEST';
+  const searchKeyword = searchParams.get('search') || '';
 
   const searchAnchorRef = useRef<HTMLDivElement | null>(null);
   const floatingSearchRef = useRef<HTMLDivElement | null>(null);
-
   const [showFloatingSearch, setShowFloatingSearch] = useState(false);
+
+  const updateParams = (updates: Record<string, string | undefined>) => {
+    const newParams = new URLSearchParams(searchParams);
+
+    Object.entries(updates).forEach(([key, value]) => {
+      if (value === undefined || value === '' || value === 'ALL' || value === 'LATEST') {
+        newParams.delete(key);
+      } else {
+        newParams.set(key, value);
+      }
+    });
+
+    setSearchParams(newParams, { replace: true });
+  };
 
   useEffect(() => {
     const el = searchAnchorRef.current;
@@ -136,10 +101,29 @@ export default function BoardPage() {
     return () => io.disconnect();
   }, []);
 
-  const filteredPosts = useMemo(() => {
-    const list = category === 'all' ? MOCK_POSTS : MOCK_POSTS.filter((p) => p.category === category);
-    return sort === 'popular' ? [...list].sort((a, b) => b.likeCount - a.likeCount) : list;
-  }, [category, sort]);
+  const { data: boardPosts = [], isLoading } = useQuery(
+    boardQueries.GET_BOARD_LIST({
+      title: searchKeyword || undefined,
+      category: category === 'ALL' ? undefined : category,
+      sort,
+    })
+  );
+
+  const handleTabChange = (tab: string) => {
+    updateParams({ tab });
+  };
+
+  const handleCategoryChange = (cat: string) => {
+    updateParams({ category: cat });
+  };
+
+  const handleSortChange = (s: SortType) => {
+    updateParams({ sort: s });
+  };
+
+  const handleSearch = (keyword: string) => {
+    updateParams({ search: keyword });
+  };
 
   const searchPlaceholder = topTab === 'community' ? '검색어를 입력해 주세요.' : '독서모임명으로 검색';
 
@@ -148,8 +132,8 @@ export default function BoardPage() {
       <UnderlineTab
         items={COMMUNITY_TABS}
         value={topTab}
-        onChange={(k) => setTopTab(k as 'community' | 'reading')}
-        className={cn('sticky', showFloatingSearch ? 'top-[6.6rem]' : 'top-0')}
+        onChange={handleTabChange}
+        className={cn('sticky', showFloatingSearch ? 'top-[6.5rem]' : 'top-0')}
       />
 
       {showFloatingSearch && (
@@ -157,29 +141,29 @@ export default function BoardPage() {
           ref={floatingSearchRef}
           className={cn('bg-gray-white sticky top-0 z-[var(--z-header)]', 'px-[2rem] pt-[0.8rem] pb-[0.8rem]')}
         >
-          <SearchBar placeholder={searchPlaceholder} />
+          <SearchBar placeholder={searchPlaceholder} onSubmit={handleSearch} />
         </div>
       )}
 
       <div className='px-[2rem] pt-[1.2rem]' ref={searchAnchorRef}>
-        <SearchBar placeholder={searchPlaceholder} />
+        <SearchBar placeholder={searchPlaceholder} onSubmit={handleSearch} />
       </div>
 
       {topTab === 'community' ? (
         <>
           <div className='flex-col-center gap-[0.9rem]'>
-            <PillTab items={CATEGORIES} value={category} onChange={setCategory} />
+            <PillTab items={CATEGORIES} value={category} onChange={handleCategoryChange} />
             <div className='flex-row-between w-full px-[2rem]'>
               <div className='flex py-[1.2rem]'>
                 <span className='caption2 text-gray-900'>
-                  총 <span className='text-primary-700'>20개</span>
+                  총 <span className='text-primary-700'>{boardPosts.length}개</span>
                 </span>
               </div>
 
               <SelectDropdown<SortType>
                 value={sort}
                 options={SORT_OPTIONS}
-                onChange={setSort}
+                onChange={handleSortChange}
                 align='end'
                 variant='title'
                 menuWidthRem={12}
@@ -189,20 +173,29 @@ export default function BoardPage() {
             </div>
           </div>
 
-          <ul className='space-y-[0.1rem]'>
-            {filteredPosts.map((p) => (
-              <li key={p.id} className='bg-gray-white'>
-                <PostCard
-                  title={p.title}
-                  content={p.content}
-                  commentCount={p.commentCount}
-                  likeCount={p.likeCount}
-                  date={p.date}
-                  author={p.author}
-                />
-              </li>
-            ))}
-          </ul>
+          {isLoading ? (
+            <div className='body5 py-[4rem] text-center text-gray-500'>로딩 중...</div>
+          ) : (
+            <ul className='space-y-[0.1rem]'>
+              {boardPosts.length === 0 ? (
+                <li className='body5 py-[4rem] text-center text-gray-500'>게시글이 없습니다.</li>
+              ) : (
+                boardPosts.map((post) => (
+                  <li key={post.id} className='bg-gray-white'>
+                    <PostCard
+                      title={post.title}
+                      content={post.previewContent}
+                      commentCount={post.commentCount}
+                      likeCount={post.likeCount}
+                      date={formatDate(post.createdAt)}
+                      author={post.writerName}
+                      onClick={() => navigate(`/board/${post.id}`)}
+                    />
+                  </li>
+                ))
+              )}
+            </ul>
+          )}
         </>
       ) : (
         <>

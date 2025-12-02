@@ -8,11 +8,14 @@ import { ROUTES } from '@routes/routes-config';
 import { cn } from '@libs/cn';
 import CircleButton from '@components/button/circle-button';
 import useFloatingButtonGuard from '@hooks/use-floating-button';
+import { HeaderProvider, useHeaderContext } from '@contexts/header-context';
 
 type FloatingBtn =
   | { name: 'back'; onClick: () => void }
   | { name: 'scan'; onClick: () => void }
   | { name: 'cart'; onClick: () => void }
+  | { name: 'create'; onClick: () => void }
+  | { name: 'add'; onClick: () => void }
   | null;
 
 function isUnder(pathname: string, root: string) {
@@ -20,8 +23,17 @@ function isUnder(pathname: string, root: string) {
 }
 
 export default function Layout() {
+  return (
+    <HeaderProvider>
+      <LayoutContent />
+    </HeaderProvider>
+  );
+}
+
+function LayoutContent() {
   const { pathname, search } = useLocation();
   const navigate = useNavigate();
+  const { override } = useHeaderContext();
 
   const isOnboarding = useMemo(() => isUnder(pathname, ROUTES.ONBOARDING), [pathname]);
   const isChat = useMemo(() => isUnder(pathname, ROUTES.CHAT), [pathname]);
@@ -33,7 +45,11 @@ export default function Layout() {
   const isReviewCreate = useMemo(() => {
     return matchPath({ path: ROUTES.REVIEW_CREATE(':id') }, pathname) != null;
   }, [pathname]);
-  const isAuthOrOnboarding = useMemo(
+  const isBoardCreate = useMemo(() => {
+    return matchPath({ path: ROUTES.BOARD_DETAIL(':id') }, pathname) != null;
+  }, [pathname]);
+
+  const isNoneFooter = useMemo(
     () =>
       isUnder(pathname, ROUTES.LOGIN) ||
       isUnder(pathname, ROUTES.SIGNUP) ||
@@ -42,27 +58,43 @@ export default function Layout() {
       isUnder(pathname, ROUTES.BOOK_CREATE) ||
       isUnder(pathname, ROUTES.PASSWORD_RESET) ||
       isUnder(pathname, ROUTES.EDIT_PROFILE) ||
+      isUnder(pathname, ROUTES.BOARD_CREATE) ||
       isReviewCreate ||
-      isOnboarding,
-    [pathname, isOnboarding, isReviewCreate]
+      isOnboarding ||
+      isBoardCreate,
+    [pathname]
   );
 
   // 헤더는 온보딩에서만 숨김
   const showHeader = !isOnboarding;
 
-  const headerProps = useMemo(
+  // override가 있으면 override 사용, 없으면 기본 헤더 설정 사용
+  const baseHeaderProps = useMemo(
     () => (showHeader ? getHeaderForRoute(pathname, search) : null),
     [pathname, search, showHeader]
   );
+
+  const headerProps = useMemo(() => {
+    if (!showHeader) return null;
+    if (override) {
+      return {
+        ...override,
+      };
+    }
+    return baseHeaderProps;
+  }, [showHeader, override, baseHeaderProps]);
 
   const currentTab = useMemo(() => {
     const params = new URLSearchParams(search);
     return params.get('tab') ?? 'books';
   }, [search]);
 
-  const floatingBtn: FloatingBtn = isAuthOrOnboarding
+  const floatingBtn: FloatingBtn = isNoneFooter
     ? null
     : (() => {
+        if (isUnder(pathname, ROUTES.BOARD)) {
+          return { name: 'add', onClick: () => navigate(ROUTES.BOARD_CREATE) };
+        }
         if (isUnder(pathname, ROUTES.HOME)) {
           return { name: 'back', onClick: () => window.scrollTo({ top: 0, behavior: 'smooth' }) };
         }
@@ -83,7 +115,7 @@ export default function Layout() {
     <div
       className={cn(
         'bg-gray-white min-h-dvh flex-col text-gray-900',
-        isAuthOrOnboarding ? 'h-dvh overflow-hidden' : 'h-full'
+        isNoneFooter ? 'h-dvh overflow-hidden' : 'h-full'
       )}
     >
       {showHeader && headerProps && <Header {...headerProps} />}
@@ -92,10 +124,10 @@ export default function Layout() {
         <div className='mx-auto w-full'>
           <Outlet />
         </div>
-        {!isAuthOrOnboarding && !isChat && !isCart && <Footer />}
+        {!isNoneFooter && !isChat && !isCart && <Footer />}
       </main>
 
-      {!isAuthOrOnboarding && !isChatRoom && <BottomNav />}
+      {!isNoneFooter && !isChatRoom && <BottomNav />}
 
       {floatingBtn && (
         <div
@@ -111,9 +143,11 @@ export default function Layout() {
                 <CircleButton name='back' onClick={floatingBtn.onClick} ariaLabel='맨 위로' />
               ) : floatingBtn.name === 'scan' ? (
                 <CircleButton name='scan' onClick={floatingBtn.onClick} ariaLabel='책 스캔' />
-              ) : (
+              ) : floatingBtn.name === 'cart' ? (
                 <CircleButton name='cart' onClick={floatingBtn.onClick} ariaLabel='장바구니' />
-              )}
+              ) : floatingBtn.name === 'add' ? (
+                <CircleButton name='add' onClick={floatingBtn.onClick} ariaLabel='게시글 추가' />
+              ) : null}
             </div>
           </div>
         </div>

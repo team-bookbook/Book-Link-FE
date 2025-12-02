@@ -28,6 +28,16 @@ export const queryKeys = {
     all: ['member'] as const,
     me: () => [...queryKeys.member.all, 'me'] as const,
   },
+
+  board: {
+    all: ['board'] as const,
+    lists: () => [...queryKeys.board.all, 'list'] as const,
+    list: (params: { title?: string; category?: string }) => [...queryKeys.board.lists(), params] as const,
+    details: () => [...queryKeys.board.all, 'detail'] as const,
+    detail: (id: string) => [...queryKeys.board.details(), id] as const,
+    likes: () => [...queryKeys.board.all, 'like'] as const,
+    like: (id: string) => [...queryKeys.board.likes(), id] as const,
+  },
 } as const;
 
 export const mutationKeys = {
@@ -47,5 +57,11 @@ export const mutationKeys = {
   },
   member: {
     update: ['member', 'update'] as const,
+  },
+  board: {
+    create: ['board', 'create'] as const,
+    update: ['board', 'update'] as const,
+    delete: ['board', 'delete'] as const,
+    like: ['board', 'like'] as const,
   },
 } as const;
