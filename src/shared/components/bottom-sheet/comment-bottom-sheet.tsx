@@ -44,6 +44,7 @@ export default function CommentBottomSheet(props: CommentProps) {
 
   const toggleReplies = async (parentId: string) => {
     const next = !openReplies[parentId];
+    console.log(parentId);
     setOpenReplies((m) => ({ ...m, [parentId]: next }));
     if (next) await onLoadReplies?.(parentId);
   };

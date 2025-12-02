@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation } from '@tanstack/react-query';
 import { commentQueries } from '@apis/board/comment-queries';
+import { commentMutations } from '@apis/board/comment-mutations';
 import type { CommentItem } from '@components/bottom-sheet/types/comment';
 import type { IComment } from '@apis/board/comment-queries';
 import { formatDate } from '@/shared/utils/formatDate';
@@ -24,6 +25,7 @@ export function useBoardComments(boardId: string) {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   const { data: commentsData = [] } = useQuery(commentQueries.GET_COMMENT_LIST(boardId));
+  const createCommentMutation = useMutation(commentMutations.POST_COMMENT());
 
   // API 응답을 CommentItem으로 변환
   const comments: CommentItem[] = commentsData.map(mapCommentToItem);
@@ -41,11 +43,38 @@ export function useBoardComments(boardId: string) {
     console.log('Toggle comment like:', { kind, id, parentId });
   }, []);
 
-  const handleSendComment = useCallback(async (text: string) => {
-    // TODO: 댓글 작성 API 연동
-    console.log('Send comment:', text);
-    return true;
-  }, []);
+  const handleSendComment = useCallback(
+    async (text: string) => {
+      try {
+        await createCommentMutation.mutateAsync({
+          boardId,
+          content: text,
+        });
+        return true;
+      } catch (error) {
+        console.error('Failed to send comment:', error);
+        return false;
+      }
+    },
+    [boardId, createCommentMutation]
+  );
+
+  const handleSendReply = useCallback(
+    async (parentId: string, text: string) => {
+      try {
+        await createCommentMutation.mutateAsync({
+          boardId,
+          parentId,
+          content: text,
+        });
+        return true;
+      } catch (error) {
+        console.error('Failed to send reply:', error);
+        return false;
+      }
+    },
+    [boardId, createCommentMutation]
+  );
 
   return {
     comments,
@@ -54,5 +83,6 @@ export function useBoardComments(boardId: string) {
     closeDrawer,
     handleToggleLike,
     handleSendComment,
+    handleSendReply,
   };
 }

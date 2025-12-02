@@ -70,4 +70,7 @@ export const mutationKeys = {
     delete: ['board', 'delete'] as const,
     like: ['board', 'like'] as const,
   },
+  comment: {
+    create: ['comment', 'create'] as const,
+  },
 } as const;

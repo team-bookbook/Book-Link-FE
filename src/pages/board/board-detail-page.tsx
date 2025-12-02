@@ -19,9 +19,8 @@ export default function BoardDetailPage() {
   const { isLiked, toggleLike } = useBoardLike(id!);
   const { isManageBottomSheetOpen, selectedManageOption, openManageSheet, closeManageSheet, handleManageOptionChange } =
     useBoardManagement(id!);
-  const { comments, isDrawerOpen, openDrawer, closeDrawer, handleToggleLike, handleSendComment } = useBoardComments(
-    id!
-  );
+  const { comments, isDrawerOpen, openDrawer, closeDrawer, handleToggleLike, handleSendComment, handleSendReply } =
+    useBoardComments(id!);
 
   const headerConfig = useMemo(() => {
     if (!boardDetail) return null;
@@ -113,6 +112,7 @@ export default function BoardDetailPage() {
         comments={comments}
         onToggleLike={handleToggleLike}
         onSend={handleSendComment}
+        onSendReply={handleSendReply}
       />
 
       <SelectBottomSheet
