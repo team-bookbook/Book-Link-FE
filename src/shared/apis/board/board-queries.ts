@@ -3,7 +3,8 @@ import { END_POINT } from '@constants/end-point';
 import { queryKeys } from '@constants/query-keys';
 import { queryOptions } from '@tanstack/react-query';
 
-export type BoardCategory = 'GENERAL' | 'POPULAR' | 'RECOMMEND';
+export type BoardCategory = 'GENERAL' | 'RECOMMEND' | 'GATHER' | 'POPULAR';
+export type SortType = 'LATEST' | 'POPULAR';
 
 export interface IBoardPost {
   id: string;
@@ -12,6 +13,7 @@ export interface IBoardPost {
   createdAt: string;
   likeCount: number;
   commentCount: number;
+  previewContent: string;
   category: BoardCategory;
   viewCount: number;
 }
@@ -25,6 +27,7 @@ export interface IBoardDetail extends IBoardPost {
 interface IBoardListParams {
   title?: string;
   category?: string;
+  sort?: SortType;
 }
 
 export const boardQueries = {

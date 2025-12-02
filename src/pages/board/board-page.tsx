@@ -1,5 +1,5 @@
-import { useMemo, useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useRef, useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import PostCard from '@pages/board/components/post-card';
 import type { IGroupCard } from '@pages/home/types/home.types';
 import PillTab from '@components/tab/pill-tab';
@@ -9,7 +9,7 @@ import SelectDropdown from '@components/dropdown/select-dropdown';
 import GroupCard from '@pages/home/components/card/group-card';
 import { cn } from '@libs/cn';
 import { useQuery } from '@tanstack/react-query';
-import { boardQueries } from '@apis/board/board-queries';
+import { boardQueries, type SortType } from '@apis/board/board-queries';
 import { formatDate } from '@/shared/utils/formatDate';
 
 export type TabItem = { key: string; label: string };
@@ -25,8 +25,6 @@ export const CATEGORIES: TabItem[] = [
   { key: 'GENERAL', label: '일상' },
   { key: 'GATHER', label: '모임 모집' },
 ];
-
-type SortType = 'LATEST' | 'POPULAR';
 
 const SORT_OPTIONS: ReadonlyArray<{ value: SortType; label: string }> = [
   { value: 'LATEST', label: '최신순' },
@@ -70,15 +68,30 @@ const MOCK_GROUPS: IGroupCard[] = [
 
 export default function BoardPage() {
   const navigate = useNavigate();
-  const [topTab, setTopTab] = useState<'community' | 'reading'>('community');
-  const [category, setCategory] = useState<string>('ALL');
-  const [sort, setSort] = useState<SortType>('LATEST');
-  const [searchKeyword, setSearchKeyword] = useState<string>('');
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const topTab = (searchParams.get('tab') as 'community' | 'reading') || 'community';
+  const category = searchParams.get('category') || 'ALL';
+  const sort = (searchParams.get('sort') as SortType) || 'LATEST';
+  const searchKeyword = searchParams.get('search') || '';
 
   const searchAnchorRef = useRef<HTMLDivElement | null>(null);
   const floatingSearchRef = useRef<HTMLDivElement | null>(null);
-
   const [showFloatingSearch, setShowFloatingSearch] = useState(false);
+
+  const updateParams = (updates: Record<string, string | undefined>) => {
+    const newParams = new URLSearchParams(searchParams);
+
+    Object.entries(updates).forEach(([key, value]) => {
+      if (value === undefined || value === '' || value === 'ALL' || value === 'LATEST') {
+        newParams.delete(key);
+      } else {
+        newParams.set(key, value);
+      }
+    });
+
+    setSearchParams(newParams, { replace: true });
+  };
 
   useEffect(() => {
     const el = searchAnchorRef.current;
@@ -92,18 +105,24 @@ export default function BoardPage() {
     boardQueries.GET_BOARD_LIST({
       title: searchKeyword || undefined,
       category: category === 'ALL' ? undefined : category,
+      sort,
     })
   );
 
-  const filteredPosts = useMemo(() => {
-    if (sort === 'POPULAR') {
-      return [...boardPosts].sort((a, b) => b.likeCount - a.likeCount);
-    }
-    return boardPosts;
-  }, [boardPosts, sort]);
+  const handleTabChange = (tab: string) => {
+    updateParams({ tab });
+  };
+
+  const handleCategoryChange = (cat: string) => {
+    updateParams({ category: cat });
+  };
+
+  const handleSortChange = (s: SortType) => {
+    updateParams({ sort: s });
+  };
 
   const handleSearch = (keyword: string) => {
-    setSearchKeyword(keyword);
+    updateParams({ search: keyword });
   };
 
   const searchPlaceholder = topTab === 'community' ? '검색어를 입력해 주세요.' : '독서모임명으로 검색';
@@ -113,7 +132,7 @@ export default function BoardPage() {
       <UnderlineTab
         items={COMMUNITY_TABS}
         value={topTab}
-        onChange={(k) => setTopTab(k as 'community' | 'reading')}
+        onChange={handleTabChange}
         className={cn('sticky', showFloatingSearch ? 'top-[6.5rem]' : 'top-0')}
       />
 
@@ -133,18 +152,18 @@ export default function BoardPage() {
       {topTab === 'community' ? (
         <>
           <div className='flex-col-center gap-[0.9rem]'>
-            <PillTab items={CATEGORIES} value={category} onChange={setCategory} />
+            <PillTab items={CATEGORIES} value={category} onChange={handleCategoryChange} />
             <div className='flex-row-between w-full px-[2rem]'>
               <div className='flex py-[1.2rem]'>
                 <span className='caption2 text-gray-900'>
-                  총 <span className='text-primary-700'>{filteredPosts.length}개</span>
+                  총 <span className='text-primary-700'>{boardPosts.length}개</span>
                 </span>
               </div>
 
               <SelectDropdown<SortType>
                 value={sort}
                 options={SORT_OPTIONS}
-                onChange={setSort}
+                onChange={handleSortChange}
                 align='end'
                 variant='title'
                 menuWidthRem={12}
@@ -158,14 +177,14 @@ export default function BoardPage() {
             <div className='body5 py-[4rem] text-center text-gray-500'>로딩 중...</div>
           ) : (
             <ul className='space-y-[0.1rem]'>
-              {filteredPosts.length === 0 ? (
+              {boardPosts.length === 0 ? (
                 <li className='body5 py-[4rem] text-center text-gray-500'>게시글이 없습니다.</li>
               ) : (
-                filteredPosts.map((post) => (
+                boardPosts.map((post) => (
                   <li key={post.id} className='bg-gray-white'>
                     <PostCard
                       title={post.title}
-                      content=''
+                      content={post.previewContent}
                       commentCount={post.commentCount}
                       likeCount={post.likeCount}
                       date={formatDate(post.createdAt)}
