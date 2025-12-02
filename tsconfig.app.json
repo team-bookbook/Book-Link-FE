@@ -31,6 +31,7 @@
       "@styles/*": ["./src/shared/styles/*"],
       "@components/*": ["./src/shared/components/*"],
       "@libs/*": ["./src/shared/libs/*"],
+      "@contexts/*": ["./src/shared/contexts/*"],
       "@constants/*": ["./src/shared/constants/*"],
       "@hooks/*": ["./src/shared/hooks/*"],
       "@routes/*": ["./src/shared/routes/*"],

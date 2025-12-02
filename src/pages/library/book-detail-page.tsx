@@ -32,19 +32,6 @@ export default function BookDetailPage() {
 
   const handleCartClick = async (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (book) {
-      // await addToCart({
-      //   id: String(book.id),
-      //   title: book.title,
-      //   author: book.author,
-      //   library: book.library,
-      //   dueDate: new Date(Date.now() + book.maxDays * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-      //   maxDays: book.maxDays,
-      //   deposit: book.deposit,
-      //   status: book.status,
-      //   imgUrl: book.imgUrl,
-      // });
-    }
   };
 
   if (!book) {

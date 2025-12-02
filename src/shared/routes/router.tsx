@@ -8,6 +8,7 @@ const HomePage = lazy(() => import('@pages/home/home-page'));
 const LibraryPage = lazy(() => import('@pages/library/library-page'));
 const SettingPage = lazy(() => import('@pages/setting/setting-page'));
 const BoardPage = lazy(() => import('@pages/board/board-page'));
+const BoardDetailPage = lazy(() => import('@pages/board/board-detail-page'));
 const ChatPage = lazy(() => import('@pages/chat/chat-page'));
 const ChatDetailPage = lazy(() => import('@pages/chat/chat-detail-page'));
 const NotificationPage = lazy(() => import('@pages/notification/notification-page'));
@@ -30,6 +31,7 @@ const ReivewCreatePage = lazy(() => import('@pages/chat/review-create-page'));
 const PasswordResetPage = lazy(() => import('@pages/setting/password-reset-page'));
 const EditProfilePage = lazy(() => import('@pages/setting/edit-profile-page'));
 const BookScanPage = lazy(() => import('@pages/library/book-scan-page'));
+const BoardCreatePage = lazy(() => import('@pages/board/board-create-page'));
 
 export const router = createBrowserRouter([
   {
@@ -42,6 +44,8 @@ export const router = createBrowserRouter([
       { path: ROUTES.PRIVACY, element: <PrivacyPage /> },
       { path: ROUTES.TERMS_OR_SERVICE, element: <TermsOfService /> },
       { path: ROUTES.BOARD, element: <BoardPage /> },
+      { path: ROUTES.BOARD_DETAIL(':id'), element: <BoardDetailPage /> },
+      { path: ROUTES.BOARD_CREATE, element: <BoardCreatePage /> },
       { path: ROUTES.CHAT, element: <ChatPage /> },
       { path: ROUTES.CHAT_ROOM(':id'), element: <ChatDetailPage /> },
       { path: ROUTES.NOTIFICATION, element: <NotificationPage /> },
