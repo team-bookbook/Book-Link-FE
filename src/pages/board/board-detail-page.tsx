@@ -1,64 +1,25 @@
-import { useState, useMemo, useCallback } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { useQuery, useMutation } from '@tanstack/react-query';
+import { useState, useMemo } from 'react';
+import { useParams } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 import Icon from '@components/icon';
 import CommentBottomSheet from '@components/bottom-sheet/comment-bottom-sheet';
 import type { CommentItem } from '@components/bottom-sheet/types/comment';
 import { boardQueries } from '@apis/board/board-queries';
-import { boardMutations } from '@apis/board/board-mutations';
 import { useHeaderOverride } from '@contexts/header-context';
 import type { ActionId } from '@layouts/header';
-import { modal } from '@libs/modal';
-import { toast } from '@libs/toast';
 import SelectBottomSheet from '@components/bottom-sheet/select-bottom-sheet';
-import { REVIEW_MANAGE_OPTIONS, type ReviewManage } from '@components/dropdown/constants/select-options';
+import { REVIEW_MANAGE_OPTIONS } from '@components/dropdown/constants/select-options';
+import { useBoardLike } from './hooks/use-board-like';
+import { useBoardManagement } from './hooks/use-board-management';
 
 export default function BoardDetailPage() {
   const { id } = useParams<{ id: string }>();
-  const navigate = useNavigate();
   const [isCommentDrawerOpen, setIsCommentDrawerOpen] = useState(false);
-  const [isManageBottomSheetOpen, setIsManageBottomSheetOpen] = useState(false);
-  const [selectedManageOption, setSelectedManageOption] = useState<ReviewManage | null>(null);
 
   const { data: boardDetail, isLoading } = useQuery(boardQueries.GET_BOARD_DETAIL(id!));
-  const { data: isLiked = false } = useQuery(boardQueries.GET_BOARD_LIKE(id!));
-  const { mutate: deleteBoard } = useMutation(boardMutations.DELETE_BOARD(id!));
-  const { mutate: addLike } = useMutation(boardMutations.POST_BOARD_LIKE(id!));
-  const { mutate: removeLike } = useMutation(boardMutations.DELETE_BOARD_LIKE(id!));
-
-  const handleKebabClick = useCallback(() => {
-    setIsManageBottomSheetOpen(true);
-  }, []);
-
-  const handleManageOptionChange = useCallback(
-    async (option: string) => {
-      setSelectedManageOption(option as 'modify' | 'delete');
-      setIsManageBottomSheetOpen(false);
-
-      if (option === 'modify') {
-        navigate(`/board-create?id=${id}`);
-      } else if (option === 'delete') {
-        const confirmDelete = await modal.confirm({
-          title: '정말 삭제하시겠습니까?',
-          confirmText: '확인',
-          cancelText: '취소',
-        });
-
-        if (confirmDelete.ok) {
-          deleteBoard(undefined, {
-            onSuccess: () => {
-              toast.success('게시글이 삭제되었습니다');
-              navigate('/board');
-            },
-            onError: () => {
-              toast.error('게시글 삭제에 실패했습니다');
-            },
-          });
-        }
-      }
-    },
-    [id, navigate, deleteBoard]
-  );
+  const { isLiked, toggleLike } = useBoardLike(id!);
+  const { isManageBottomSheetOpen, selectedManageOption, openManageSheet, closeManageSheet, handleManageOptionChange } =
+    useBoardManagement(id!);
 
   const headerConfig = useMemo(() => {
     if (!boardDetail) return null;
@@ -70,11 +31,11 @@ export default function BoardDetailPage() {
       actions: boardDetail.isOwner ? ['kebab' as const] : [],
       onAction: (action: ActionId) => {
         if (action === 'kebab') {
-          handleKebabClick();
+          openManageSheet();
         }
       },
     };
-  }, [boardDetail, handleKebabClick]);
+  }, [boardDetail, openManageSheet]);
 
   useHeaderOverride(headerConfig);
 
@@ -120,32 +81,6 @@ export default function BoardDetailPage() {
   const handleCommentSectionClick = () => {
     setIsCommentDrawerOpen(true);
   };
-
-  const handleCloseDrawer = () => {
-    setIsCommentDrawerOpen(false);
-  };
-
-  const handleBoardLikeClick = useCallback(() => {
-    if (isLiked) {
-      removeLike(undefined, {
-        onSuccess: () => {
-          toast.success('게시글 좋아요를 취소했습니다');
-        },
-        onError: () => {
-          toast.error('좋아요 취소에 실패했습니다');
-        },
-      });
-    } else {
-      addLike(undefined, {
-        onSuccess: () => {
-          toast.success('게시글에 좋아요를 눌렀습니다!');
-        },
-        onError: () => {
-          toast.error('좋아요에 실패했습니다');
-        },
-      });
-    }
-  }, [isLiked, addLike, removeLike]);
 
   const handleCommentToggleLike = (kind: 'comment' | 'reply', id: string, parentId?: string) => {
     // TODO: 댓글 좋아요 API 연동
@@ -215,7 +150,7 @@ export default function BoardDetailPage() {
                 <p className='caption1'>{boardDetail.commentCount}</p>
               </span>
             </button>
-            <button type='button' onClick={handleBoardLikeClick} className='cursor-pointer'>
+            <button type='button' onClick={toggleLike} className='cursor-pointer'>
               <span className='flex-items-center gap-[2px]'>
                 <Icon name={isLiked ? 'heart-fill' : 'heart'} size={2.4} className='text-system-error'></Icon>
                 <p className='caption1'>{boardDetail.likeCount}</p>
@@ -227,7 +162,7 @@ export default function BoardDetailPage() {
 
       <CommentBottomSheet
         open={isCommentDrawerOpen}
-        onClose={handleCloseDrawer}
+        onClose={() => setIsCommentDrawerOpen(false)}
         comments={comments}
         onToggleLike={handleCommentToggleLike}
         onSend={handleSendComment}
@@ -235,7 +170,7 @@ export default function BoardDetailPage() {
 
       <SelectBottomSheet
         open={isManageBottomSheetOpen}
-        onClose={() => setIsManageBottomSheetOpen(false)}
+        onClose={closeManageSheet}
         options={REVIEW_MANAGE_OPTIONS}
         value={selectedManageOption}
         onChange={handleManageOptionChange}
