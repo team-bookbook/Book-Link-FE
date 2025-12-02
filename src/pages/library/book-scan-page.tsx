@@ -19,9 +19,10 @@ export default function BookScanPage() {
       if (!barcodes || barcodes.length === 0) return;
       if (scannedIsbn) return;
 
+      console.log(scannedIsbn);
       const barcode = barcodes[0];
       const barcodeValue = barcode.rawValue;
-
+      console.log(barcode, barcodeValue);
       const validation = validateISBN(barcodeValue);
 
       if (!validation.valid) {
@@ -35,14 +36,10 @@ export default function BookScanPage() {
     [scannedIsbn]
   );
 
-  const {
-    scannerRef,
-    isSupported,
-    error: scannerError,
-  } = useBarcodeScanner({
+  const { scannerRef } = useBarcodeScanner({
     onCapture: handleCapture,
     decodeInterval: 200, // 200ms 간격으로 디코드
-    qrBoxSize: 250, // 스캔 박스 크기 (픽셀)
+    qrBoxSize: 300, // 스캔 박스 높이 (픽셀) - min-h-[25rem] = 250px
   });
 
   // ISBN으로 도서 정보 조회
@@ -64,23 +61,11 @@ export default function BookScanPage() {
     });
   };
 
-  // 바코드 스캐너 미지원 또는 에러 처리
-  if (!isSupported || scannerError) {
-    return (
-      <div className='flex h-[calc(100vh-55px)] flex-col items-center justify-center bg-gray-900 px-[2rem]'>
-        <div className='flex-col-center text-gray-white gap-[1rem]'>
-          <Icon name='alert-circle' size={4} className='text-system-error' ariaHidden />
-          <p className='body5 text-center'>{scannerError || '이 브라우저는 바코드 스캔을 지원하지 않습니다.'}</p>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className='flex h-[calc(100vh-55px)] flex-col bg-gray-900'>
+    <div className='flex h-[calc(100vh-55px-5.5rem)] flex-col bg-gray-900'>
       <div
         className={cn(
-          'fixed top-[5.5rem] left-1/2 min-h-[4.5rem] w-full max-w-[43rem] -translate-x-1/2 bg-[#FAEAEA]',
+          'fixed top-[5.5rem] left-1/2 min-h-[4.5rem] w-full -translate-x-1/2 bg-[#FAEAEA]',
           'z-1',
           'px-[1.6rem] py-[1.2rem]',
           'transition-all duration-300 ease-out'
@@ -94,15 +79,16 @@ export default function BookScanPage() {
         </div>
       </div>
 
-      <div className='flex flex-1 items-center justify-center'>
-        <div className='relative h-[calc(100vh-55px)] w-full'>
+      <div className='flex pt-[4.5rem]'>
+        <div className='relative w-full'>
           {/* html5-qrcode 스캔 영역 */}
           <div
             ref={scannerRef}
-            className='h-[calc(100vh-55px)] w-full'
+            className='w-full'
             style={{
               WebkitTransform: 'translateZ(0)',
               transform: 'translateZ(0)',
+              zIndex: 88,
             }}
           />
 
@@ -111,31 +97,25 @@ export default function BookScanPage() {
             <div className='relative min-h-[25rem] w-full'>
               <div className='absolute inset-0 rounded-3xl border-[0.2rem] border-gray-400' />
 
-              {/* 그리드 선 */}
               <div className='absolute top-0 bottom-0 left-[33%] w-[0.1rem] bg-gray-50/30' />
               <div className='absolute top-0 bottom-0 left-[66%] w-[0.1rem] bg-gray-50/30' />
               <div className='absolute top-[33%] right-0 left-0 h-[0.1rem] bg-gray-50/30' />
               <div className='absolute top-[66%] right-0 left-0 h-[0.1rem] bg-gray-50/30' />
 
-              {/* 모서리 강조 */}
-              {/* 왼쪽 위 */}
-              <div className='bg-gray-white absolute top-0 left-0 h-[0.5rem] w-[30%] rounded-tl-3xl' />
+              {/* <div className='bg-gray-white absolute top-0 left-0 h-[0.5rem] w-[30%] rounded-tl-3xl' />
               <div className='bg-gray-white absolute top-0 left-0 h-[30%] w-[0.5rem] rounded-tl-3xl' />
-              {/* 오른쪽 위 */}
               <div className='bg-gray-white absolute top-0 right-0 h-[0.5rem] w-[30%] rounded-tr-3xl' />
               <div className='bg-gray-white absolute top-0 right-0 h-[30%] w-[0.5rem] rounded-tr-3xl' />
-              {/* 왼쪽 아래 */}
               <div className='bg-gray-white absolute bottom-0 left-0 h-[0.5rem] w-[30%] rounded-bl-3xl' />
               <div className='bg-gray-white absolute bottom-0 left-0 h-[30%] w-[0.5rem] rounded-bl-3xl' />
-              {/* 오른쪽 아래 */}
               <div className='bg-gray-white absolute right-0 bottom-0 h-[0.5rem] w-[30%] rounded-br-3xl' />
-              <div className='bg-gray-white absolute right-0 bottom-0 h-[30%] w-[0.5rem] rounded-br-3xl' />
+              <div className='bg-gray-white absolute right-0 bottom-0 h-[30%] w-[0.5rem] rounded-br-3xl' /> */}
 
-              {/* 스캔 라인 애니메이션 */}
               <div className='scan-line absolute right-0 left-0 h-[0.2rem] bg-gray-50' />
             </div>
+
             {/* 하단 도서 미리보기 영역 */}
-            <div className='min-h-[16.5rem] w-full rounded-[5px] bg-gray-800 px-[2rem] py-[1rem]'>
+            <div className='-z-30 min-h-[16.5rem] w-full rounded-[5px] bg-gray-800 px-[2rem] py-[1rem]'>
               {!scannedIsbn && (
                 <div className='flex-col-center h-full gap-[1rem] text-gray-400'>
                   <Icon name='book' size={4} ariaHidden />
@@ -175,7 +155,7 @@ export default function BookScanPage() {
               )}
 
               {scannedIsbn && bookInfo && !isLoadingBook && (
-                <div className='flex-row-center h-full gap-[2rem]'>
+                <div className='flex-row-center realtive h-full gap-[2rem]'>
                   {/* 이미지 영역 */}
                   <div className='rouded-[5px] h-full min-w-[10rem] bg-gray-500'></div>
                   <div className='flex-col gap-[5px]'>

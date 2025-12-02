@@ -57,17 +57,11 @@ export function useBarcodeScanner(options: BarcodeScannerOptions = {}): UseBarco
         // 카메라 설정
         const config = {
           fps: fps,
-          qrbox: { width: qrBoxSize, height: qrBoxSize },
+          qrbox: { width: qrBoxSize + 20, height: 250 },
           aspectRatio: 1.0,
           // 바코드 포맷 지정
           formatsToSupport: [
-            // QR코드
-            8, // QR_CODE
-            // 바코드
             13, // EAN_13
-            8, // EAN_8
-            3, // CODE_128
-            2, // CODE_39
           ],
         };
 
@@ -79,6 +73,7 @@ export function useBarcodeScanner(options: BarcodeScannerOptions = {}): UseBarco
 
         // 에러 콜백 (바코드를 찾지 못한 경우 - 정상 동작)
         const qrCodeErrorCallback = () => {
+          console.log('동작 프레임');
           // 바코드를 찾지 못한 경우는 에러로 처리하지 않음
         };
 
@@ -111,7 +106,6 @@ export function useBarcodeScanner(options: BarcodeScannerOptions = {}): UseBarco
         const error = err as Error;
         console.error('카메라 접근 오류:', error);
 
-        // 에러 타입에 따라 메시지 구분
         let errorMessage = '카메라 접근에 실패했습니다';
         if (error.message.includes('NotFoundError') || error.message.includes('not found')) {
           errorMessage = '카메라를 찾을 수 없습니다. 카메라가 연결되어 있는지 확인해주세요.';
