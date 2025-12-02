@@ -56,4 +56,8 @@ export const END_POINT = {
   // 회원 API
   MEMBER_ME: '/member/me',
   MEMBER_UPDATE: '/member/update',
+
+  // 게시판 API
+  BOARD: '/board',
+  BOARD_BY_ID: (boardId: string) => `/board/${boardId}`,
 };

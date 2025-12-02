@@ -7,6 +7,7 @@ export const ROUTES = {
   LIBRARY_CREATE: '/library-create',
   BOOK_CREATE: '/book-create',
   BOARD: '/board',
+  BOARD_DETAIL: (id = ':boardId') => `/board/${id}`,
   ONBOARDING: '/onboarding',
   SETTING: '/mypage',
   SETTING_EDIT: '/mypage/edit',

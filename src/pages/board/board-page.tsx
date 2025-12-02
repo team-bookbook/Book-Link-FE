@@ -1,4 +1,5 @@
 import { useMemo, useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import PostCard from '@pages/board/components/post-card';
 import type { IGroupCard } from '@pages/home/types/home.types';
 import PillTab from '@components/tab/pill-tab';
@@ -7,6 +8,9 @@ import UnderlineTab from '@components/tab/underline-tab';
 import SelectDropdown from '@components/dropdown/select-dropdown';
 import GroupCard from '@pages/home/components/card/group-card';
 import { cn } from '@libs/cn';
+import { useQuery } from '@tanstack/react-query';
+import { boardQueries } from '@apis/board/board-queries';
+import { formatDate } from '@/shared/utils/formatDate';
 
 type TabItem = { key: string; label: string };
 
@@ -22,15 +26,19 @@ const CATEGORIES: TabItem[] = [
   { key: 'gather', label: '모임 모집' },
 ];
 
-type Post = {
-  id: string;
-  title: string;
-  content: string;
-  commentCount: number;
-  likeCount: number;
-  date: string;
-  author: string;
-  category: string;
+// UI 카테고리를 API 카테고리로 변환
+const mapCategoryToApi = (category: string): string | undefined => {
+  switch (category) {
+    case 'recommend':
+      return 'RECOMMEND';
+    case 'daily':
+      return 'GENERAL';
+    case 'gather':
+      return 'POPULAR';
+    case 'all':
+    default:
+      return undefined;
+  }
 };
 
 type SortType = 'latest' | 'popular';
@@ -38,49 +46,6 @@ type SortType = 'latest' | 'popular';
 const SORT_OPTIONS: ReadonlyArray<{ value: SortType; label: string }> = [
   { value: 'latest', label: '최신순' },
   { value: 'popular', label: '인기순' },
-];
-
-const MOCK_POSTS: Post[] = [
-  {
-    id: 'p1',
-    title: '게시글 제목',
-    content: '내용이 여기에 들어갑니다. 내용이 여기에 들어갑니다. 내용이 여기에 들어갑니다. 내용이 여기에 들어갑니다.',
-    commentCount: 9,
-    likeCount: 9,
-    date: '2025.09.21',
-    author: '작성자이름',
-    category: 'all',
-  },
-  {
-    id: 'p2',
-    title: '게시글 제목',
-    content: '내용이 여기에 들어갑니다. 내용이 여기에 들어갑니다. 내용이 여기에 들어갑니다. 내용이 여기에 들어갑니다.',
-    commentCount: 9,
-    likeCount: 9,
-    date: '2025.09.21',
-    author: '작성자이름',
-    category: 'all',
-  },
-  {
-    id: 'p3',
-    title: '게시글 제목',
-    content: '내용이 여기에 들어갑니다. 내용이 여기에 들어갑니다. 내용이 여기에 들어갑니다. 내용이 여기에 들어갑니다.',
-    commentCount: 9,
-    likeCount: 9,
-    date: '2025.09.21',
-    author: '작성자이름',
-    category: 'all',
-  },
-  {
-    id: 'p4',
-    title: '게시글 제목',
-    content: '내용이 여기에 들어갑니다. 내용이 여기에 들어갑니다. 내용이 여기에 들어갑니다. 내용이 여기에 들어갑니다.',
-    commentCount: 9,
-    likeCount: 9,
-    date: '2025.09.21',
-    author: '작성자이름',
-    category: 'all',
-  },
 ];
 
 const MOCK_GROUPS: IGroupCard[] = [
@@ -119,9 +84,11 @@ const MOCK_GROUPS: IGroupCard[] = [
 ];
 
 export default function BoardPage() {
+  const navigate = useNavigate();
   const [topTab, setTopTab] = useState<'community' | 'reading'>('community');
   const [category, setCategory] = useState<string>('all');
   const [sort, setSort] = useState<SortType>('latest');
+  const [searchKeyword, setSearchKeyword] = useState<string>('');
 
   const searchAnchorRef = useRef<HTMLDivElement | null>(null);
   const floatingSearchRef = useRef<HTMLDivElement | null>(null);
@@ -136,10 +103,24 @@ export default function BoardPage() {
     return () => io.disconnect();
   }, []);
 
+  const apiCategory = mapCategoryToApi(category);
+  const { data: boardPosts = [], isLoading } = useQuery(
+    boardQueries.GET_BOARD_LIST({
+      title: searchKeyword || undefined,
+      category: apiCategory,
+    })
+  );
+
   const filteredPosts = useMemo(() => {
-    const list = category === 'all' ? MOCK_POSTS : MOCK_POSTS.filter((p) => p.category === category);
-    return sort === 'popular' ? [...list].sort((a, b) => b.likeCount - a.likeCount) : list;
-  }, [category, sort]);
+    if (sort === 'popular') {
+      return [...boardPosts].sort((a, b) => b.likeCount - a.likeCount);
+    }
+    return boardPosts;
+  }, [boardPosts, sort]);
+
+  const handleSearch = (keyword: string) => {
+    setSearchKeyword(keyword);
+  };
 
   const searchPlaceholder = topTab === 'community' ? '검색어를 입력해 주세요.' : '독서모임명으로 검색';
 
@@ -149,7 +130,7 @@ export default function BoardPage() {
         items={COMMUNITY_TABS}
         value={topTab}
         onChange={(k) => setTopTab(k as 'community' | 'reading')}
-        className={cn('sticky', showFloatingSearch ? 'top-[6.6rem]' : 'top-0')}
+        className={cn('sticky', showFloatingSearch ? 'top-[6.5rem]' : 'top-0')}
       />
 
       {showFloatingSearch && (
@@ -157,12 +138,12 @@ export default function BoardPage() {
           ref={floatingSearchRef}
           className={cn('bg-gray-white sticky top-0 z-[var(--z-header)]', 'px-[2rem] pt-[0.8rem] pb-[0.8rem]')}
         >
-          <SearchBar placeholder={searchPlaceholder} />
+          <SearchBar placeholder={searchPlaceholder} onSubmit={handleSearch} />
         </div>
       )}
 
       <div className='px-[2rem] pt-[1.2rem]' ref={searchAnchorRef}>
-        <SearchBar placeholder={searchPlaceholder} />
+        <SearchBar placeholder={searchPlaceholder} onSubmit={handleSearch} />
       </div>
 
       {topTab === 'community' ? (
@@ -172,7 +153,7 @@ export default function BoardPage() {
             <div className='flex-row-between w-full px-[2rem]'>
               <div className='flex py-[1.2rem]'>
                 <span className='caption2 text-gray-900'>
-                  총 <span className='text-primary-700'>20개</span>
+                  총 <span className='text-primary-700'>{filteredPosts.length}개</span>
                 </span>
               </div>
 
@@ -189,20 +170,29 @@ export default function BoardPage() {
             </div>
           </div>
 
-          <ul className='space-y-[0.1rem]'>
-            {filteredPosts.map((p) => (
-              <li key={p.id} className='bg-gray-white'>
-                <PostCard
-                  title={p.title}
-                  content={p.content}
-                  commentCount={p.commentCount}
-                  likeCount={p.likeCount}
-                  date={p.date}
-                  author={p.author}
-                />
-              </li>
-            ))}
-          </ul>
+          {isLoading ? (
+            <div className='body5 py-[4rem] text-center text-gray-500'>로딩 중...</div>
+          ) : (
+            <ul className='space-y-[0.1rem]'>
+              {filteredPosts.length === 0 ? (
+                <li className='body5 py-[4rem] text-center text-gray-500'>게시글이 없습니다.</li>
+              ) : (
+                filteredPosts.map((post) => (
+                  <li key={post.id} className='bg-gray-white'>
+                    <PostCard
+                      title={post.title}
+                      content=''
+                      commentCount={post.commentCount}
+                      likeCount={post.likeCount}
+                      date={formatDate(post.createdAt)}
+                      author={post.writerName}
+                      onClick={() => navigate(`/board/${post.id}`)}
+                    />
+                  </li>
+                ))
+              )}
+            </ul>
+          )}
         </>
       ) : (
         <>

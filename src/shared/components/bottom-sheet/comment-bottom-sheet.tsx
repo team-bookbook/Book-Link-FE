@@ -19,8 +19,8 @@ export default function CommentBottomSheet(props: CommentProps) {
   } = props;
 
   const [text, setText] = useState('');
-  const [openReplies, setOpenReplies] = useState<Record<number, boolean>>({});
-  const [replyTargetId, setReplyTargetId] = useState<number | null>(null);
+  const [openReplies, setOpenReplies] = useState<Record<string, boolean>>({});
+  const [replyTargetId, setReplyTargetId] = useState<string | null>(null);
 
   const canSend = useMemo(() => text.trim().length > 0, [text]);
 
@@ -42,7 +42,7 @@ export default function CommentBottomSheet(props: CommentProps) {
     setReplyTargetId(null);
   };
 
-  const toggleReplies = async (parentId: number) => {
+  const toggleReplies = async (parentId: string) => {
     const next = !openReplies[parentId];
     setOpenReplies((m) => ({ ...m, [parentId]: next }));
     if (next) await onLoadReplies?.(parentId);
