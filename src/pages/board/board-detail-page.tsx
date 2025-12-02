@@ -33,7 +33,7 @@ export default function BoardDetailPage() {
       setIsManageBottomSheetOpen(false);
 
       if (option === 'modify') {
-        navigate(`/board/${id}/edit`);
+        navigate(`/board-create?id=${id}`);
       } else if (option === 'delete') {
         const confirmDelete = await modal.confirm({
           title: '정말 삭제하시겠습니까?',

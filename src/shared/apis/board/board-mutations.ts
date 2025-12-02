@@ -1,4 +1,4 @@
-import { post, del } from '@apis/base/client';
+import { post, put, del } from '@apis/base/client';
 import { END_POINT } from '@constants/end-point';
 import { mutationKeys, queryKeys } from '@constants/query-keys';
 import queryClient from '@libs/query-client';
@@ -10,6 +10,12 @@ export interface ICreateBoardParams {
   title: string;
   content: string;
   category: BoardCategory;
+}
+
+export interface IUpdateBoardParams {
+  boardId: string;
+  title: string;
+  content: string;
 }
 
 export const boardMutations = {
@@ -24,6 +30,21 @@ export const boardMutations = {
         }),
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: queryKeys.board.lists() });
+      },
+    }),
+
+  PUT_BOARD: () =>
+    mutationOptions<string, Error, IUpdateBoardParams>({
+      mutationKey: mutationKeys.board.update,
+      mutationFn: (data) =>
+        put<string>(END_POINT.BOARD, data, {
+          headers: {
+            'Trace-Id': uuidv4(),
+          },
+        }),
+      onSuccess: (_, variables) => {
+        queryClient.invalidateQueries({ queryKey: queryKeys.board.lists() });
+        queryClient.invalidateQueries({ queryKey: queryKeys.board.detail(variables.boardId) });
       },
     }),
 

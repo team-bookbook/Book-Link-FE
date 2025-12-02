@@ -9,13 +9,14 @@ export type PillTabProps = {
   className?: string; // 컨테이너 클래스
   scrollable?: boolean;
   label?: string;
+  disabled?: boolean;
 };
 
 const ACTIVE_BG_CLASS = 'bg-secondary-900';
 const INACTIVE_TEXT_CLASS = 'text-gray-400';
 const INACTIVE_OUTLINE_CLASS = 'outline-offset-[-1px] outline outline-gray-100';
 
-export default function PillTab({ items, value, onChange, className, label }: PillTabProps) {
+export default function PillTab({ items, value, onChange, className, label, disabled = false }: PillTabProps) {
   return (
     <div
       role='tablist'
@@ -40,7 +41,8 @@ export default function PillTab({ items, value, onChange, className, label }: Pi
               role='tab'
               aria-selected={active}
               tabIndex={active ? 0 : -1}
-              onClick={() => onChange(it.key)}
+              onClick={() => !disabled && onChange(it.key)}
+              disabled={disabled}
               className={cn(
                 'flex-row-center',
                 'cursor-pointer rounded-[22px] px-[1.6rem] py-[0.7rem]',
@@ -48,7 +50,8 @@ export default function PillTab({ items, value, onChange, className, label }: Pi
                 'transition-colors',
                 active
                   ? cn('text-gray-white', ACTIVE_BG_CLASS)
-                  : cn('bg-gray-white', INACTIVE_OUTLINE_CLASS, INACTIVE_TEXT_CLASS)
+                  : cn('bg-gray-white', INACTIVE_OUTLINE_CLASS, INACTIVE_TEXT_CLASS),
+                disabled && 'cursor-not-allowed opacity-60'
               )}
             >
               {it.label}

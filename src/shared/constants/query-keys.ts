@@ -58,6 +58,7 @@ export const mutationKeys = {
   },
   board: {
     create: ['board', 'create'] as const,
+    update: ['board', 'update'] as const,
     delete: ['board', 'delete'] as const,
   },
 } as const;
