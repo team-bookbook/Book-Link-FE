@@ -1,5 +1,3 @@
-import { toast } from '@libs/toast';
-
 function validateISBN13(isbn: string): boolean {
   if (isbn.length !== 13) return false;
 
@@ -39,8 +37,6 @@ export function validateISBN(barcode: string): {
 
   // 길이 반드시 13자리
   if (normalized.length !== 13) {
-    toast.error('인식 중 오류가 발생해서 다시 스캔할게요!');
-
     return {
       valid: false,
       reason: `ISBN-13은 13자리여야 합니다 (현재: ${normalized.length})`,
@@ -49,8 +45,6 @@ export function validateISBN(barcode: string): {
 
   // ISBN-13 접두어 체크 (국제 ISBN 규격)
   if (!normalized.startsWith('978') && !normalized.startsWith('979')) {
-    toast.error('인식 중 오류가 발생해서 다시 스캔할게요!');
-
     return {
       valid: false,
       reason: 'ISBN-13은 978 또는 979로 시작해야 합니다',
@@ -59,8 +53,6 @@ export function validateISBN(barcode: string): {
 
   // 체크섬 검증
   if (!validateISBN13(normalized)) {
-    toast.error('인식 중 오류가 발생해서 다시 스캔할게요!');
-
     return {
       valid: false,
       reason: 'ISBN-13 체크섬이 유효하지 않습니다',

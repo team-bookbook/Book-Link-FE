@@ -206,6 +206,7 @@ export default function BookCreatePage() {
           placeholder='책 제목을 입력해 주세요.'
           value={title}
           onChange={(e) => setTitle(e.currentTarget.value)}
+          readOnly={!!state?.bookInfo}
         />
 
         <Input
@@ -214,6 +215,7 @@ export default function BookCreatePage() {
           placeholder='작가를 입력해 주세요.'
           value={author}
           onChange={(e) => setAuthor(e.currentTarget.value)}
+          readOnly={!!state?.bookInfo}
         />
 
         <Input
@@ -222,6 +224,7 @@ export default function BookCreatePage() {
           placeholder='출판사를 입력해 주세요.'
           value={publisher}
           onChange={(e) => setPublisher(e.currentTarget.value)}
+          readOnly={!!state?.bookInfo}
         />
 
         <Input
@@ -231,9 +234,17 @@ export default function BookCreatePage() {
           inputMode='numeric'
           value={price}
           onChange={(e) => setPrice(e.currentTarget.value.replace(/[^\d]/g, ''))}
+          readOnly={!!state?.bookInfo}
         />
 
-        <Input id='book-category' label='카테고리' value={categoryLabel} endIcon='dropdown' readOnly onClick={open} />
+        <Input
+          id='book-category'
+          label='카테고리'
+          value={categoryLabel}
+          endIcon='dropdown'
+          readOnly
+          onClick={state?.bookInfo ? undefined : open}
+        />
 
         <Input
           id='book-isbn'
@@ -241,6 +252,7 @@ export default function BookCreatePage() {
           placeholder='ISBN을 입력해 주세요.'
           value={isbn}
           onChange={(e) => setIsbn(e.currentTarget.value)}
+          readOnly={!!state?.bookInfo}
         />
 
         <Input

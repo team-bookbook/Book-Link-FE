@@ -12,6 +12,7 @@ import { useBarcodeScanner } from '@hooks/use-barcode-scanner';
 
 export default function BookScanPage() {
   const [scannedIsbn, setScannedIsbn] = useState<string>('');
+  const [invalidBarcode, setInvalidBarcode] = useState<string>('');
   const navigate = useNavigate();
 
   const handleCapture = useCallback(
@@ -27,9 +28,15 @@ export default function BookScanPage() {
 
       if (!validation.valid) {
         console.log('유효하지 않은 바코드:', barcodeValue, validation.reason);
+        // 새 스캔 시 이전 상태 초기화
+        setScannedIsbn('');
+        setInvalidBarcode(barcodeValue);
+        toast.error('유효하지 않은 바코드입니다');
         return;
       }
 
+      // 새 스캔 시 이전 상태 초기화
+      setInvalidBarcode('');
       setScannedIsbn(validation.isbn!);
       toast.success(`${validation.type} 스캔 완료`);
     },
@@ -38,8 +45,8 @@ export default function BookScanPage() {
 
   const { scannerRef } = useBarcodeScanner({
     onCapture: handleCapture,
-    decodeInterval: 200, // 200ms 간격으로 디코드
-    qrBoxSize: 300, // 스캔 박스 높이 (픽셀) - min-h-[25rem] = 250px
+    decodeInterval: 200,
+    qrBoxSize: 300,
   });
 
   // ISBN으로 도서 정보 조회
@@ -50,9 +57,11 @@ export default function BookScanPage() {
   } = useQuery({
     ...bookQueries.GET_BOOK_BY_ISBN(scannedIsbn),
     enabled: !!scannedIsbn,
+    throwOnError: false,
   });
 
   const handleNavigateToCreate = () => {
+    console.log(scannedIsbn, bookInfo);
     navigate(ROUTES.BOOK_CREATE, {
       state: {
         isbn: scannedIsbn,
@@ -62,10 +71,10 @@ export default function BookScanPage() {
   };
 
   return (
-    <div className='flex h-[calc(100vh-55px-5.5rem)] flex-col bg-gray-900'>
+    <div className='bg-black' style={{ height: 'calc(100vh - 5.5rem - 5.7rem)' }}>
       <div
         className={cn(
-          'fixed top-[5.5rem] left-1/2 min-h-[4.5rem] w-full -translate-x-1/2 bg-[#FAEAEA]',
+          'fixed top-[5.5rem] right-0 left-0 min-h-[4.5rem] bg-[#FAEAEA]',
           'z-1',
           'px-[1.6rem] py-[1.2rem]',
           'transition-all duration-300 ease-out'
@@ -80,8 +89,7 @@ export default function BookScanPage() {
       </div>
 
       <div className='flex pt-[4.5rem]'>
-        <div className='relative w-full'>
-          {/* html5-qrcode 스캔 영역 */}
+        <div className='w-full'>
           <div
             ref={scannerRef}
             className='w-full'
@@ -92,41 +100,33 @@ export default function BookScanPage() {
             }}
           />
 
-          {/* 스캔 가이드 오버레이 */}
-          <div className='pointer-events-none absolute inset-0 flex-col items-center justify-center gap-[4rem] px-[2rem]'>
-            <div className='relative min-h-[25rem] w-full'>
-              <div className='absolute inset-0 rounded-3xl border-[0.2rem] border-gray-400' />
-
-              <div className='absolute top-0 bottom-0 left-[33%] w-[0.1rem] bg-gray-50/30' />
-              <div className='absolute top-0 bottom-0 left-[66%] w-[0.1rem] bg-gray-50/30' />
-              <div className='absolute top-[33%] right-0 left-0 h-[0.1rem] bg-gray-50/30' />
-              <div className='absolute top-[66%] right-0 left-0 h-[0.1rem] bg-gray-50/30' />
-
-              {/* <div className='bg-gray-white absolute top-0 left-0 h-[0.5rem] w-[30%] rounded-tl-3xl' />
-              <div className='bg-gray-white absolute top-0 left-0 h-[30%] w-[0.5rem] rounded-tl-3xl' />
-              <div className='bg-gray-white absolute top-0 right-0 h-[0.5rem] w-[30%] rounded-tr-3xl' />
-              <div className='bg-gray-white absolute top-0 right-0 h-[30%] w-[0.5rem] rounded-tr-3xl' />
-              <div className='bg-gray-white absolute bottom-0 left-0 h-[0.5rem] w-[30%] rounded-bl-3xl' />
-              <div className='bg-gray-white absolute bottom-0 left-0 h-[30%] w-[0.5rem] rounded-bl-3xl' />
-              <div className='bg-gray-white absolute right-0 bottom-0 h-[0.5rem] w-[30%] rounded-br-3xl' />
-              <div className='bg-gray-white absolute right-0 bottom-0 h-[30%] w-[0.5rem] rounded-br-3xl' /> */}
-
-              <div className='scan-line absolute right-0 left-0 h-[0.2rem] bg-gray-50' />
-            </div>
-
-            {/* 하단 도서 미리보기 영역 */}
-            <div className='-z-30 min-h-[16.5rem] w-full rounded-[5px] bg-gray-800 px-[2rem] py-[1rem]'>
-              {!scannedIsbn && (
-                <div className='flex-col-center h-full gap-[1rem] text-gray-400'>
-                  <Icon name='book' size={4} ariaHidden />
+          <div className='mt-[1.5rem] w-full px-[2rem]'>
+            <div className='flex-row-center h-full min-h-[14.5rem] w-full rounded-[5px] bg-gray-800 px-[2rem]'>
+              {!scannedIsbn && !invalidBarcode && (
+                <div className='flex-col-center gap-[1rem] text-gray-400'>
                   <p className='body5'>바코드를 스캔하면 도서 정보가 표시됩니다</p>
                 </div>
               )}
 
-              {scannedIsbn && isLoadingBook && (
-                <div className='flex-col-center text-gray-white h-full gap-[1rem]'>
-                  <Icon name='clock' size={4} ariaHidden className='animate-spin' />
-                  <p className='body5'>도서 정보를 조회하는 중...</p>
+              {invalidBarcode && (
+                <div className='h-full flex-col py-[2rem]'>
+                  <div className='flex-col gap-[1rem]'>
+                    <div className='flex-row-center gap-[0.8rem]'>
+                      <div className='gap-[0.4rem] text-center'>
+                        <p className='body5 text-gray-white'>유효하지 않은 바코드입니다</p>
+                        <p className='caption5 text-gray-400'>바코드: {invalidBarcode}</p>
+                      </div>
+                    </div>
+                  </div>
+                  <Button
+                    variant='primary'
+                    fullWidth
+                    onClick={handleNavigateToCreate}
+                    className='mt-[2rem] py-[1.2rem]'
+                    roundStyle='rounded-[12px]'
+                  >
+                    직접 입력하기
+                  </Button>
                 </div>
               )}
 
@@ -140,16 +140,15 @@ export default function BookScanPage() {
                         <p className='caption2 text-gray-400'>ISBN: {scannedIsbn}</p>
                       </div>
                     </div>
-                    <p className='caption2 text-gray-400'>수동으로 도서 정보를 입력해주세요</p>
                   </div>
                   <Button
                     variant='primary'
                     fullWidth
                     onClick={handleNavigateToCreate}
-                    className='py-[1.2rem]'
+                    className='mt-[2rem] py-[1.2rem]'
                     roundStyle='rounded-[12px]'
                   >
-                    수동 입력하러 가기
+                    직접 입력하기
                   </Button>
                 </div>
               )}
@@ -157,7 +156,7 @@ export default function BookScanPage() {
               {scannedIsbn && bookInfo && !isLoadingBook && (
                 <div className='flex-row-center realtive h-full gap-[2rem]'>
                   {/* 이미지 영역 */}
-                  <div className='rouded-[5px] h-full min-w-[10rem] bg-gray-500'></div>
+                  <div className='h-[12.5rem] min-w-[10rem] rounded-2xl bg-gray-50'></div>
                   <div className='flex-col gap-[5px]'>
                     <p className='title4 text-gray-white'>{bookInfo.title}</p>
                     <p className='body5 text-gray-100'>{bookInfo.author}</p>
@@ -170,7 +169,12 @@ export default function BookScanPage() {
                       </span>
                     </div>
                   </div>
-                  <button className='min-h-[4rem] min-w-[4rem] rounded-full bg-gray-200'></button>
+                  <button
+                    className='min-h-[4rem] min-w-[4rem] rounded-full bg-gray-200'
+                    onClick={handleNavigateToCreate}
+                  >
+                    <Icon name='back' size={2.4} className='text-primary-900 scale-x-[-1]'></Icon>
+                  </button>
                 </div>
               )}
             </div>
