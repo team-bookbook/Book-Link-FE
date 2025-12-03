@@ -8,7 +8,7 @@ const useOutsideClick = (ref: React.RefObject<HTMLElement | null>, handler: () =
 
       const target = event.target as Node;
 
-      const bottomSheet = document.querySelector('[role="dialog"]');
+      const bottomSheet = document.querySelector('[data-bottom-sheet]');
       if (bottomSheet) return;
 
       if (el.contains(target)) return;

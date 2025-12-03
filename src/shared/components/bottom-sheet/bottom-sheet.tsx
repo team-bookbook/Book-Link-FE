@@ -149,6 +149,7 @@ export default function BottomSheet({
 
       <div
         ref={sheetRef}
+        data-bottom-sheet
         className={cn(
           'absolute inset-x-0 bottom-0 mx-auto w-full',
           'transition-transform duration-300 ease-out',
