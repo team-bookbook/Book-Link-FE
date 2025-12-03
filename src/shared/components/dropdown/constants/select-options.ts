@@ -45,3 +45,7 @@ export const REVIEW_MANAGE_OPTIONS: ReadonlyArray<{ value: ReviewManage; label: 
   { value: 'modify', label: '수정하기' },
   { value: 'delete', label: '삭제하기' },
 ];
+
+export const COMMENT_MANAGE_OPTIONS: ReadonlyArray<{ value: ReviewManage; label: string }> = [
+  { value: 'delete', label: '삭제하기' },
+];

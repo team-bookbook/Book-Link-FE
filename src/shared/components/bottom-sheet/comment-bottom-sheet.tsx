@@ -3,6 +3,7 @@ import BottomSheet from '@components/bottom-sheet/bottom-sheet';
 import { cn } from '@libs/cn';
 import Icon from '@components/icon';
 import type { CommentProps } from '@components/bottom-sheet/types/comment';
+import { formatDate } from '@/shared/utils/formatDate';
 
 export default function CommentBottomSheet(props: CommentProps) {
   const {
@@ -11,11 +12,12 @@ export default function CommentBottomSheet(props: CommentProps) {
     comments,
     onToggleLike,
     onReplyClick,
+    onLongPress,
     onSend,
     onSendReply,
     onLoadReplies,
     indicatorStroke = true,
-    emptyText = '첫 댓글을 남겨보세요.',
+    emptyText = '첫 댓글을 남겨보세요!',
   } = props;
 
   const [text, setText] = useState('');
@@ -24,9 +26,26 @@ export default function CommentBottomSheet(props: CommentProps) {
 
   const canSend = useMemo(() => text.trim().length > 0, [text]);
 
+  // Long press 상태 관리
+  const [longPressTimer, setLongPressTimer] = useState<NodeJS.Timeout | null>(null);
+
+  const handleLongPressStart = (kind: 'comment' | 'reply', id: string, parentId?: string) => {
+    const timer = setTimeout(() => {
+      onLongPress?.(kind, id, parentId);
+    }, 500);
+    setLongPressTimer(timer);
+  };
+
+  const handleLongPressEnd = () => {
+    if (longPressTimer) {
+      clearTimeout(longPressTimer);
+      setLongPressTimer(null);
+    }
+  };
+
   const targetAuthor = useMemo(() => {
     if (replyTargetId == null) return null;
-    return comments.find((c) => c.id === replyTargetId)?.author ?? null;
+    return comments.find((c) => c.id === replyTargetId)?.writerName ?? null;
   }, [comments, replyTargetId]);
 
   const handleSend = async () => {
@@ -66,30 +85,35 @@ export default function CommentBottomSheet(props: CommentProps) {
               {comments.map((c) => {
                 const isRepliesOpen = !!openReplies[c.id];
                 const loadedCount = c.replies?.length ?? 0;
-                const hasMoreHint = c.replyCount > loadedCount;
+                const topChild = typeof c.topChild === 'string' ? JSON.parse(c.topChild) : c.topChild;
 
                 return (
                   <li key={c.id} className='px-[1.6rem] py-[1.6rem]'>
-                    <div className='flex items-start gap-[1.2rem]'>
-                      {c.avatarUrl ? (
-                        <img src={c.avatarUrl} alt='' className='h-[4rem] w-[4rem] rounded-full object-cover' />
-                      ) : (
-                        <div className='h-[4rem] w-[4rem] rounded-full bg-gray-100' aria-hidden />
-                      )}
+                    <div
+                      className='flex items-start gap-[1.2rem] rounded-[8px] p-[0.8rem] transition-colors hover:bg-gray-50'
+                      onMouseDown={() => handleLongPressStart('comment', c.id)}
+                      onMouseUp={handleLongPressEnd}
+                      onMouseLeave={handleLongPressEnd}
+                      onTouchStart={() => handleLongPressStart('comment', c.id)}
+                      onTouchEnd={handleLongPressEnd}
+                      onTouchCancel={handleLongPressEnd}
+                    >
+                      <div className='h-[4rem] w-[4rem] rounded-full bg-gray-100' aria-hidden />
 
                       <div className='min-w-0 flex-1'>
                         <div className='flex items-center gap-[0.8rem]'>
-                          <p className='body4 text-gray-900'>{c.author}</p>
-                          <p className='caption4 text-gray-600'>{c.dateText}</p>
+                          <p className='body4 text-gray-900'>{c.writerName}</p>
+                          <p className='caption4 text-gray-600'>{formatDate(c.createdAt)}</p>
                         </div>
 
                         <p className='body5 mt-[0.4rem] break-words text-gray-700'>{c.content}</p>
 
                         <div className='mt-[0.8rem] flex items-center gap-[0.8rem]'>
-                          <span className='caption4 flex items-center gap-[0.4rem] text-gray-700'>
-                            <Icon name='comment' width={1.6} height={1.6} ariaHidden />
-                            {c.replyCount}
-                          </span>
+                          {topChild && (
+                            <span className='caption4 flex items-center gap-[0.4rem] text-gray-700'>
+                              <Icon name='comment' width={1.6} height={1.6} ariaHidden />
+                            </span>
+                          )}
 
                           <button
                             type='button'
@@ -107,17 +131,13 @@ export default function CommentBottomSheet(props: CommentProps) {
                       <div className='flex-col-center gap-[0.4rem] select-none'>
                         <button
                           type='button'
-                          aria-pressed={!!c.liked}
+                          aria-pressed={!!c.likedByMe}
                           onClick={() => onToggleLike?.('comment', c.id)}
-                          disabled={c.disabled}
-                          className={cn(
-                            'cursor-pointer p-[0.2rem] active:opacity-80',
-                            c.disabled && 'cursor-not-allowed opacity-50'
-                          )}
+                          className='cursor-pointer p-[0.2rem] active:opacity-80'
                         >
                           <Icon
                             className='text-system-error'
-                            name={c.liked ? 'heart-fill' : 'heart'}
+                            name={c.likedByMe ? 'heart-fill' : 'heart'}
                             size={2}
                             ariaHidden
                           />
@@ -125,51 +145,52 @@ export default function CommentBottomSheet(props: CommentProps) {
                         <span className='caption4 text-gray-800'>{c.likeCount}</span>
                       </div>
                     </div>
-                    {c.replyCount > 0 && (
+                    {topChild && (
                       <button
                         type='button'
                         onClick={() => toggleReplies(c.id)}
-                        className='caption4 mt-[0.6rem] cursor-pointer text-gray-700 active:opacity-80'
+                        className='caption4 mt-[0.6rem] cursor-pointer pl-[2rem] text-gray-700 active:opacity-80'
                       >
-                        {isRepliesOpen ? '답글 접기' : `— 답글 ${hasMoreHint ? c.replyCount : loadedCount}개 더 보기`}
+                        {isRepliesOpen ? '답글 접기' : `ㅡ  ${topChild.content}`}
                       </button>
                     )}
                     {isRepliesOpen && loadedCount > 0 && (
-                      <ul className='mt-[1.2rem] space-y-[0.8rem]'>
+                      <ul className='mt-[1.2rem] flex-col gap-[0.4rem]'>
                         {c.replies!.map((r) => (
-                          <li key={r.id} className='flex items-start gap-[0.8rem] pl-[3.6rem]'>
-                            {r.avatarUrl ? (
-                              <img
-                                src={r.avatarUrl}
-                                alt=''
-                                className='h-[2.2rem] w-[2.2rem] rounded-full object-cover'
-                              />
-                            ) : (
+                          <li key={r.id} className='pl-[3.6rem]'>
+                            <div
+                              className='flex items-start gap-[0.8rem] rounded-[8px] p-[0.8rem] transition-colors hover:bg-gray-50'
+                              onMouseDown={() => handleLongPressStart('reply', r.id, c.id)}
+                              onMouseUp={handleLongPressEnd}
+                              onMouseLeave={handleLongPressEnd}
+                              onTouchStart={() => handleLongPressStart('reply', r.id, c.id)}
+                              onTouchEnd={handleLongPressEnd}
+                              onTouchCancel={handleLongPressEnd}
+                            >
                               <div className='h-[2.2rem] w-[2.2rem] rounded-full bg-gray-100' aria-hidden />
-                            )}
-                            <div className='min-w-0 flex-1'>
-                              <div className='flex items-center gap-[0.6rem]'>
-                                <p className='caption3 font-semibold text-gray-900'>{r.author}</p>
-                                <p className='caption5 text-gray-600'>{r.dateText}</p>
+                              <div className='min-w-0 flex-1 flex-col'>
+                                <div className='flex items-center gap-[0.6rem]'>
+                                  <p className='caption3 font-semibold text-gray-900'>{r.writerName}</p>
+                                  <p className='caption5 text-gray-600'>{formatDate(r.createdAt)}</p>
+                                </div>
+                                <p className='caption3 mt-[0.2rem] break-words text-gray-700'>{r.content}</p>
                               </div>
-                              <p className='caption3 mt-[0.2rem] break-words text-gray-700'>{r.content}</p>
-                            </div>
-                            <div className='flex-col-center gap-[0.2rem] select-none'>
-                              <button
-                                type='button'
-                                aria-pressed={!!r.liked}
-                                onClick={() => onToggleLike?.('reply', r.id, c.id)}
-                                disabled={r.disabled}
-                                className={cn('p-[0.2rem] active:opacity-80', r.disabled && 'opacity-50')}
-                              >
-                                <Icon
-                                  className='text-system-error'
-                                  name={r.liked ? 'heart-fill' : 'heart'}
-                                  size={1.6}
-                                  ariaHidden
-                                />
-                              </button>
-                              <span className='caption5 text-gray-800'>{r.likeCount}</span>
+                              <div className='flex-col-center gap-[0.2rem] select-none'>
+                                <button
+                                  type='button'
+                                  aria-pressed={!!r.likedByMe}
+                                  onClick={() => onToggleLike?.('reply', r.id, c.id)}
+                                  className='p-[0.2rem] active:opacity-80'
+                                >
+                                  <Icon
+                                    className='text-system-error cursor-pointer'
+                                    name={r.likedByMe ? 'heart-fill' : 'heart'}
+                                    size={1.6}
+                                    ariaHidden
+                                  />
+                                </button>
+                                <span className='caption5 text-gray-800'>{r.likeCount}</span>
+                              </div>
                             </div>
                           </li>
                         ))}

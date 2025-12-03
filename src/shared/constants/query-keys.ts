@@ -38,6 +38,14 @@ export const queryKeys = {
     likes: () => [...queryKeys.board.all, 'like'] as const,
     like: (id: string) => [...queryKeys.board.likes(), id] as const,
   },
+
+  comment: {
+    all: ['comment'] as const,
+    lists: () => [...queryKeys.comment.all, 'list'] as const,
+    list: (boardId: string) => [...queryKeys.comment.lists(), boardId] as const,
+    repliesLists: () => [...queryKeys.comment.all, 'replies'] as const,
+    repliesList: (parentId: string) => [...queryKeys.comment.repliesLists(), parentId] as const,
+  },
 } as const;
 
 export const mutationKeys = {
@@ -63,5 +71,10 @@ export const mutationKeys = {
     update: ['board', 'update'] as const,
     delete: ['board', 'delete'] as const,
     like: ['board', 'like'] as const,
+  },
+  comment: {
+    create: ['comment', 'create'] as const,
+    like: ['comment', 'like'] as const,
+    delete: ['comment', 'delete'] as const,
   },
 } as const;
