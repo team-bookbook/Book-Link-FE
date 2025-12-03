@@ -82,7 +82,7 @@ export default function LibraryBookCard({ book, isCart = true }: LibraryBookCard
             {book.expectedReturnDate}
           </p>
           <h3 className='caption5 flex gap-[0.5rem] text-gray-600'>
-            <span>거리 {Math.floor(book.distance)}m</span>
+            <span>거리 {book.distance.toFixed(1)}m</span>
             <span>|</span>
             <span>보증금 {book.deposit}p</span>
           </h3>

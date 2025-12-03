@@ -59,8 +59,8 @@ export interface IBookDetail {
   genre?: string;
   price?: number;
   description?: string;
-  latitude?: number;
-  longitude?: number;
+  latitude: number;
+  longitude: number;
 }
 
 export interface ITopReview {

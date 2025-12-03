@@ -7,10 +7,13 @@ import Button from '@components/button/button';
 import { BOOK_DETAIL_LABELS } from '@pages/library/constants/book-detail';
 import { libraryBookQueries } from '@apis/library/library-book-queries';
 import LoadingSpinner from '@components/loading-spinner';
+import KakaoMap from '@pages/library/components/kakao-map';
+import { useKakaoMaps } from '@hooks/use-kakao-map';
 
 export default function BookDetailPage() {
   const params = useParams<{ id: string }>();
   const navigate = useNavigate();
+  useKakaoMaps(); // Kakao Maps SDK 로드
 
   const bookId = params.id;
 
@@ -111,7 +114,11 @@ export default function BookDetailPage() {
         )}
         <div className='flex-col gap-[1rem]'>
           <h2 className='caption2 text-gray-800'>{BOOK_DETAIL_LABELS.mapTitle}</h2>
-          <div className='min-h-[33.5rem] max-w-[43rem] min-w-[33.5rem] bg-gray-100'></div>
+          <KakaoMap
+            latitude={book.latitude}
+            longitude={book.longitude}
+            className='min-h-[33.5rem] max-w-[43rem] min-w-[33.5rem] rounded-[8px]'
+          />
         </div>
       </div>
     );
