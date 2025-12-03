@@ -15,12 +15,33 @@ export interface IComment {
   topChild: string;
 }
 
+export interface IReply {
+  id: string;
+  content: string;
+  writerName: string;
+  createdAt: string;
+  isUpdated: boolean;
+  likeCount: number;
+  likedByMe: boolean;
+  isMine: boolean;
+  topChild: string;
+}
+
 export const commentQueries = {
   GET_COMMENT_LIST: (boardId: string) =>
     queryOptions<IComment[]>({
       queryKey: queryKeys.comment.list(boardId),
       queryFn: async () => {
         const res = await get<IComment[]>(END_POINT.COMMENT_BY_BOARD_ID(boardId));
+        return res;
+      },
+    }),
+
+  GET_REPLY_LIST: (parentId: string) =>
+    queryOptions<IReply[]>({
+      queryKey: queryKeys.comment.repliesList(parentId),
+      queryFn: async () => {
+        const res = await get<IReply[]>(END_POINT.COMMENT_REPLIES(parentId));
         return res;
       },
     }),

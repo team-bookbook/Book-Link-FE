@@ -67,7 +67,6 @@ export default function CommentBottomSheet(props: CommentProps) {
               {comments.map((c) => {
                 const isRepliesOpen = !!openReplies[c.id];
                 const loadedCount = c.replies?.length ?? 0;
-                const hasMoreHint = c.replyCount > loadedCount;
 
                 return (
                   <li key={c.id} className='px-[1.6rem] py-[1.6rem]'>
@@ -126,17 +125,17 @@ export default function CommentBottomSheet(props: CommentProps) {
                         <span className='caption4 text-gray-800'>{c.likeCount}</span>
                       </div>
                     </div>
-                    {c.replyCount > 0 && (
+                    {c.topChild && (
                       <button
                         type='button'
                         onClick={() => toggleReplies(c.id)}
-                        className='caption4 mt-[0.6rem] cursor-pointer text-gray-700 active:opacity-80'
+                        className='caption4 mt-[0.6rem] cursor-pointer pl-[2rem] text-gray-700 active:opacity-80'
                       >
-                        {isRepliesOpen ? '답글 접기' : `— 답글 ${hasMoreHint ? c.replyCount : loadedCount}개 더 보기`}
+                        {isRepliesOpen ? '답글 접기' : `ㅡ  ${c.topChild.content}`}
                       </button>
                     )}
                     {isRepliesOpen && loadedCount > 0 && (
-                      <ul className='mt-[1.2rem] space-y-[0.8rem]'>
+                      <ul className='mt-[1.2rem] flex-col gap-[2rem]'>
                         {c.replies!.map((r) => (
                           <li key={r.id} className='flex items-start gap-[0.8rem] pl-[3.6rem]'>
                             {r.avatarUrl ? (
@@ -148,7 +147,7 @@ export default function CommentBottomSheet(props: CommentProps) {
                             ) : (
                               <div className='h-[2.2rem] w-[2.2rem] rounded-full bg-gray-100' aria-hidden />
                             )}
-                            <div className='min-w-0 flex-1'>
+                            <div className='min-w-0 flex-1 flex-col'>
                               <div className='flex items-center gap-[0.6rem]'>
                                 <p className='caption3 font-semibold text-gray-900'>{r.author}</p>
                                 <p className='caption5 text-gray-600'>{r.dateText}</p>

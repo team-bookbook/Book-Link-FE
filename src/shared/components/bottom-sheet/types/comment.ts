@@ -28,6 +28,7 @@ export type CommentItem = {
   isUpdated?: boolean;
   isMine?: boolean;
   createdAt?: string;
+  topChild: ReplyItem;
 };
 
 export type ToggleLikeKind = 'comment' | 'reply';

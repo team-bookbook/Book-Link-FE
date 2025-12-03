@@ -25,6 +25,8 @@ export const commentMutations = {
         console.log(variables);
         queryClient.invalidateQueries({ queryKey: queryKeys.comment.list(variables.boardId) });
         queryClient.invalidateQueries({ queryKey: queryKeys.board.detail(variables.boardId) });
+        if (variables.parentId)
+          queryClient.invalidateQueries({ queryKey: queryKeys.comment.repliesList(variables.parentId) });
       },
     }),
 };

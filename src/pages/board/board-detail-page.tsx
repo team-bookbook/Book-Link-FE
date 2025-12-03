@@ -19,8 +19,16 @@ export default function BoardDetailPage() {
   const { isLiked, toggleLike } = useBoardLike(id!);
   const { isManageBottomSheetOpen, selectedManageOption, openManageSheet, closeManageSheet, handleManageOptionChange } =
     useBoardManagement(id!);
-  const { comments, isDrawerOpen, openDrawer, closeDrawer, handleToggleLike, handleSendComment, handleSendReply } =
-    useBoardComments(id!);
+  const {
+    comments,
+    isDrawerOpen,
+    openDrawer,
+    closeDrawer,
+    handleToggleLike,
+    handleSendComment,
+    handleSendReply,
+    handleLoadReplies,
+  } = useBoardComments(id!);
 
   const headerConfig = useMemo(() => {
     if (!boardDetail) return null;
@@ -88,7 +96,6 @@ export default function BoardDetailPage() {
         </div>
       </section>
 
-      {/* 댓글 섹션 */}
       <section>
         <div className='flex w-full gap-[1rem]'>
           <button type='button' onClick={openDrawer} className='cursor-pointer'>
@@ -113,6 +120,7 @@ export default function BoardDetailPage() {
         onToggleLike={handleToggleLike}
         onSend={handleSendComment}
         onSendReply={handleSendReply}
+        onLoadReplies={handleLoadReplies}
       />
 
       <SelectBottomSheet
