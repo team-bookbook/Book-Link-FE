@@ -1,42 +1,71 @@
-import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 import Divider from '@components/divider';
 import Icon from '@components/icon';
 import type { IBookDetail } from '@pages/library/types/library.types';
 import Button from '@components/button/button';
 import { BOOK_DETAIL_LABELS } from '@pages/library/constants/book-detail';
+import { libraryBookQueries } from '@apis/library/library-book-queries';
+import LoadingSpinner from '@components/loading-spinner';
 
 export default function BookDetailPage() {
-  const { bookId } = useParams<{ bookId: string }>();
-  const [book, setBook] = useState<IBookDetail | null>(null);
+  const params = useParams<{ id: string }>();
   const navigate = useNavigate();
-  // const { addToCart } = useCart();
 
-  useEffect(() => {
-    const mockBook: IBookDetail = {
-      id: Number(bookId),
-      title: '1Q84',
-      author: '무라카미 하루키',
-      publisher: '민음사',
-      library: 'OO 도서관',
-      maxDays: 30,
-      deposit: 500,
-      status: 'available',
-      genre: '소설',
-      price: 12200,
-      description: '책 관련 상세 설명 내용이 작성되는 칸\n또는, 사용자가 도서 규칙에 관해 자유롭게 작성할 수 있는 칸',
-      imgUrl: undefined,
-    };
-    setBook(mockBook);
-  }, [bookId]);
+  const bookId = params.id;
+
+  console.log('BookDetailPage - params:', params, 'bookId:', bookId);
+
+  const {
+    data: bookDetail,
+    isLoading,
+    error,
+  } = useQuery({
+    ...libraryBookQueries.GET_LIBRARY_BOOK_DETAIL(bookId!),
+    enabled: !!bookId,
+  });
+
+  console.log('BookDetailPage - isLoading:', isLoading, 'error:', error, 'bookDetail:', bookDetail);
 
   const handleCartClick = async (e: React.MouseEvent) => {
     e.stopPropagation();
   };
 
-  if (!book) {
-    return;
+  if (isLoading) {
+    return (
+      <div className='flex-row-center min-h-screen'>
+        <LoadingSpinner />
+      </div>
+    );
   }
+
+  if (error || !bookDetail) {
+    return (
+      <div className='flex-row-center min-h-screen text-gray-600'>
+        <p>도서 정보를 불러올 수 없습니다.</p>
+      </div>
+    );
+  }
+
+  // API 응답을 기존 IBookDetail 형식으로 변환
+  const { libraryDto, libraryBookDetailDto, bookDetailDto } = bookDetail;
+
+  const book: IBookDetail = {
+    id: parseInt(libraryBookDetailDto.id) || 0,
+    title: bookDetailDto.title,
+    author: bookDetailDto.author,
+    publisher: bookDetailDto.publisher,
+    library: libraryDto.name,
+    maxDays: 14, // TODO: API에서 제공하지 않는 필드, 기본값 설정
+    deposit: libraryBookDetailDto.deposit,
+    status: libraryBookDetailDto.status,
+    imgUrl: libraryBookDetailDto.previewImages ? JSON.parse(libraryBookDetailDto.previewImages)[0] : undefined,
+    genre: bookDetailDto.category,
+    price: bookDetailDto.originalPrice,
+    description: undefined, // TODO: API에서 제공하지 않는 필드
+    latitude: libraryDto.latitude,
+    longitude: libraryDto.longitude,
+  };
 
   const bookDetailHeader = () => {
     return (
@@ -68,7 +97,7 @@ export default function BookDetailPage() {
   const bookDetailDescription = () => {
     return (
       <div className='flex-col gap-[2rem] px-[2rem]'>
-        <div className='caption5 max-w-[8.5rem] flex-col gap-[1rem] text-gray-800'>
+        <div className='caption5 max-w-[12rem] flex-col gap-[1rem] text-gray-800'>
           {book.genre && (
             <div className='flex-row-between caption5'>
               <span>{BOOK_DETAIL_LABELS.genre}</span>

@@ -1,4 +1,4 @@
-export type BookStatus = 'available' | 'rented' | 'reserved';
+export type BookStatus = 'AVAILABLE' | 'RESERVABLE' | 'BORROWED' | 'RESERVED';
 
 export interface ILibraryBook {
   imageUrl: string;
@@ -12,6 +12,38 @@ export interface ILibraryBook {
   deposit: number;
   rentedOut: boolean;
   expectedReturnDate: string;
+}
+
+// 도서 상세 조회 응답 타입
+export interface ILibraryBookDetail {
+  libraryDto: {
+    id: string;
+    name: string;
+    latitude: number;
+    longitude: number;
+  };
+  libraryBookDetailDto: {
+    id: string;
+    status: BookStatus;
+    copies: number;
+    deposit: number;
+    borrowedCount: number;
+    previewImages: string; // JSON string "[url1, url2, ...]"
+    expectedReturnDate: string;
+    borrowId: string;
+    borrowedStatus: string;
+    reservedId: string;
+  };
+  bookDetailDto: {
+    id: string;
+    title: string;
+    author: string;
+    publisher: string;
+    category: string;
+    originalPrice: number;
+    publishedDate: string;
+    isbn: string;
+  };
 }
 
 export interface IBookDetail {

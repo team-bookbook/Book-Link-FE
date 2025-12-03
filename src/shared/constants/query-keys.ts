@@ -22,6 +22,8 @@ export const queryKeys = {
       bookName?: string;
       sortType?: string;
     }) => [...queryKeys.libraryBook.lists(), params] as const,
+    details: () => [...queryKeys.libraryBook.all, 'detail'] as const,
+    detail: (libraryBookId: string) => [...queryKeys.libraryBook.details(), libraryBookId] as const,
   },
 
   book: {
