@@ -12,6 +12,7 @@ export type CommentProps = {
   comments: readonly ICommentWithReplies[];
   onToggleLike?: (kind: ToggleLikeKind, id: string, parentId?: string) => void;
   onReplyClick?: (parentId: string) => void;
+  onLongPress?: (kind: ToggleLikeKind, id: string, parentId?: string) => void;
   onSend?: (text: string) => boolean | void | Promise<boolean | void>;
   onSendReply?: (parentId: string, text: string) => boolean | void | Promise<boolean | void>;
   onLoadReplies?: (parentId: string) => Promise<IReply[] | void> | void;

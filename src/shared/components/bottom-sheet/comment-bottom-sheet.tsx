@@ -12,6 +12,7 @@ export default function CommentBottomSheet(props: CommentProps) {
     comments,
     onToggleLike,
     onReplyClick,
+    onLongPress,
     onSend,
     onSendReply,
     onLoadReplies,
@@ -24,6 +25,23 @@ export default function CommentBottomSheet(props: CommentProps) {
   const [replyTargetId, setReplyTargetId] = useState<string | null>(null);
 
   const canSend = useMemo(() => text.trim().length > 0, [text]);
+
+  // Long press 상태 관리
+  const [longPressTimer, setLongPressTimer] = useState<NodeJS.Timeout | null>(null);
+
+  const handleLongPressStart = (kind: 'comment' | 'reply', id: string, parentId?: string) => {
+    const timer = setTimeout(() => {
+      onLongPress?.(kind, id, parentId);
+    }, 500);
+    setLongPressTimer(timer);
+  };
+
+  const handleLongPressEnd = () => {
+    if (longPressTimer) {
+      clearTimeout(longPressTimer);
+      setLongPressTimer(null);
+    }
+  };
 
   const targetAuthor = useMemo(() => {
     if (replyTargetId == null) return null;
@@ -71,7 +89,15 @@ export default function CommentBottomSheet(props: CommentProps) {
 
                 return (
                   <li key={c.id} className='px-[1.6rem] py-[1.6rem]'>
-                    <div className='flex items-start gap-[1.2rem]'>
+                    <div
+                      className='flex items-start gap-[1.2rem] rounded-[8px] p-[0.8rem] transition-colors hover:bg-gray-50'
+                      onMouseDown={() => handleLongPressStart('comment', c.id)}
+                      onMouseUp={handleLongPressEnd}
+                      onMouseLeave={handleLongPressEnd}
+                      onTouchStart={() => handleLongPressStart('comment', c.id)}
+                      onTouchEnd={handleLongPressEnd}
+                      onTouchCancel={handleLongPressEnd}
+                    >
                       <div className='h-[4rem] w-[4rem] rounded-full bg-gray-100' aria-hidden />
 
                       <div className='min-w-0 flex-1'>
@@ -129,32 +155,42 @@ export default function CommentBottomSheet(props: CommentProps) {
                       </button>
                     )}
                     {isRepliesOpen && loadedCount > 0 && (
-                      <ul className='mt-[1.2rem] flex-col gap-[2rem]'>
+                      <ul className='mt-[1.2rem] flex-col gap-[0.4rem]'>
                         {c.replies!.map((r) => (
-                          <li key={r.id} className='flex items-start gap-[0.8rem] pl-[3.6rem]'>
-                            <div className='h-[2.2rem] w-[2.2rem] rounded-full bg-gray-100' aria-hidden />
-                            <div className='min-w-0 flex-1 flex-col'>
-                              <div className='flex items-center gap-[0.6rem]'>
-                                <p className='caption3 font-semibold text-gray-900'>{r.writerName}</p>
-                                <p className='caption5 text-gray-600'>{formatDate(r.createdAt)}</p>
+                          <li key={r.id} className='pl-[3.6rem]'>
+                            <div
+                              className='flex items-start gap-[0.8rem] rounded-[8px] p-[0.8rem] transition-colors hover:bg-gray-50'
+                              onMouseDown={() => handleLongPressStart('reply', r.id, c.id)}
+                              onMouseUp={handleLongPressEnd}
+                              onMouseLeave={handleLongPressEnd}
+                              onTouchStart={() => handleLongPressStart('reply', r.id, c.id)}
+                              onTouchEnd={handleLongPressEnd}
+                              onTouchCancel={handleLongPressEnd}
+                            >
+                              <div className='h-[2.2rem] w-[2.2rem] rounded-full bg-gray-100' aria-hidden />
+                              <div className='min-w-0 flex-1 flex-col'>
+                                <div className='flex items-center gap-[0.6rem]'>
+                                  <p className='caption3 font-semibold text-gray-900'>{r.writerName}</p>
+                                  <p className='caption5 text-gray-600'>{formatDate(r.createdAt)}</p>
+                                </div>
+                                <p className='caption3 mt-[0.2rem] break-words text-gray-700'>{r.content}</p>
                               </div>
-                              <p className='caption3 mt-[0.2rem] break-words text-gray-700'>{r.content}</p>
-                            </div>
-                            <div className='flex-col-center gap-[0.2rem] select-none'>
-                              <button
-                                type='button'
-                                aria-pressed={!!r.likedByMe}
-                                onClick={() => onToggleLike?.('reply', r.id, c.id)}
-                                className='p-[0.2rem] active:opacity-80'
-                              >
-                                <Icon
-                                  className='text-system-error cursor-pointer'
-                                  name={r.likedByMe ? 'heart-fill' : 'heart'}
-                                  size={1.6}
-                                  ariaHidden
-                                />
-                              </button>
-                              <span className='caption5 text-gray-800'>{r.likeCount}</span>
+                              <div className='flex-col-center gap-[0.2rem] select-none'>
+                                <button
+                                  type='button'
+                                  aria-pressed={!!r.likedByMe}
+                                  onClick={() => onToggleLike?.('reply', r.id, c.id)}
+                                  className='p-[0.2rem] active:opacity-80'
+                                >
+                                  <Icon
+                                    className='text-system-error cursor-pointer'
+                                    name={r.likedByMe ? 'heart-fill' : 'heart'}
+                                    size={1.6}
+                                    ariaHidden
+                                  />
+                                </button>
+                                <span className='caption5 text-gray-800'>{r.likeCount}</span>
+                              </div>
                             </div>
                           </li>
                         ))}

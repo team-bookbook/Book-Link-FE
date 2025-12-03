@@ -7,7 +7,7 @@ import { boardQueries } from '@apis/board/board-queries';
 import { useHeaderOverride } from '@contexts/header-context';
 import type { ActionId } from '@layouts/header';
 import SelectBottomSheet from '@components/bottom-sheet/select-bottom-sheet';
-import { REVIEW_MANAGE_OPTIONS } from '@components/dropdown/constants/select-options';
+import { COMMENT_MANAGE_OPTIONS, REVIEW_MANAGE_OPTIONS } from '@components/dropdown/constants/select-options';
 import { useBoardLike } from './hooks/use-board-like';
 import { useBoardManagement } from './hooks/use-board-management';
 import { useBoardComments } from './hooks/use-board-comments';
@@ -28,6 +28,11 @@ export default function BoardDetailPage() {
     handleSendComment,
     handleSendReply,
     handleLoadReplies,
+    handleLongPress,
+    isManageOpen: isCommentManageOpen,
+    selectedManageOption: selectedCommentManageOption,
+    closeManageSheet: closeCommentManageSheet,
+    handleManageOptionChange: handleCommentManageOptionChange,
   } = useBoardComments(id!);
 
   const headerConfig = useMemo(() => {
@@ -118,6 +123,7 @@ export default function BoardDetailPage() {
         onClose={closeDrawer}
         comments={comments}
         onToggleLike={handleToggleLike}
+        onLongPress={handleLongPress}
         onSend={handleSendComment}
         onSendReply={handleSendReply}
         onLoadReplies={handleLoadReplies}
@@ -129,6 +135,14 @@ export default function BoardDetailPage() {
         options={REVIEW_MANAGE_OPTIONS}
         value={selectedManageOption}
         onChange={handleManageOptionChange}
+      />
+
+      <SelectBottomSheet
+        open={isCommentManageOpen}
+        onClose={closeCommentManageSheet}
+        options={COMMENT_MANAGE_OPTIONS}
+        value={selectedCommentManageOption}
+        onChange={handleCommentManageOptionChange}
       />
     </main>
   );
