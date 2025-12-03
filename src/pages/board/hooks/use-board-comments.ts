@@ -12,6 +12,8 @@ export function useBoardComments(boardId: string) {
   const queryClient = useQueryClient();
   const { data: commentsData = [] } = useQuery(commentQueries.GET_COMMENT_LIST(boardId));
   const createCommentMutation = useMutation(commentMutations.POST_COMMENT());
+  const likeCommentMutation = useMutation(commentMutations.POST_COMMENT_LIKE());
+  const unlikeCommentMutation = useMutation(commentMutations.DELETE_COMMENT_LIKE());
 
   // 서버 데이터 그대로 사용 (변환 없이)
   const comments: ICommentWithReplies[] = commentsData.map((comment) => ({
@@ -27,10 +29,42 @@ export function useBoardComments(boardId: string) {
     setIsDrawerOpen(false);
   }, []);
 
-  const handleToggleLike = useCallback((kind: 'comment' | 'reply', id: string, parentId?: string) => {
-    // TODO: 댓글 좋아요 API 연동
-    console.log('Toggle comment like:', { kind, id, parentId });
-  }, []);
+  const handleToggleLike = useCallback(
+    async (kind: 'comment' | 'reply', id: string, parentId?: string) => {
+      try {
+        let isLiked = false;
+
+        if (kind === 'comment') {
+          const comment = commentsData.find((c) => c.id === id);
+          isLiked = comment?.likedByMe ?? false;
+        } else if (kind === 'reply' && parentId) {
+          const reply = loadedReplies[parentId]?.find((r) => r.id === id);
+          isLiked = reply?.likedByMe ?? false;
+        }
+
+        if (isLiked) {
+          await unlikeCommentMutation.mutateAsync({
+            commentId: id,
+            boardId,
+            parentId,
+          });
+        } else {
+          await likeCommentMutation.mutateAsync({
+            commentId: id,
+            boardId,
+            parentId,
+          });
+        }
+
+        if (kind === 'reply' && parentId) {
+          await handleLoadReplies(parentId);
+        }
+      } catch (error) {
+        console.error('Failed to toggle like:', error);
+      }
+    },
+    [commentsData, loadedReplies, boardId, likeCommentMutation, unlikeCommentMutation]
+  );
 
   const handleSendComment = useCallback(
     async (text: string) => {

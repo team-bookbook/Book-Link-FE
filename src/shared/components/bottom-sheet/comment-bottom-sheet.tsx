@@ -148,7 +148,7 @@ export default function CommentBottomSheet(props: CommentProps) {
                                 className='p-[0.2rem] active:opacity-80'
                               >
                                 <Icon
-                                  className='text-system-error'
+                                  className='text-system-error cursor-pointer'
                                   name={r.likedByMe ? 'heart-fill' : 'heart'}
                                   size={1.6}
                                   ariaHidden

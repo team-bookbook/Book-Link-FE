@@ -74,5 +74,6 @@ export const mutationKeys = {
   },
   comment: {
     create: ['comment', 'create'] as const,
+    like: ['comment', 'like'] as const,
   },
 } as const;
