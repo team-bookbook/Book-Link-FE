@@ -4,7 +4,7 @@ import ButtonFrame from '@components/button/button-frame';
 import Input from '@components/input/input';
 import Icon from '@components/icon';
 import useImageUpload from '@hooks/use-image-upload';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { bookMutations } from '@apis/book/book-mutations';
 import { libraryBookMutations } from '@apis/library/library-book-mutations';
 import { uploadImage } from '@apis/s3/s3-api';
@@ -15,6 +15,9 @@ import SelectBottomSheet from '@components/bottom-sheet/select-bottom-sheet';
 import { BOOK_CATEGORY_CREATE_OPTIONS } from '@components/dropdown/constants/select-options';
 import { ROUTES } from '@routes/routes-config';
 import type { IBookInfo } from '@apis/book/book-queries';
+import { memberQueries } from '@apis/member/member-queries';
+import { isAuthenticated } from '@utils/auth';
+import type { ApiError } from '@apis/base/client';
 
 interface LocationState {
   isbn: string;
@@ -26,6 +29,11 @@ export default function BookCreatePage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const state = location.state as LocationState | null;
+
+  const { data: memberData } = useQuery({
+    ...memberQueries.GET_ME(),
+    enabled: isAuthenticated(),
+  });
 
   const { fileRef, images, openFilePicker, handleFileChange, removeImage } = useImageUpload({ mode: 'multiple' });
 
@@ -69,6 +77,15 @@ export default function BookCreatePage() {
   const submit = async () => {
     if (!canSubmit || isSubmitting) return;
 
+    // libraryId 체크
+    if (!memberData?.libraryId) {
+      toast.error('도서관 정보를 찾을 수 없습니다');
+      setIsSubmitting(false);
+      return;
+    }
+
+    const libraryId = memberData.libraryId;
+
     try {
       setIsSubmitting(true);
 
@@ -82,8 +99,6 @@ export default function BookCreatePage() {
         })
       );
 
-      const previewImages = JSON.stringify(uploadedImageUrls.filter((url) => url !== ''));
-
       // 2. bookInfo가 없는 경우 (새 도서 등록)
       if (!state?.bookInfo) {
         // 2-1. POST /api/book (도서 등록)
@@ -95,26 +110,24 @@ export default function BookCreatePage() {
             category: category.trim(),
             originalPrice: Number(price.trim()) || 0,
             publishedDate: new Date().toISOString().split('T')[0],
-            isbn: '1313',
-            ISBN: isbn.trim(),
+            isbn: isbn.trim(),
           },
           {
-            onSuccess: async (bookResponse) => {
+            onSuccess: async () => {
               // 2-2. POST /api/library-book (도서관 도서 등록)
               createLibraryBook(
                 {
-                  id: bookResponse.bookId,
+                  id: libraryId,
                   copies: Number(copies) || 1,
                   deposit: Number(deposit.trim()) || 0,
-                  previewImages: previewImages,
+                  previewImages: uploadedImageUrls,
                 },
                 {
                   onSuccess: () => {
                     toast.success('도서 등록이 완료되었어요');
                     navigate(ROUTES.LIBRARY);
                   },
-                  onError: (error) => {
-                    console.error('도서관 도서 등록 실패:', error);
+                  onError: () => {
                     toast.error('도서관 도서 등록에 실패했어요');
                     setIsSubmitting(false);
                   },
@@ -122,9 +135,37 @@ export default function BookCreatePage() {
               );
             },
             onError: (error) => {
-              console.error('도서 등록 실패:', error);
-              toast.error('도서 등록에 실패했어요');
-              setIsSubmitting(false);
+              const apiError = error as unknown as ApiError;
+              const isAlreadyExists = apiError.status === 400;
+              console.log(error, isAlreadyExists);
+
+              if (isAlreadyExists) {
+                console.log('이미 존재하는 도서입니다. 도서관 도서 등록을 진행합니다.');
+                // 도서관 도서 등록
+                createLibraryBook(
+                  {
+                    id: libraryId,
+                    copies: Number(copies) || 1,
+                    deposit: Number(deposit.trim()) || 0,
+                    previewImages: uploadedImageUrls,
+                  },
+                  {
+                    onSuccess: () => {
+                      toast.success('도서 등록이 완료되었어요');
+                      navigate(ROUTES.LIBRARY);
+                    },
+                    onError: (error) => {
+                      console.error('도서관 도서 등록 실패:', error);
+                      toast.error('도서관 도서 등록에 실패했어요');
+                      setIsSubmitting(false);
+                    },
+                  }
+                );
+              } else {
+                console.error('도서 등록 실패:', error);
+                toast.error('도서 등록에 실패했어요');
+                setIsSubmitting(false);
+              }
             },
           }
         );
@@ -133,10 +174,10 @@ export default function BookCreatePage() {
         // 3-1. POST /api/library-book (도서관 도서 등록)
         createLibraryBook(
           {
-            id: state.bookInfo.id,
+            id: libraryId,
             copies: Number(copies) || 1,
             deposit: Number(deposit.trim()) || 0,
-            previewImages: previewImages,
+            previewImages: uploadedImageUrls,
           },
           {
             onSuccess: () => {

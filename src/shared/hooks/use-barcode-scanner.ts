@@ -106,15 +106,7 @@ export function useBarcodeScanner(options: BarcodeScannerOptions = {}): UseBarco
         const error = err as Error;
         console.error('카메라 접근 오류:', error);
 
-        let errorMessage = '카메라 접근에 실패했습니다';
-        if (error.message.includes('NotFoundError') || error.message.includes('not found')) {
-          errorMessage = '카메라를 찾을 수 없습니다. 카메라가 연결되어 있는지 확인해주세요.';
-        } else if (error.message.includes('NotAllowedError') || error.message.includes('Permission')) {
-          errorMessage = '카메라 접근 권한이 거부되었습니다. 브라우저 설정에서 카메라 권한을 허용해주세요.';
-        } else if (error.message.includes('NotReadableError')) {
-          errorMessage = '카메라가 이미 다른 곳에서 사용 중입니다.';
-        }
-
+        const errorMessage = '카메라 접근에 실패했습니다';
         setError(errorMessage);
         setIsScanning(false);
         setIsSupported(false);

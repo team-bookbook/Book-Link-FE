@@ -8,7 +8,7 @@ export interface ICreateLibraryBookParams {
   id: string; // Book ID
   copies: number;
   deposit: number;
-  previewImages: string; // JSON array string
+  previewImages: string[]; // JSON array string
 }
 
 export interface ICreateLibraryBookResponse {

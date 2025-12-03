@@ -1,7 +1,8 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '@routes/routes-config';
 import { toast } from '@libs/toast';
+import { modal } from '@libs/modal';
 import Icon from '@components/icon';
 import { validateISBN } from '@utils/isbn';
 import { cn } from '@libs/cn';
@@ -9,33 +10,36 @@ import { useQuery } from '@tanstack/react-query';
 import { bookQueries } from '@apis/book/book-queries';
 import Button from '@components/button/button';
 import { useBarcodeScanner } from '@hooks/use-barcode-scanner';
+import { memberQueries } from '@apis/member/member-queries';
+import { isAuthenticated } from '@utils/auth';
 
 export default function BookScanPage() {
   const [scannedIsbn, setScannedIsbn] = useState<string>('');
   const [invalidBarcode, setInvalidBarcode] = useState<string>('');
   const navigate = useNavigate();
 
+  const { data: memberData } = useQuery({
+    ...memberQueries.GET_ME(),
+    enabled: isAuthenticated(),
+  });
+
   const handleCapture = useCallback(
     (barcodes: { rawValue: string }[]) => {
       if (!barcodes || barcodes.length === 0) return;
       if (scannedIsbn) return;
 
-      console.log(scannedIsbn);
       const barcode = barcodes[0];
       const barcodeValue = barcode.rawValue;
-      console.log(barcode, barcodeValue);
       const validation = validateISBN(barcodeValue);
 
       if (!validation.valid) {
         console.log('유효하지 않은 바코드:', barcodeValue, validation.reason);
-        // 새 스캔 시 이전 상태 초기화
         setScannedIsbn('');
         setInvalidBarcode(barcodeValue);
         toast.error('유효하지 않은 바코드입니다');
         return;
       }
 
-      // 새 스캔 시 이전 상태 초기화
       setInvalidBarcode('');
       setScannedIsbn(validation.isbn!);
       toast.success(`${validation.type} 스캔 완료`);
@@ -43,11 +47,63 @@ export default function BookScanPage() {
     [scannedIsbn]
   );
 
-  const { scannerRef } = useBarcodeScanner({
+  const { scannerRef, error: cameraError } = useBarcodeScanner({
     onCapture: handleCapture,
     decodeInterval: 200,
     qrBoxSize: 300,
   });
+
+  // 도서관 등록 여부 확인
+  useEffect(() => {
+    if (memberData && memberData.libraryId === null) {
+      const handleNoLibrary = async () => {
+        const confirmed = await modal.confirm({
+          title: '도서관 등록 필요',
+          description: '도서를 등록하려면 먼저 도서관을 생성해야 합니다.\n도서관을 생성하시겠습니까?',
+          confirmText: '생성하기',
+        });
+
+        if (confirmed.ok) {
+          navigate(ROUTES.LIBRARY_CREATE);
+        } else {
+          navigate(ROUTES.LIBRARY);
+        }
+      };
+
+      handleNoLibrary();
+    }
+  }, [memberData, navigate]);
+
+  // 카메라 에러 처리 (카메라를 찾을 수 없는 경우만)
+  useEffect(() => {
+    console.log(cameraError);
+    if (cameraError) {
+      const handleCameraError = async () => {
+        const confirmed = await modal.confirm({
+          title: '카메라 연결 실패',
+          description: `카메라가 연결되어있지 않습니다. \n직접 입력하시겠습니까?`,
+        });
+
+        if (confirmed.ok) {
+          navigate(ROUTES.BOOK_CREATE, {
+            state: {
+              isbn: '',
+              bookInfo: null,
+            },
+          });
+        } else {
+          navigate(ROUTES.LIBRARY, {
+            state: {
+              isbn: '',
+              bookInfo: null,
+            },
+          });
+        }
+      };
+
+      handleCameraError();
+    }
+  }, [cameraError, navigate]);
 
   // ISBN으로 도서 정보 조회
   const {
@@ -71,10 +127,10 @@ export default function BookScanPage() {
   };
 
   return (
-    <div className='bg-black' style={{ height: 'calc(100vh - 5.5rem - 5.7rem)' }}>
+    <div className='flex w-full flex-col bg-black' style={{ height: 'calc(100vh - 5.5rem)' }}>
       <div
         className={cn(
-          'fixed top-[5.5rem] right-0 left-0 min-h-[4.5rem] bg-[#FAEAEA]',
+          'relative right-0 left-0 min-h-[4.5rem] w-full bg-[#FAEAEA]',
           'z-1',
           'px-[1.6rem] py-[1.2rem]',
           'transition-all duration-300 ease-out'
@@ -88,19 +144,18 @@ export default function BookScanPage() {
         </div>
       </div>
 
-      <div className='flex pt-[4.5rem]'>
-        <div className='w-full'>
+      <div className='relative flex flex-1 flex-col overflow-hidden'>
+        <div className='flex w-full flex-1 flex-col'>
           <div
             ref={scannerRef}
-            className='w-full'
+            className='min-h-[300px] w-full flex-shrink-0'
             style={{
               WebkitTransform: 'translateZ(0)',
               transform: 'translateZ(0)',
-              zIndex: 88,
             }}
           />
 
-          <div className='mt-[1.5rem] w-full px-[2rem]'>
+          <div className='absolute right-0 bottom-[1.5rem] left-0 w-full px-[2rem]'>
             <div className='flex-row-center h-full min-h-[14.5rem] w-full rounded-[5px] bg-gray-800 px-[2rem]'>
               {!scannedIsbn && !invalidBarcode && (
                 <div className='flex-col-center gap-[1rem] text-gray-400'>

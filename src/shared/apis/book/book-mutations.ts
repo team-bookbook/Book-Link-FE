@@ -12,7 +12,6 @@ export interface ICreateBookParams {
   originalPrice: number;
   publishedDate: string;
   isbn: string;
-  ISBN: string;
 }
 
 export interface ICreateBookResponse {
