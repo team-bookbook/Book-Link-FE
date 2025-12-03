@@ -8,7 +8,6 @@ import { ROUTES } from '@routes/routes-config';
 import { libraryQueries } from '@apis/library/library-queries';
 import { libraryMutations } from '@apis/library/library-mutations';
 import { useQuery, useMutation } from '@tanstack/react-query';
-import LibraryRating from './components/section/section-library-rating';
 import { modal } from '@libs/modal';
 
 export default function LibraryDetailPage() {
@@ -19,6 +18,8 @@ export default function LibraryDetailPage() {
   const isMyLibrary = libraryId === 'my';
 
   const { data: libraryInfo, isLoading } = useQuery(libraryQueries.GET_LIBRARY_DETAIL(libraryId || ''));
+
+  console.log(libraryInfo);
 
   const bookData = libraryInfo?.topBooks || [];
 
@@ -111,7 +112,7 @@ export default function LibraryDetailPage() {
           <h1 className='title3'>{libraryInfo.name}</h1>
           <h2 className='caption1'>{`${libraryInfo.startTime} - ${libraryInfo.endTime}`}</h2>
         </div>
-        <LibraryRating libraryId={libraryId || ''} likeCount={libraryInfo.likeCount} />
+        {/* <LibraryRating libraryId={libraryId || ''} likeCount={libraryInfo.likeCount} /> */}
       </div>
     );
   };
