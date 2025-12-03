@@ -25,8 +25,6 @@ export default function BookDetailPage() {
     enabled: !!bookId,
   });
 
-  console.log('BookDetailPage - isLoading:', isLoading, 'error:', error, 'bookDetail:', bookDetail);
-
   const handleCartClick = async (e: React.MouseEvent) => {
     e.stopPropagation();
   };
@@ -40,14 +38,9 @@ export default function BookDetailPage() {
   }
 
   if (error || !bookDetail) {
-    return (
-      <div className='flex-row-center min-h-screen text-gray-600'>
-        <p>도서 정보를 불러올 수 없습니다.</p>
-      </div>
-    );
+    return;
   }
 
-  // API 응답을 기존 IBookDetail 형식으로 변환
   const { libraryDto, libraryBookDetailDto, bookDetailDto } = bookDetail;
 
   const book: IBookDetail = {

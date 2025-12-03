@@ -28,7 +28,7 @@ export interface ILibraryBookDetail {
     copies: number;
     deposit: number;
     borrowedCount: number;
-    previewImages: string; // JSON string "[url1, url2, ...]"
+    previewImages: string;
     expectedReturnDate: string;
     borrowId: string;
     borrowedStatus: string;
