@@ -12,6 +12,11 @@ export interface IGroup {
   isPrivate: boolean;
 }
 
+export interface IGroupMember {
+  id: string;
+  name: string;
+}
+
 interface IGroupListParams {
   name?: string;
 }
@@ -24,6 +29,15 @@ export const groupQueries = {
         const res = await get<IGroup[]>(END_POINT.GROUP, {
           params,
         });
+        return res;
+      },
+    }),
+
+  GET_GROUP_MEMBERS: (id: string) =>
+    queryOptions<IGroupMember[]>({
+      queryKey: queryKeys.group.memberList(id),
+      queryFn: async () => {
+        const res = await get<IGroupMember[]>(END_POINT.GROUP_MEMBERS(id));
         return res;
       },
     }),
