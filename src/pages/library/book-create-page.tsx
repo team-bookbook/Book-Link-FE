@@ -4,26 +4,20 @@ import ButtonFrame from '@components/button/button-frame';
 import Input from '@components/input/input';
 import Icon from '@components/icon';
 import useImageUpload from '@hooks/use-image-upload';
-import { useMutation, useQuery } from '@tanstack/react-query';
-import { bookMutations } from '@apis/book/book-mutations';
-import { libraryBookMutations } from '@apis/library/library-book-mutations';
-import { uploadImage } from '@apis/s3/s3-api';
+import { useQuery } from '@tanstack/react-query';
 import { toast } from '@libs/toast';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import useBottomSheet from '@components/bottom-sheet/hooks/use-bottom-sheet';
 import SelectBottomSheet from '@components/bottom-sheet/select-bottom-sheet';
 import { BOOK_CATEGORY_CREATE_OPTIONS } from '@components/dropdown/constants/select-options';
-import { ROUTES } from '@routes/routes-config';
-import type { IBookInfo } from '@apis/book/book-queries';
 import { memberQueries } from '@apis/member/member-queries';
 import { isAuthenticated } from '@utils/auth';
-import { get } from '@apis/base/client';
-import { END_POINT } from '@constants/end-point';
 import { libraryBookQueries } from '@apis/library/library-book-queries';
+import { useCreateBook } from './hooks/use-create-book';
+import { useUpdateBook } from './hooks/use-update-book';
 
 export default function BookCreatePage() {
   const [searchParams] = useSearchParams();
-  const navigate = useNavigate();
   const libraryBookId = searchParams.get('id');
   const isEditMode = !!libraryBookId;
 
@@ -50,13 +44,18 @@ export default function BookCreatePage() {
   const [deposit, setDeposit] = useState('');
   const [isbn, setIsbn] = useState('');
   const [copies, setCopies] = useState('1');
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const { isOpen, open, close } = useBottomSheet();
-  const { mutate: createBook } = useMutation(bookMutations.POST_BOOK());
-  const { mutate: createLibraryBook } = useMutation(libraryBookMutations.POST_LIBRARY_BOOK());
-  const { mutate: updateLibraryBook } = useMutation(libraryBookMutations.PATCH_LIBRARY_BOOK());
 
+  const { submit: createBookSubmit, isSubmitting: isCreating } = useCreateBook({
+    libraryId: memberData?.libraryId || '',
+  });
+
+  const { submit: updateBookSubmit, isSubmitting: isUpdating } = useUpdateBook({
+    libraryBookId: libraryBookId || '',
+  });
+
+  const isSubmitting = isCreating || isUpdating;
   const canSubmit = images.length >= 3 && title.trim().length > 0;
 
   // editMode: bookDetail로 폼 미리 채우기
@@ -95,155 +94,29 @@ export default function BookCreatePage() {
   const submit = async () => {
     if (!canSubmit || isSubmitting) return;
 
-    if (!memberData?.libraryId) {
-      toast.error('도서관 정보를 찾을 수 없습니다');
-      return;
-    }
-
-    if (!isbn.trim()) {
-      toast.error('ISBN을 입력해 주세요');
-      return;
-    }
-
-    try {
-      setIsSubmitting(true);
-
-      // editMode: 수정 로직
-      if (isEditMode && libraryBookId) {
-        // 1. 이미지 S3에 업로드 (새 이미지만)
-        const uploadedImageUrls = await Promise.all(
-          images.map(async (img) => {
-            if (img.file) {
-              return await uploadImage(img.file);
-            }
-            // 기존 이미지는 URL 그대로 반환
-            return img.url || '';
-          })
-        );
-
-        const updateData = {
-          id: libraryBookId,
-          copies: Number(copies) || 1,
-          deposit: Number(deposit.trim()) || 0,
-          previewImages: uploadedImageUrls.filter((url) => url !== ''),
-        };
-
-        updateLibraryBook(updateData, {
-          onSuccess: () => {
-            toast.success('도서 수정이 완료되었어요');
-            navigate(`/book/${libraryBookId}`);
-          },
-          onError: (error) => {
-            console.error('도서 수정 실패:', error);
-            toast.error('도서 수정에 실패했어요');
-            setIsSubmitting(false);
-          },
-        });
+    if (isEditMode) {
+      await updateBookSubmit({
+        images,
+        copies,
+        deposit,
+      });
+    } else {
+      if (!memberData?.libraryId) {
+        toast.error('도서관 정보를 찾을 수 없습니다');
         return;
       }
 
-      // createMode: 등록 로직
-      // 1. 이미지 S3에 업로드
-      const uploadedImageUrls = await Promise.all(
-        images.map(async (img) => {
-          if (img.file) {
-            return await uploadImage(img.file);
-          }
-          return '';
-        })
-      );
-
-      // 2. GET /book/{isbn} - ISBN으로 도서 조회
-      let bookId: string | null = null;
-
-      try {
-        const existingBook = await get<IBookInfo>(END_POINT.BOOK_BY_ISBN(isbn.trim()), {
-          headers: {
-            'Trace-Id': crypto.randomUUID(),
-          },
-        });
-        if (existingBook?.id) {
-          bookId = existingBook.id;
-          console.log('기존 도서 발견:', bookId);
-        }
-      } catch (error) {
-        console.log('기존 도서 없음, 새로 등록합니다.', error);
-      }
-
-      // 3. bookId가 없으면 POST /book (새 도서 등록)
-      if (!bookId) {
-        const bookData = {
-          title: title.trim(),
-          author: author.trim(),
-          publisher: publisher.trim(),
-          category: category.trim(),
-          originalPrice: Number(price.trim()) || 0,
-          publishedDate: new Date().toISOString().split('T')[0],
-          isbn: isbn.trim(),
-        };
-
-        console.log('도서 등록 요청 데이터:', bookData);
-
-        createBook(bookData, {
-          onSuccess: async (response) => {
-            console.log('도서 등록 성공:', response);
-            bookId = response;
-            const libraryBookData = {
-              id: bookId,
-              copies: Number(copies) || 1,
-              deposit: Number(deposit.trim()) || 0,
-              previewImages: uploadedImageUrls,
-            };
-
-            console.log('도서관 도서 등록 요청 데이터:', libraryBookData);
-
-            // 4. POST /library-book (도서관 도서 등록)
-            createLibraryBook(libraryBookData, {
-              onSuccess: () => {
-                toast.success('도서 등록이 완료되었어요');
-                navigate(ROUTES.LIBRARY);
-              },
-              onError: (error) => {
-                console.error('도서관 도서 등록 실패:', error);
-                toast.error('도서관 도서 등록에 실패했어요');
-                setIsSubmitting(false);
-              },
-            });
-          },
-          onError: (error) => {
-            console.error('도서 등록 실패:', error);
-            console.error('에러 상세:', JSON.stringify(error, null, 2));
-            toast.error('도서 등록에 실패했어요');
-            setIsSubmitting(false);
-          },
-        });
-      } else {
-        // 4. bookId가 있으면 바로 POST /library-book (도서관 도서 등록)
-        const libraryBookData = {
-          id: bookId,
-          copies: Number(copies) || 1,
-          deposit: Number(deposit.trim()) || 0,
-          previewImages: uploadedImageUrls,
-        };
-
-        console.log('도서관 도서 등록 요청 데이터 (기존 도서):', libraryBookData);
-
-        createLibraryBook(libraryBookData, {
-          onSuccess: () => {
-            toast.success('도서 등록이 완료되었어요');
-            navigate(ROUTES.LIBRARY);
-          },
-          onError: (error) => {
-            console.error('도서관 도서 등록 실패:', error);
-            toast.error('도서관 도서 등록에 실패했어요');
-            setIsSubmitting(false);
-          },
-        });
-      }
-    } catch (error) {
-      console.error('이미지 업로드 실패:', error);
-      toast.error('이미지 업로드에 실패했어요');
-      setIsSubmitting(false);
+      await createBookSubmit({
+        images,
+        title,
+        author,
+        publisher,
+        price,
+        category,
+        isbn,
+        deposit,
+        copies,
+      });
     }
   };
 
