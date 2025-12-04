@@ -4,7 +4,7 @@ import ButtonFrame from '@components/button/button-frame';
 import Input from '@components/input/input';
 import Icon from '@components/icon';
 import useImageUpload from '@hooks/use-image-upload';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { bookMutations } from '@apis/book/book-mutations';
 import { libraryBookMutations } from '@apis/library/library-book-mutations';
 import { uploadImage } from '@apis/s3/s3-api';
@@ -24,7 +24,6 @@ import { libraryBookQueries } from '@apis/library/library-book-queries';
 export default function BookCreatePage() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
   const libraryBookId = searchParams.get('id');
   const isEditMode = !!libraryBookId;
 
@@ -55,8 +54,8 @@ export default function BookCreatePage() {
 
   const { isOpen, open, close } = useBottomSheet();
   const { mutate: createBook } = useMutation(bookMutations.POST_BOOK());
-  const { mutate: createLibraryBook } = useMutation(libraryBookMutations.POST_LIBRARY_BOOK(queryClient));
-  const { mutate: updateLibraryBook } = useMutation(libraryBookMutations.PATCH_LIBRARY_BOOK(queryClient));
+  const { mutate: createLibraryBook } = useMutation(libraryBookMutations.POST_LIBRARY_BOOK());
+  const { mutate: updateLibraryBook } = useMutation(libraryBookMutations.PATCH_LIBRARY_BOOK());
 
   const canSubmit = images.length >= 3 && title.trim().length > 0;
 

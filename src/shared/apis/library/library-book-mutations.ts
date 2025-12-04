@@ -1,14 +1,15 @@
 import { post, del, patch } from '@apis/base/client';
 import { END_POINT } from '@constants/end-point';
 import { mutationKeys, queryKeys } from '@constants/query-keys';
-import { mutationOptions, QueryClient } from '@tanstack/react-query';
+import queryClient from '@libs/query-client';
+import { mutationOptions } from '@tanstack/react-query';
 import { v4 as uuidv4 } from 'uuid';
 
 export interface ICreateLibraryBookParams {
-  id: string; // Book ID
+  id: string;
   copies: number;
   deposit: number;
-  previewImages: string[]; // JSON array string
+  previewImages: string[];
 }
 
 export interface IUpdateLibraryBookParams {
@@ -23,7 +24,7 @@ export interface ICreateLibraryBookResponse {
 }
 
 export const libraryBookMutations = {
-  POST_LIBRARY_BOOK: (queryClient: QueryClient) =>
+  POST_LIBRARY_BOOK: () =>
     mutationOptions<ICreateLibraryBookResponse, Error, ICreateLibraryBookParams>({
       mutationKey: mutationKeys.libraryBook.create,
       mutationFn: (data) =>
@@ -38,7 +39,7 @@ export const libraryBookMutations = {
       },
     }),
 
-  PATCH_LIBRARY_BOOK: (queryClient: QueryClient) =>
+  PATCH_LIBRARY_BOOK: () =>
     mutationOptions<void, Error, IUpdateLibraryBookParams>({
       mutationKey: mutationKeys.libraryBook.update,
       mutationFn: ({ id, copies, deposit, previewImages }) =>
@@ -71,5 +72,9 @@ export const libraryBookMutations = {
             'Trace-Id': uuidv4(),
           },
         }),
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: queryKeys.libraryBook.lists() });
+        queryClient.invalidateQueries({ queryKey: queryKeys.libraryBook.details() });
+      },
     }),
 };
