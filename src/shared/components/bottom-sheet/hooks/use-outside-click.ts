@@ -4,7 +4,15 @@ const useOutsideClick = (ref: React.RefObject<HTMLElement | null>, handler: () =
   useEffect(() => {
     const listener = (event: MouseEvent) => {
       const el = ref.current;
-      if (!el || el.contains(event.target as Node)) return;
+      if (!el) return;
+
+      const target = event.target as Node;
+
+      const bottomSheet = document.querySelector('[data-bottom-sheet]');
+      if (bottomSheet) return;
+
+      if (el.contains(target)) return;
+
       handler();
     };
 
