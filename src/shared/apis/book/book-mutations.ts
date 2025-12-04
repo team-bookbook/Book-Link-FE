@@ -14,16 +14,12 @@ export interface ICreateBookParams {
   isbn: string;
 }
 
-export interface ICreateBookResponse {
-  bookId: string;
-}
-
 export const bookMutations = {
   POST_BOOK: () =>
-    mutationOptions<ICreateBookResponse, Error, ICreateBookParams>({
+    mutationOptions<string, Error, ICreateBookParams>({
       mutationKey: mutationKeys.book.create,
       mutationFn: (data) =>
-        post<ICreateBookResponse>(END_POINT.BOOK, data, {
+        post<string>(END_POINT.BOOK, data, {
           headers: {
             'Trace-Id': uuidv4(),
           },

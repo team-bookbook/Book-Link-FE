@@ -17,7 +17,8 @@ import { ROUTES } from '@routes/routes-config';
 import type { IBookInfo } from '@apis/book/book-queries';
 import { memberQueries } from '@apis/member/member-queries';
 import { isAuthenticated } from '@utils/auth';
-import type { ApiError } from '@apis/base/client';
+import { get } from '@apis/base/client';
+import { END_POINT } from '@constants/end-point';
 
 interface LocationState {
   isbn: string;
@@ -77,14 +78,15 @@ export default function BookCreatePage() {
   const submit = async () => {
     if (!canSubmit || isSubmitting) return;
 
-    // libraryId 체크
     if (!memberData?.libraryId) {
       toast.error('도서관 정보를 찾을 수 없습니다');
-      setIsSubmitting(false);
       return;
     }
 
-    const libraryId = memberData.libraryId;
+    if (!isbn.trim()) {
+      toast.error('ISBN을 입력해 주세요');
+      return;
+    }
 
     try {
       setIsSubmitting(true);
@@ -99,98 +101,92 @@ export default function BookCreatePage() {
         })
       );
 
-      // 2. bookInfo가 없는 경우 (새 도서 등록)
-      if (!state?.bookInfo) {
-        // 2-1. POST /api/book (도서 등록)
-        createBook(
-          {
-            title: title.trim(),
-            author: author.trim(),
-            publisher: publisher.trim(),
-            category: category.trim(),
-            originalPrice: Number(price.trim()) || 0,
-            publishedDate: new Date().toISOString().split('T')[0],
-            isbn: isbn.trim(),
-          },
-          {
-            onSuccess: async () => {
-              // 2-2. POST /api/library-book (도서관 도서 등록)
-              createLibraryBook(
-                {
-                  id: libraryId,
-                  copies: Number(copies) || 1,
-                  deposit: Number(deposit.trim()) || 0,
-                  previewImages: uploadedImageUrls,
-                },
-                {
-                  onSuccess: () => {
-                    toast.success('도서 등록이 완료되었어요');
-                    navigate(ROUTES.LIBRARY);
-                  },
-                  onError: () => {
-                    toast.error('도서관 도서 등록에 실패했어요');
-                    setIsSubmitting(false);
-                  },
-                }
-              );
-            },
-            onError: (error) => {
-              const apiError = error as unknown as ApiError;
-              const isAlreadyExists = apiError.status === 400;
-              console.log(error, isAlreadyExists);
+      // 2. GET /book/{isbn} - ISBN으로 도서 조회
+      let bookId: string | null = null;
 
-              if (isAlreadyExists) {
-                console.log('이미 존재하는 도서입니다. 도서관 도서 등록을 진행합니다.');
-                // 도서관 도서 등록
-                createLibraryBook(
-                  {
-                    id: libraryId,
-                    copies: Number(copies) || 1,
-                    deposit: Number(deposit.trim()) || 0,
-                    previewImages: uploadedImageUrls,
-                  },
-                  {
-                    onSuccess: () => {
-                      toast.success('도서 등록이 완료되었어요');
-                      navigate(ROUTES.LIBRARY);
-                    },
-                    onError: (error) => {
-                      console.error('도서관 도서 등록 실패:', error);
-                      toast.error('도서관 도서 등록에 실패했어요');
-                      setIsSubmitting(false);
-                    },
-                  }
-                );
-              } else {
-                console.error('도서 등록 실패:', error);
-                toast.error('도서 등록에 실패했어요');
-                setIsSubmitting(false);
-              }
-            },
-          }
-        );
-      } else {
-        // 3. bookInfo가 있는 경우 (기존 도서)
-        // 3-1. POST /api/library-book (도서관 도서 등록)
-        createLibraryBook(
-          {
-            id: libraryId,
-            copies: Number(copies) || 1,
-            deposit: Number(deposit.trim()) || 0,
-            previewImages: uploadedImageUrls,
+      try {
+        const existingBook = await get<IBookInfo>(END_POINT.BOOK_BY_ISBN(isbn.trim()), {
+          headers: {
+            'Trace-Id': crypto.randomUUID(),
           },
-          {
-            onSuccess: () => {
-              toast.success('도서 등록이 완료되었어요');
-              navigate(ROUTES.LIBRARY);
-            },
-            onError: (error) => {
-              console.error('도서관 도서 등록 실패:', error);
-              toast.error('도서관 도서 등록에 실패했어요');
-              setIsSubmitting(false);
-            },
-          }
-        );
+        });
+        if (existingBook?.id) {
+          bookId = existingBook.id;
+          console.log('기존 도서 발견:', bookId);
+        }
+      } catch (error) {
+        console.log('기존 도서 없음, 새로 등록합니다.', error);
+      }
+
+      // 3. bookId가 없으면 POST /book (새 도서 등록)
+      if (!bookId) {
+        const bookData = {
+          title: title.trim(),
+          author: author.trim(),
+          publisher: publisher.trim(),
+          category: category.trim(),
+          originalPrice: Number(price.trim()) || 0,
+          publishedDate: new Date().toISOString().split('T')[0],
+          isbn: isbn.trim(),
+        };
+
+        console.log('도서 등록 요청 데이터:', bookData);
+
+        createBook(bookData, {
+          onSuccess: async (response) => {
+            console.log('도서 등록 성공:', response);
+            bookId = response;
+            const libraryBookData = {
+              id: bookId,
+              copies: Number(copies) || 1,
+              deposit: Number(deposit.trim()) || 0,
+              previewImages: uploadedImageUrls,
+            };
+
+            console.log('도서관 도서 등록 요청 데이터:', libraryBookData);
+
+            // 4. POST /library-book (도서관 도서 등록)
+            createLibraryBook(libraryBookData, {
+              onSuccess: () => {
+                toast.success('도서 등록이 완료되었어요');
+                navigate(ROUTES.LIBRARY);
+              },
+              onError: (error) => {
+                console.error('도서관 도서 등록 실패:', error);
+                toast.error('도서관 도서 등록에 실패했어요');
+                setIsSubmitting(false);
+              },
+            });
+          },
+          onError: (error) => {
+            console.error('도서 등록 실패:', error);
+            console.error('에러 상세:', JSON.stringify(error, null, 2));
+            toast.error('도서 등록에 실패했어요');
+            setIsSubmitting(false);
+          },
+        });
+      } else {
+        // 4. bookId가 있으면 바로 POST /library-book (도서관 도서 등록)
+        const libraryBookData = {
+          id: bookId,
+          copies: Number(copies) || 1,
+          deposit: Number(deposit.trim()) || 0,
+          previewImages: uploadedImageUrls,
+        };
+
+        console.log('도서관 도서 등록 요청 데이터 (기존 도서):', libraryBookData);
+
+        createLibraryBook(libraryBookData, {
+          onSuccess: () => {
+            toast.success('도서 등록이 완료되었어요');
+            navigate(ROUTES.LIBRARY);
+          },
+          onError: (error) => {
+            console.error('도서관 도서 등록 실패:', error);
+            toast.error('도서관 도서 등록에 실패했어요');
+            setIsSubmitting(false);
+          },
+        });
       }
     } catch (error) {
       console.error('이미지 업로드 실패:', error);
