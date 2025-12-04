@@ -45,8 +45,11 @@ function LayoutContent() {
   const isReviewCreate = useMemo(() => {
     return matchPath({ path: ROUTES.REVIEW_CREATE(':id') }, pathname) != null;
   }, [pathname]);
-  const isBoardCreate = useMemo(() => {
+  const isBoardDetail = useMemo(() => {
     return matchPath({ path: ROUTES.BOARD_DETAIL(':id') }, pathname) != null;
+  }, [pathname]);
+  const isGroupDetail = useMemo(() => {
+    return matchPath({ path: ROUTES.GROUP_DETAIL(':id') }, pathname) != null;
   }, [pathname]);
 
   const isNoneFooter = useMemo(
@@ -61,14 +64,13 @@ function LayoutContent() {
       isUnder(pathname, ROUTES.BOARD_CREATE) ||
       isReviewCreate ||
       isOnboarding ||
-      isBoardCreate,
+      isBoardDetail ||
+      isGroupDetail,
     [pathname]
   );
 
-  // 헤더는 온보딩에서만 숨김
   const showHeader = !isOnboarding;
 
-  // override가 있으면 override 사용, 없으면 기본 헤더 설정 사용
   const baseHeaderProps = useMemo(
     () => (showHeader ? getHeaderForRoute(pathname, search) : null),
     [pathname, search, showHeader]
