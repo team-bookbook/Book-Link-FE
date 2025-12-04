@@ -20,7 +20,8 @@ export default function BoardPage() {
   const topTab = (searchParams.get('tab') as 'community' | 'reading') || 'community';
   const category = searchParams.get('category') || 'ALL';
   const sort = (searchParams.get('sort') as SortType) || '';
-  const searchKeyword = searchParams.get('search') || '';
+  const communitySearch = searchParams.get('communitySearch') || '';
+  const readingSearch = searchParams.get('readingSearch') || '';
 
   const searchAnchorRef = useRef<HTMLDivElement | null>(null);
   const floatingSearchRef = useRef<HTMLDivElement | null>(null);
@@ -61,10 +62,15 @@ export default function BoardPage() {
   };
 
   const handleSearch = (keyword: string) => {
-    updateParams({ search: keyword });
+    if (topTab === 'community') {
+      updateParams({ communitySearch: keyword });
+    } else {
+      updateParams({ readingSearch: keyword });
+    }
   };
 
   const searchPlaceholder = topTab === 'community' ? '검색어를 입력해 주세요.' : '독서모임명으로 검색';
+  const currentSearchValue = topTab === 'community' ? communitySearch : readingSearch;
 
   return (
     <div>
@@ -80,24 +86,34 @@ export default function BoardPage() {
           ref={floatingSearchRef}
           className={cn('bg-gray-white sticky top-0 z-[var(--z-header)]', 'px-[2rem] pt-[0.8rem] pb-[0.8rem]')}
         >
-          <SearchBar placeholder={searchPlaceholder} onSubmit={handleSearch} />
+          <SearchBar
+            key={`floating-${topTab}`}
+            placeholder={searchPlaceholder}
+            onSubmit={handleSearch}
+            defaultValue={currentSearchValue}
+          />
         </div>
       )}
 
       <div className='px-[2rem] pt-[1.2rem]' ref={searchAnchorRef}>
-        <SearchBar placeholder={searchPlaceholder} onSubmit={handleSearch} />
+        <SearchBar
+          key={`anchor-${topTab}`}
+          placeholder={searchPlaceholder}
+          onSubmit={handleSearch}
+          defaultValue={currentSearchValue}
+        />
       </div>
 
       {topTab === 'community' ? (
         <SectionCommunity
           category={category}
           sort={sort}
-          searchKeyword={searchKeyword}
+          searchKeyword={communitySearch}
           onCategoryChange={handleCategoryChange}
           onSortChange={handleSortChange}
         />
       ) : (
-        <SectionReading searchKeyword={searchKeyword} />
+        <SectionReading searchKeyword={readingSearch} />
       )}
     </div>
   );

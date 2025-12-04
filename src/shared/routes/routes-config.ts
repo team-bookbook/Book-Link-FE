@@ -8,6 +8,7 @@ export const ROUTES = {
   BOOK_CREATE: '/book-create',
   BOARD: '/board',
   BOARD_DETAIL: (id = ':boardId') => `/board/${id}`,
+  GROUP_DETAIL: (id = ':groupId') => `/group/${id}`,
   BOARD_CREATE: '/board-create',
   GROUP_CREATE: '/group-create',
   ONBOARDING: '/onboarding',

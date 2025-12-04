@@ -25,12 +25,13 @@ export default function SectionReading({ searchKeyword }: SectionReadingProps) {
         groups.map((group) => (
           <li key={group.id}>
             <GroupCard
-              id={Number(group.id) || 0}
+              id={group.id}
               imgurl={group.thumbnail}
               groupName={group.name}
-              leaderName='hostName 필드 추가 필요'
+              hostName='hostName 필드 추가 필요'
               memberCount={group.participantCount}
               description={`Description 필드 추가 필요`}
+              isPrivate={group.isPrivate}
             />
           </li>
         ))

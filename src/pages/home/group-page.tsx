@@ -19,7 +19,7 @@ export default function GroupPage() {
           key={group.id}
           id={group.id}
           groupName={group.groupName}
-          leaderName={group.leaderName}
+          hostName={group.hostName}
           memberCount={group.memberCount}
           description={group.description}
           imgurl={group.imgurl}

@@ -8,12 +8,13 @@ export type IBookCard = {
 };
 
 export type IGroupCard = {
-  id: number;
+  id: string;
   groupName: string;
-  leaderName?: string;
+  hostName?: string;
   memberCount: number;
   imgurl: string;
   description: string;
+  isPrivate?: boolean;
 };
 
 export interface IHomeData {
