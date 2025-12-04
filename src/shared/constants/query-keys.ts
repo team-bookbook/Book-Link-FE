@@ -46,6 +46,12 @@ export const queryKeys = {
     repliesLists: () => [...queryKeys.comment.all, 'replies'] as const,
     repliesList: (parentId: string) => [...queryKeys.comment.repliesLists(), parentId] as const,
   },
+
+  group: {
+    all: ['group'] as const,
+    lists: () => [...queryKeys.group.all, 'list'] as const,
+    list: (params: { name?: string }) => [...queryKeys.group.lists(), params] as const,
+  },
 } as const;
 
 export const mutationKeys = {

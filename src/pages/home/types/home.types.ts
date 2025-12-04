@@ -10,7 +10,7 @@ export type IBookCard = {
 export type IGroupCard = {
   id: number;
   groupName: string;
-  leaderName: string;
+  leaderName?: string;
   memberCount: number;
   imgurl: string;
   description: string;

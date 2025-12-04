@@ -9,9 +9,13 @@ export default function GroupCard({ id, imgurl, groupName, leaderName, memberCou
         <div className='flex-col gap-[0.6rem]'>
           <h1 className='title4 text-gray-900'>{groupName}</h1>
           <div className='flex-items-center gap-[0.6rem]'>
-            <Icon name='profile' className='text-system-info' size={2.4} />
-            <h2 className='caption1 text-gray-800'>{leaderName}</h2>
-            <h2 className='caption1 text-gray-600'>|</h2>
+            {leaderName && (
+              <>
+                <Icon name='profile' className='text-system-info' size={2.4} />
+                <h2 className='caption1 text-gray-800'>{leaderName}</h2>
+                <h2 className='caption1 text-gray-600'>|</h2>
+              </>
+            )}
             <h3 className='caption5 text-system-error'>{memberCount}명</h3>
           </div>
         </div>
