@@ -69,6 +69,8 @@ export const mutationKeys = {
   },
   libraryBook: {
     create: ['library-book', 'create'] as const,
+    update: ['library-book', 'update'] as const,
+    delete: ['library-book', 'delete'] as const,
   },
   member: {
     update: ['member', 'update'] as const,

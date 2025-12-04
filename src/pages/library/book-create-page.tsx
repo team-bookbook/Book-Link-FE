@@ -9,7 +9,7 @@ import { bookMutations } from '@apis/book/book-mutations';
 import { libraryBookMutations } from '@apis/library/library-book-mutations';
 import { uploadImage } from '@apis/s3/s3-api';
 import { toast } from '@libs/toast';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import useBottomSheet from '@components/bottom-sheet/hooks/use-bottom-sheet';
 import SelectBottomSheet from '@components/bottom-sheet/select-bottom-sheet';
 import { BOOK_CATEGORY_CREATE_OPTIONS } from '@components/dropdown/constants/select-options';
@@ -19,24 +19,28 @@ import { memberQueries } from '@apis/member/member-queries';
 import { isAuthenticated } from '@utils/auth';
 import { get } from '@apis/base/client';
 import { END_POINT } from '@constants/end-point';
-
-interface LocationState {
-  isbn: string;
-  bookInfo?: IBookInfo | null;
-}
+import { libraryBookQueries } from '@apis/library/library-book-queries';
 
 export default function BookCreatePage() {
-  const location = useLocation();
+  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const state = location.state as LocationState | null;
+  const libraryBookId = searchParams.get('id');
+  const isEditMode = !!libraryBookId;
 
   const { data: memberData } = useQuery({
     ...memberQueries.GET_ME(),
     enabled: isAuthenticated(),
   });
 
-  const { fileRef, images, openFilePicker, handleFileChange, removeImage } = useImageUpload({ mode: 'multiple' });
+  const { data: bookDetail } = useQuery({
+    ...libraryBookQueries.GET_LIBRARY_BOOK_DETAIL(libraryBookId!),
+    enabled: isEditMode,
+  });
+
+  const { fileRef, images, openFilePicker, handleFileChange, removeImage, setImages } = useImageUpload({
+    mode: 'multiple',
+  });
 
   const [title, setTitle] = useState('');
   const [author, setAuthor] = useState('');
@@ -52,24 +56,38 @@ export default function BookCreatePage() {
   const { isOpen, open, close } = useBottomSheet();
   const { mutate: createBook } = useMutation(bookMutations.POST_BOOK());
   const { mutate: createLibraryBook } = useMutation(libraryBookMutations.POST_LIBRARY_BOOK(queryClient));
+  const { mutate: updateLibraryBook } = useMutation(libraryBookMutations.PATCH_LIBRARY_BOOK(queryClient));
 
   const canSubmit = images.length >= 3 && title.trim().length > 0;
 
-  // location.state에서 받은 bookInfo로 폼 미리 채우기
+  // editMode: bookDetail로 폼 미리 채우기
   useEffect(() => {
-    if (state?.isbn) {
-      setIsbn(state.isbn);
-    }
+    if (isEditMode && bookDetail) {
+      const { libraryBookDetailDto, bookDetailDto } = bookDetail;
 
-    if (state?.bookInfo) {
-      const bookInfo = state.bookInfo;
-      setTitle(bookInfo.title);
-      setAuthor(bookInfo.author);
-      setPublisher(bookInfo.publisher);
-      setCategory(bookInfo.category);
-      setPrice(bookInfo.originalPrice.toString());
+      setTitle(bookDetailDto.title);
+      setAuthor(bookDetailDto.author);
+      setPublisher(bookDetailDto.publisher);
+      setCategory(bookDetailDto.category);
+
+      setPrice(bookDetailDto.originalPrice.toString());
+      setIsbn(bookDetailDto.isbn);
+      setDeposit(libraryBookDetailDto.deposit.toString());
+      setCopies(libraryBookDetailDto.copies.toString());
+
+      // 기존 이미지 설정
+      if (libraryBookDetailDto.previewImages) {
+        const previewImages = JSON.parse(libraryBookDetailDto.previewImages);
+        setImages(
+          previewImages.map((url: string, index: number) => ({
+            id: `existing-${index}`,
+            url,
+            file: null,
+          }))
+        );
+      }
     }
-  }, [state]);
+  }, [isEditMode, bookDetail, setImages]);
 
   const categoryLabel = category
     ? BOOK_CATEGORY_CREATE_OPTIONS.find((option) => option.value === category)?.label || '카테고리'
@@ -91,6 +109,41 @@ export default function BookCreatePage() {
     try {
       setIsSubmitting(true);
 
+      // editMode: 수정 로직
+      if (isEditMode && libraryBookId) {
+        // 1. 이미지 S3에 업로드 (새 이미지만)
+        const uploadedImageUrls = await Promise.all(
+          images.map(async (img) => {
+            if (img.file) {
+              return await uploadImage(img.file);
+            }
+            // 기존 이미지는 URL 그대로 반환
+            return img.url || '';
+          })
+        );
+
+        const updateData = {
+          id: libraryBookId,
+          copies: Number(copies) || 1,
+          deposit: Number(deposit.trim()) || 0,
+          previewImages: uploadedImageUrls.filter((url) => url !== ''),
+        };
+
+        updateLibraryBook(updateData, {
+          onSuccess: () => {
+            toast.success('도서 수정이 완료되었어요');
+            navigate(`/book/${libraryBookId}`);
+          },
+          onError: (error) => {
+            console.error('도서 수정 실패:', error);
+            toast.error('도서 수정에 실패했어요');
+            setIsSubmitting(false);
+          },
+        });
+        return;
+      }
+
+      // createMode: 등록 로직
       // 1. 이미지 S3에 업로드
       const uploadedImageUrls = await Promise.all(
         images.map(async (img) => {
@@ -243,7 +296,7 @@ export default function BookCreatePage() {
           placeholder='책 제목을 입력해 주세요.'
           value={title}
           onChange={(e) => setTitle(e.currentTarget.value)}
-          readOnly={!!state?.bookInfo}
+          readOnly={isEditMode}
         />
 
         <Input
@@ -252,7 +305,7 @@ export default function BookCreatePage() {
           placeholder='작가를 입력해 주세요.'
           value={author}
           onChange={(e) => setAuthor(e.currentTarget.value)}
-          readOnly={!!state?.bookInfo}
+          readOnly={isEditMode}
         />
 
         <Input
@@ -261,7 +314,7 @@ export default function BookCreatePage() {
           placeholder='출판사를 입력해 주세요.'
           value={publisher}
           onChange={(e) => setPublisher(e.currentTarget.value)}
-          readOnly={!!state?.bookInfo}
+          readOnly={isEditMode}
         />
 
         <Input
@@ -271,7 +324,7 @@ export default function BookCreatePage() {
           inputMode='numeric'
           value={price}
           onChange={(e) => setPrice(e.currentTarget.value.replace(/[^\d]/g, ''))}
-          readOnly={!!state?.bookInfo}
+          readOnly={isEditMode}
         />
 
         <Input
@@ -280,7 +333,7 @@ export default function BookCreatePage() {
           value={categoryLabel}
           endIcon='dropdown'
           readOnly
-          onClick={state?.bookInfo ? undefined : open}
+          onClick={isEditMode ? undefined : open}
         />
 
         <Input
@@ -289,7 +342,7 @@ export default function BookCreatePage() {
           placeholder='ISBN을 입력해 주세요.'
           value={isbn}
           onChange={(e) => setIsbn(e.currentTarget.value)}
-          readOnly={!!state?.bookInfo}
+          readOnly={isEditMode}
         />
 
         <Input
@@ -333,7 +386,7 @@ export default function BookCreatePage() {
           disabled={!canSubmit || isSubmitting}
           onClick={submit}
         >
-          {isSubmitting ? '등록 중...' : '도서 등록'}
+          {isSubmitting ? (isEditMode ? '수정 중...' : '등록 중...') : isEditMode ? '도서 수정' : '도서 등록'}
         </Button>
       </ButtonFrame>
 

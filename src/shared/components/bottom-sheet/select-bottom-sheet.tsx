@@ -20,7 +20,7 @@ type Props = {
   /** 현재 선택 값 */
   value: string | null;
   /** 선택 변경 */
-  onChange: (next: string) => void;
+  onChange: (next: string, URL?: string) => void;
   /** 강조 배경 색상 클래스 오버라이드가 필요할 때 */
   activeBgClassName?: string;
 };

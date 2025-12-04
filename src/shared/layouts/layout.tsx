@@ -48,6 +48,9 @@ function LayoutContent() {
   const isBoardCreate = useMemo(() => {
     return matchPath({ path: ROUTES.BOARD_DETAIL(':id') }, pathname) != null;
   }, [pathname]);
+  const isBookDetail = useMemo(() => {
+    return matchPath({ path: ROUTES.BOOK_DETAIL(':id') }, pathname) != null;
+  }, [pathname]);
 
   const isNoneFooter = useMemo(
     () =>
@@ -62,7 +65,8 @@ function LayoutContent() {
       isUnder(pathname, ROUTES.BOARD_CREATE) ||
       isReviewCreate ||
       isOnboarding ||
-      isBoardCreate,
+      isBoardCreate ||
+      isBookDetail,
     [pathname]
   );
 
