@@ -46,6 +46,12 @@ const boardCreateRule: Rule = (path) =>
     ? { title: '커뮤니티 글 작성', actions: ['close'], safeTop: true }
     : undefined;
 
+// 커뮤니티 게시글 작성
+const groupCreateRule: Rule = (path) =>
+  matchPath({ path: ROUTES.GROUP_CREATE, end: true }, path)
+    ? { title: '독서모임 등록', actions: ['close'], safeTop: true }
+    : undefined;
+
 // 라이브러리 기본
 const libraryRootRule: Rule = (path) => {
   if (!matchPath({ path: ROUTES.LIBRARY, end: true }, path)) return undefined;
@@ -172,6 +178,7 @@ const RULES: ReadonlyArray<Rule> = [
   passwordResetRule,
   boardCreateRule,
   boardDetailRule,
+  groupCreateRule,
 ];
 
 export function getHeaderForRoute(pathname: string, search: string): HeaderProps {

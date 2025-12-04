@@ -9,6 +9,7 @@ export const ROUTES = {
   BOARD: '/board',
   BOARD_DETAIL: (id = ':boardId') => `/board/${id}`,
   BOARD_CREATE: '/board-create',
+  GROUP_CREATE: '/group-create',
   ONBOARDING: '/onboarding',
   SETTING: '/mypage',
   SETTING_EDIT: '/mypage/edit',

@@ -93,7 +93,10 @@ function LayoutContent() {
     ? null
     : (() => {
         if (isUnder(pathname, ROUTES.BOARD)) {
-          return { name: 'add', onClick: () => navigate(ROUTES.BOARD_CREATE) };
+          const params = new URLSearchParams(search);
+          const boardTab = params.get('tab');
+          const targetRoute = boardTab === 'reading' ? ROUTES.GROUP_CREATE : ROUTES.BOARD_CREATE;
+          return { name: 'add', onClick: () => navigate(targetRoute) };
         }
         if (isUnder(pathname, ROUTES.HOME)) {
           return { name: 'back', onClick: () => window.scrollTo({ top: 0, behavior: 'smooth' }) };

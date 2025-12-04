@@ -31,6 +31,7 @@ const ReivewCreatePage = lazy(() => import('@pages/chat/review-create-page'));
 const PasswordResetPage = lazy(() => import('@pages/setting/password-reset-page'));
 const EditProfilePage = lazy(() => import('@pages/setting/edit-profile-page'));
 const BoardCreatePage = lazy(() => import('@pages/board/board-create-page'));
+const GroupCreatePage = lazy(() => import('@pages/board/group-create-page'));
 
 export const router = createBrowserRouter([
   {
@@ -45,6 +46,7 @@ export const router = createBrowserRouter([
       { path: ROUTES.BOARD, element: <BoardPage /> },
       { path: ROUTES.BOARD_DETAIL(':id'), element: <BoardDetailPage /> },
       { path: ROUTES.BOARD_CREATE, element: <BoardCreatePage /> },
+      { path: ROUTES.GROUP_CREATE, element: <GroupCreatePage /> },
       { path: ROUTES.CHAT, element: <ChatPage /> },
       { path: ROUTES.CHAT_ROOM(':id'), element: <ChatDetailPage /> },
       { path: ROUTES.NOTIFICATION, element: <NotificationPage /> },

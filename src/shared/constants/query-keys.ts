@@ -77,4 +77,7 @@ export const mutationKeys = {
     like: ['comment', 'like'] as const,
     delete: ['comment', 'delete'] as const,
   },
+  group: {
+    create: ['group', 'create'] as const,
+  },
 } as const;

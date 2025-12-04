@@ -68,4 +68,7 @@ export const END_POINT = {
   COMMENT_BY_ID: (commentId: string) => `/comment/${commentId}`,
   COMMENT_REPLIES: (parentId: string) => `/comment/${parentId}/replies`,
   COMMENT_LIKE: (commentId: string) => `/comment/${commentId}/like`,
+
+  // 모임 API
+  GROUP: '/group',
 };
