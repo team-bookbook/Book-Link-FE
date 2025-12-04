@@ -51,6 +51,8 @@ export const queryKeys = {
     all: ['group'] as const,
     lists: () => [...queryKeys.group.all, 'list'] as const,
     list: (params: { name?: string }) => [...queryKeys.group.lists(), params] as const,
+    details: () => [...queryKeys.group.all, 'detail'] as const,
+    detail: (id: string) => [...queryKeys.group.details(), id] as const,
     members: () => [...queryKeys.group.all, 'members'] as const,
     memberList: (id: string) => [...queryKeys.group.members(), id] as const,
   },

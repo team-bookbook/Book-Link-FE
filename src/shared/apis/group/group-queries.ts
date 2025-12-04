@@ -17,6 +17,18 @@ export interface IGroupMember {
   name: string;
 }
 
+export interface IGroupDetail {
+  id: string;
+  thumbnail: string;
+  name: string;
+  description: string;
+  participantCount: number;
+  maxCapacity: number;
+  hostName: string;
+  isPrivate: boolean;
+  memberList: IGroupMember[];
+}
+
 interface IGroupListParams {
   name?: string;
 }
@@ -29,6 +41,15 @@ export const groupQueries = {
         const res = await get<IGroup[]>(END_POINT.GROUP, {
           params,
         });
+        return res;
+      },
+    }),
+
+  GET_GROUP_DETAIL: (id: string) =>
+    queryOptions<IGroupDetail>({
+      queryKey: queryKeys.group.detail(id),
+      queryFn: async () => {
+        const res = await get<IGroupDetail>(END_POINT.GROUP_BY_ID(id));
         return res;
       },
     }),

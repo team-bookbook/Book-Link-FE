@@ -71,5 +71,6 @@ export const END_POINT = {
 
   // 모임 API
   GROUP: '/group',
+  GROUP_BY_ID: (id: string) => `/group/${id}`,
   GROUP_MEMBERS: (id: string) => `/group/${id}/members`,
 };

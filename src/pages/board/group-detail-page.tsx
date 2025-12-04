@@ -10,6 +10,8 @@ import SectionSchedule from './components/section/section-schedule';
 import SectionParticipant from './components/section/section-participant';
 import ButtonFrame from '@components/button/button-frame';
 import Button from '@components/button/button';
+import { groupQueries } from '@apis/group/group-queries';
+import { useQuery } from '@tanstack/react-query';
 
 const GROUP_TABS: TabItem[] = [
   { key: 'schedule', label: '일정' },
@@ -74,6 +76,13 @@ export default function GroupDetailPage() {
   const [showFloatingSearch, setShowFloatingSearch] = useState(false);
   const searchAnchorRef = useRef<HTMLDivElement | null>(null);
 
+  const { data: groupDetail, isLoading } = useQuery({
+    ...groupQueries.GET_GROUP_DETAIL(id || ''),
+    enabled: !!id,
+  });
+
+  console.log(groupDetail);
+
   useEffect(() => {
     const el = searchAnchorRef.current;
     if (!el) return;
@@ -108,6 +117,41 @@ export default function GroupDetailPage() {
     );
   }
 
+  if (isLoading) {
+    return (
+      <main className='flex-col-center py-[4rem]'>
+        <p className='body5 text-gray-500'>로딩 중...</p>
+      </main>
+    );
+  }
+
+  if (!groupDetail) {
+    return (
+      <main className='flex-col-center py-[4rem]'>
+        <p className='body5 text-gray-500'>모임 정보를 불러올 수 없습니다.</p>
+      </main>
+    );
+  }
+
+  // Todo : 헤더 오버라이드 추가
+  // const headerConfig = useMemo(() => {
+  //   if (!groupDetail) return null;
+
+  //   return {
+  //     left: 'back' as const,
+  //     safeTop: true,
+  //     title: groupDetail.name,
+  //     actions: groupDetail.isOwner ? ['kebab' as const] : [],
+  //     onAction: (action: ActionId) => {
+  //       if (action === 'kebab') {
+  //         openManageSheet();
+  //       }
+  //     },
+  //   };
+  // }, [boardDetail, openManageSheet]);
+
+  // useHeaderOverride(headerConfig);
+
   return (
     <main className='mb-[8rem]'>
       <section className='flex-col gap-[2rem] p-[2rem]'>
@@ -115,12 +159,12 @@ export default function GroupDetailPage() {
           <Icon name='logo-alt' size={5} className='text-[#b5b5b5]' />
         </div>
         <span className='flex-row-between'>
-          <h1 className='title5'>독서 모임 모집합니다!</h1>
-          <h2 className='body5'>n명</h2>
+          <h1 className='title5'>{groupDetail.name}</h1>
+          <h2 className='body5'>
+            {groupDetail.participantCount}/{groupDetail.maxCapacity}명
+          </h2>
         </span>
-        <p className='body5 mt-[2rem]'>
-          설명글이 여기에 들어갑니다. 설명글이 여기에 들어갑니다.설명글이 여기에 들어갑니다.
-        </p>
+        <p className='body5 mt-[2rem]'>{groupDetail.description}</p>
       </section>
       <Divider />
       <section>
