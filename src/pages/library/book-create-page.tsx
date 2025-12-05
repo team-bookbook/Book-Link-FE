@@ -47,9 +47,7 @@ export default function BookCreatePage() {
 
   const { isOpen, open, close } = useBottomSheet();
 
-  const { submit: createBookSubmit, isSubmitting: isCreating } = useCreateBook({
-    libraryId: memberData?.libraryId || '',
-  });
+  const { submit: createBookSubmit, isSubmitting: isCreating } = useCreateBook();
 
   const { submit: updateBookSubmit, isSubmitting: isUpdating } = useUpdateBook({
     libraryBookId: libraryBookId || '',
