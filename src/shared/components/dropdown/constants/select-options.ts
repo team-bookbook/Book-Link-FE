@@ -27,8 +27,7 @@ export const RENT_STATUS_OPTIONS: ReadonlyArray<{ value: RentStatus; label: stri
   { value: 'stopped', label: '대여 중단' },
 ];
 
-export const BOOK_CATEGORY_OPTIONS: ReadonlyArray<{ value: BookCategory; label: BookCategoryLabel }> = [
-  { value: 'all', label: '카테고리 전체' },
+const BASE_BOOK_CATEGORIES = [
   { value: '000', label: '총류' },
   { value: '100', label: '철학' },
   { value: '200', label: '종교' },
@@ -39,7 +38,14 @@ export const BOOK_CATEGORY_OPTIONS: ReadonlyArray<{ value: BookCategory; label: 
   { value: '700', label: '언어(어학)' },
   { value: '800', label: '문학' },
   { value: '900', label: '역사' },
-];
+] as const satisfies ReadonlyArray<{ value: Exclude<BookCategory, 'all'>; label: BookCategoryLabel }>;
+
+export const BOOK_CATEGORY_OPTIONS = [
+  { value: 'all', label: '카테고리 전체' },
+  ...BASE_BOOK_CATEGORIES,
+] as const satisfies ReadonlyArray<{ value: BookCategory; label: BookCategoryLabel }>;
+
+export const BOOK_CATEGORY_CREATE_OPTIONS = BASE_BOOK_CATEGORIES;
 
 export const REVIEW_MANAGE_OPTIONS: ReadonlyArray<{ value: ReviewManage; label: string }> = [
   { value: 'modify', label: '수정하기' },

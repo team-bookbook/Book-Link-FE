@@ -7,7 +7,6 @@ import { useMemo } from 'react';
 import { modal } from '@libs/modal';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { authMutations } from '@apis/auth/auth-mutations';
-import { removeAccessToken } from '../utils/auth';
 
 type LeftKind = 'none' | 'back' | 'logo' | 'close';
 export type ActionId = 'search' | 'cart' | 'share' | 'kebab' | 'bell' | 'close' | 'logout';
@@ -64,7 +63,7 @@ export default function Header({
   safeTop = true,
   className,
 }: HeaderProps) {
-  const nav = useNavigate();
+  const navigate = useNavigate();
   const { pathname } = useLocation();
   const queryClient = useQueryClient();
   const isSetting = useMemo(() => isUnder(pathname, ROUTES.SETTING), [pathname]);
@@ -81,11 +80,11 @@ export default function Header({
 
   const handleAction = async (id: ActionId) => {
     if (id === 'bell') {
-      nav(ROUTES.NOTIFICATION);
+      navigate(ROUTES.NOTIFICATION);
       return;
     }
     if (id === 'close' && !onAction) {
-      nav(-1);
+      navigate(-1);
       return;
     }
     if (id === 'logout' && !onAction) {
@@ -98,12 +97,12 @@ export default function Header({
       if (result.ok) {
         try {
           await logoutMutation.mutateAsync();
-          removeAccessToken();
-          nav(ROUTES.LOGIN);
+          localStorage.removeItem('accessToken');
+          navigate(ROUTES.LOGIN);
         } catch (error) {
           console.error('로그아웃 실패:', error);
-          removeAccessToken();
-          nav(ROUTES.LOGIN);
+          localStorage.removeItem('accessToken');
+          navigate(ROUTES.LOGIN);
         }
       }
       return;
@@ -133,7 +132,7 @@ export default function Header({
             <button
               className='cursor-pointer text-gray-900 hover:opacity-80'
               aria-label='뒤로가기'
-              onClick={() => nav(-1)}
+              onClick={() => navigate(-1)}
             >
               <Icon name='back' size={2.4} ariaHidden />
             </button>

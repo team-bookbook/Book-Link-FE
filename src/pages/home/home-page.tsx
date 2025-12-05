@@ -45,6 +45,8 @@ export default function HomePage() {
     enabled: isAuthenticated(),
   });
 
+  console.log(memberData);
+
   const { loanData, reservationData, groupData, isLoadingLoans, isLoadingReservations, isLoadingGroups } =
     useHomeData();
 

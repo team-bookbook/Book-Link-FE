@@ -48,6 +48,9 @@ function LayoutContent() {
   const isBoardCreate = useMemo(() => {
     return matchPath({ path: ROUTES.BOARD_DETAIL(':id') }, pathname) != null;
   }, [pathname]);
+  const isBookDetail = useMemo(() => {
+    return matchPath({ path: ROUTES.BOOK_DETAIL(':id') }, pathname) != null;
+  }, [pathname]);
 
   const isNoneFooter = useMemo(
     () =>
@@ -58,10 +61,12 @@ function LayoutContent() {
       isUnder(pathname, ROUTES.BOOK_CREATE) ||
       isUnder(pathname, ROUTES.PASSWORD_RESET) ||
       isUnder(pathname, ROUTES.EDIT_PROFILE) ||
+      isUnder(pathname, ROUTES.SCAN) ||
       isUnder(pathname, ROUTES.BOARD_CREATE) ||
       isReviewCreate ||
       isOnboarding ||
-      isBoardCreate,
+      isBoardCreate ||
+      isBookDetail,
     [pathname]
   );
 

@@ -11,19 +11,19 @@ interface LibraryBookCardProps {
 
 const getStatusInfo = (status: BookStatus) => {
   switch (status) {
-    case 'rented':
+    case 'BORROWED':
       return { text: '대여 중', color: 'text-system-error' };
-    case 'reserved':
+    case 'RESERVED':
       return { text: '예약 중', color: 'text-gray-600' };
-    case 'available':
-      return { text: '대여가능', color: 'text-gray-600' };
+    case 'RESERVABLE':
+      return { text: '예약가능', color: 'text-gray-600' };
     default:
       return { text: '대여가능', color: 'text-gray-600' };
   }
 };
 
 export default function LibraryBookCard({ book, isCart = true }: LibraryBookCardProps) {
-  const status: BookStatus = book.rentedOut ? 'rented' : 'available';
+  const status: BookStatus = book.rentedOut ? 'RESERVED' : 'AVAILABLE';
   const statusInfo = getStatusInfo(status);
   const navigate = useNavigate();
   const { addToCart } = useCart();
@@ -82,7 +82,7 @@ export default function LibraryBookCard({ book, isCart = true }: LibraryBookCard
             {book.expectedReturnDate}
           </p>
           <h3 className='caption5 flex gap-[0.5rem] text-gray-600'>
-            <span>거리 {book.distance}m</span>
+            <span>거리 {book.distance.toFixed(1)}m</span>
             <span>|</span>
             <span>보증금 {book.deposit}p</span>
           </h3>

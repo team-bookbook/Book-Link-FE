@@ -4,9 +4,11 @@ import { LIBRARY_LIST_LABELS, type LibraryListTab } from '@pages/library/constan
 import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '@routes/routes-config';
 import { libraryQueries } from '@apis/library/library-queries';
+import { memberQueries } from '@apis/member/member-queries';
 import { useQuery } from '@tanstack/react-query';
 import { v4 as uuidv4 } from 'uuid';
 import type { TLocation } from '@pages/library/types/library.types';
+import { isAuthenticated } from '@utils/auth';
 
 interface LibaryListProps {
   queryParams: TLocation;
@@ -17,6 +19,21 @@ export default function LibraryList({ queryParams }: LibaryListProps) {
   const [activeTab, setActiveTab] = useState<LibraryListTab>('recommended');
 
   const { data } = useQuery(libraryQueries.GET_LIBRARY(queryParams));
+
+  const { data: memberData, isLoading: isMemberLoading } = useQuery({
+    ...memberQueries.GET_ME(),
+    enabled: isAuthenticated(),
+  });
+
+  const handleMyLibraryClick = () => {
+    if (isMemberLoading) return;
+
+    if (memberData?.libraryId) {
+      navigate(ROUTES.LIBRARY_DETAIL(memberData.libraryId));
+    } else {
+      navigate(ROUTES.LIBRARY_CREATE);
+    }
+  };
 
   return (
     <div className='flex-col gap-[1.2rem] py-[2rem]'>
@@ -36,14 +53,14 @@ export default function LibraryList({ queryParams }: LibaryListProps) {
           </span>
         </div>
         <div
-          onClick={() => navigate(ROUTES.LIBRARY_DETAIL('my'))}
+          onClick={handleMyLibraryClick}
           className='caption3 flex-row-center bg-gray-white cursor-pointer rounded-[8px] border border-gray-300 px-[1.3rem] py-[0.8rem]'
         >
           {LIBRARY_LIST_LABELS.myLibrary}
         </div>
       </div>
       <div className='flex-col gap-[2rem] px-[2rem]'>
-        {data?.map((library) => (
+        {data?.content?.map((library) => (
           <LibraryCard key={uuidv4()} library={library} />
         ))}
       </div>

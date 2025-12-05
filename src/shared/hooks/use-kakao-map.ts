@@ -6,9 +6,35 @@ declare global {
   }
 }
 
+export interface KakaoLatLng {
+  getLat: () => number;
+  getLng: () => number;
+}
+
+export interface KakaoMap {
+  setCenter: (latlng: KakaoLatLng) => void;
+}
+
+export interface KakaoMarker {
+  setMap: (map: KakaoMap | null) => void;
+}
+
+export interface MapOptions {
+  center: KakaoLatLng;
+  level: number;
+}
+
+export interface MarkerOptions {
+  position: KakaoLatLng;
+  map: KakaoMap;
+}
+
 interface KakaoMaps {
   maps: {
     load: (callback: () => void) => void;
+    LatLng: new (lat: number, lng: number) => KakaoLatLng;
+    Map: new (container: HTMLElement, options: MapOptions) => KakaoMap;
+    Marker: new (options: MarkerOptions) => KakaoMarker;
     services: {
       Status: {
         OK: string;
@@ -89,7 +115,13 @@ export const useKakaoMaps = () => {
     }
 
     const apiKey = import.meta.env.VITE_KAKAO_MAP_API_KEY;
-    console.log('Kakao API Key loaded:', apiKey ? 'YES' : 'NO', apiKey?.substring(0, 8) + '...');
+    console.log('Kakao API Key loaded:', apiKey ? 'YES' : 'NO');
+    console.log('Kakao API Key value:', apiKey);
+
+    if (!apiKey) {
+      console.error('VITE_KAKAO_MAP_API_KEY is not defined in .env file');
+      return;
+    }
 
     const script = document.createElement('script');
     script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${apiKey}&libraries=services&autoload=false`;
@@ -97,13 +129,19 @@ export const useKakaoMaps = () => {
     console.log('Loading Kakao SDK from:', script.src);
 
     script.onload = () => {
-      window.kakao.maps.load(() => {
-        console.log('Kakao Map SDK loaded (new script)');
-      });
+      console.log('Kakao SDK script loaded successfully');
+      if (window.kakao?.maps) {
+        window.kakao.maps.load(() => {
+          console.log('Kakao Map SDK initialized (new script)');
+        });
+      } else {
+        console.error('window.kakao.maps is undefined after script load');
+      }
     };
 
-    script.onerror = () => {
-      console.error('Failed to load Kakao Map SDK');
+    script.onerror = (error) => {
+      console.error('Failed to load Kakao Map SDK script:', error);
+      console.error('Script URL:', script.src);
     };
 
     document.head.appendChild(script);

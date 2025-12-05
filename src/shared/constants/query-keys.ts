@@ -22,6 +22,14 @@ export const queryKeys = {
       bookName?: string;
       sortType?: string;
     }) => [...queryKeys.libraryBook.lists(), params] as const,
+    details: () => [...queryKeys.libraryBook.all, 'detail'] as const,
+    detail: (libraryBookId: string) => [...queryKeys.libraryBook.details(), libraryBookId] as const,
+  },
+
+  book: {
+    all: ['book'] as const,
+    details: () => [...queryKeys.book.all, 'detail'] as const,
+    detail: (isbn: string) => [...queryKeys.book.details(), isbn] as const,
   },
 
   member: {
@@ -29,6 +37,10 @@ export const queryKeys = {
     me: () => [...queryKeys.member.all, 'me'] as const,
   },
 
+  notification: {
+    all: ['notification'] as const,
+    lists: () => [...queryKeys.notification.all, 'list'] as const,
+  },
   board: {
     all: ['board'] as const,
     lists: () => [...queryKeys.board.all, 'list'] as const,
@@ -63,8 +75,16 @@ export const mutationKeys = {
     reviewUpdate: ['library', 'review', 'update'] as const,
     reviewDelete: ['library', 'review', 'delete'] as const,
   },
+  libraryBook: {
+    create: ['library-book', 'create'] as const,
+    update: ['library-book', 'update'] as const,
+    delete: ['library-book', 'delete'] as const,
+  },
   member: {
     update: ['member', 'update'] as const,
+  },
+  book: {
+    create: ['book', 'create'] as const,
   },
   board: {
     create: ['board', 'create'] as const,

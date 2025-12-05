@@ -12,7 +12,7 @@ import type { TabItem } from './board-page';
 import { toast } from '@libs/toast';
 
 export const CATEGORIES: TabItem[] = [
-  { key: 'GENERAL', label: '일상' },
+  { key: 'DAILY', label: '일상' },
   { key: 'RECOMMEND', label: '책 추천' },
   { key: 'GATHER', label: '모임 모집' },
 ];
@@ -25,7 +25,7 @@ export default function BoardCreatePage() {
 
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
-  const [category, setCategory] = useState<string>('GENERAL');
+  const [category, setCategory] = useState<string>('DAILY');
 
   const { data: boardDetail } = useQuery({
     ...boardQueries.GET_BOARD_DETAIL(boardId || ''),

@@ -13,6 +13,7 @@ import { memberQueries } from '@apis/member/member-queries';
 import { memberMutations } from '@apis/member/member-mutations';
 import { isAuthenticated } from '@/shared/utils/auth';
 import { toast } from '@libs/toast';
+import { uploadImage } from '@apis/s3/s3-api';
 
 function EditProfilePage() {
   const { data: memberData } = useQuery({
@@ -61,21 +62,20 @@ function EditProfilePage() {
     if (!canSubmit) return;
 
     try {
-      const profileImageUrl = memberData?.profileImage || '';
+      let profileImageUrl = memberData?.profileImage || '';
 
-      // if (image?.file) {
-      //   profileImageUrl = await uploadImage(image.file);
-      //   console.log('새 프로필 이미지 업로드:', profileImageUrl);
-      // }
-      // S3 CORS 해결되면 수정
+      if (image?.file) {
+        profileImageUrl = await uploadImage(image.file);
+        console.log('새 프로필 이미지 업로드:', profileImageUrl);
+      }
 
-      const fullAddress = [addr1, addr2, zip].filter(Boolean).join(' ').trim();
+      const fullAddress = [addr1.trim(), addr2.trim(), zip.trim()].filter(Boolean).join(' ').trim();
 
       updateMember(
         {
-          nickname,
+          nickname: nickname.trim(),
           address: fullAddress,
-          phone,
+          phone: phone.trim(),
           profileImage: profileImageUrl,
         },
         {

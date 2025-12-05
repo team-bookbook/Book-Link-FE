@@ -39,7 +39,7 @@ export const END_POINT = {
 
   // 도서관 도서 API
   LIBRARY_BOOK: '/library-book',
-  LIBRARY_BOOK_BY_ID: (libraryBookId: number) => `/library-book/${libraryBookId}`,
+  LIBRARY_BOOK_BY_ID: (libraryBookId: string) => `/library-book/${libraryBookId}`,
 
   // 도서관 API
   LIBRARY: 'library',

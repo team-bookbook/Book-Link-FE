@@ -33,7 +33,7 @@ export default function ReviewCreatePage() {
         targetId: id,
         targetType: reviewType === 'library' ? 'LIBRARY' : 'USER',
         rating,
-        comment: desc,
+        comment: desc.trim(),
       },
       {
         onSuccess: () => {

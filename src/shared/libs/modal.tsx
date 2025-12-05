@@ -139,7 +139,7 @@ function ModalViewport() {
       className={cn('fixed inset-0 z-[var(--z-modal)]', 'flex-row-center')}
     >
       <div className='bg-opacity-light absolute inset-0' onClick={onOverlayClick} />
-      <div className={cn('relative mx-[4rem] w-[min(43rem,calc(100vw-8rem))]', 'bg-gray-white rounded-[16px]')}>
+      <div className={cn('relative w-[min(40rem,calc(100vw-8rem))]', 'bg-gray-white rounded-[16px]')}>
         {kind.type === 'confirm' ? (
           <ConfirmContent cfg={cfg} onClose={close} onResolve={(r) => kind.resolve(r)} confirmColor={confirmColor} />
         ) : (

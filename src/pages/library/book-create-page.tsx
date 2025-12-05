@@ -1,12 +1,39 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Button from '@components/button/button';
 import ButtonFrame from '@components/button/button-frame';
 import Input from '@components/input/input';
 import Icon from '@components/icon';
 import useImageUpload from '@hooks/use-image-upload';
+import { useQuery } from '@tanstack/react-query';
+import { toast } from '@libs/toast';
+import { useSearchParams } from 'react-router-dom';
+import useBottomSheet from '@components/bottom-sheet/hooks/use-bottom-sheet';
+import SelectBottomSheet from '@components/bottom-sheet/select-bottom-sheet';
+import { BOOK_CATEGORY_CREATE_OPTIONS } from '@components/dropdown/constants/select-options';
+import { memberQueries } from '@apis/member/member-queries';
+import { isAuthenticated } from '@utils/auth';
+import { libraryBookQueries } from '@apis/library/library-book-queries';
+import { useCreateBook } from './hooks/use-create-book';
+import { useUpdateBook } from './hooks/use-update-book';
 
 export default function BookCreatePage() {
-  const { fileRef, images, openFilePicker, handleFileChange, removeImage } = useImageUpload({ mode: 'multiple' });
+  const [searchParams] = useSearchParams();
+  const libraryBookId = searchParams.get('id');
+  const isEditMode = !!libraryBookId;
+
+  const { data: memberData } = useQuery({
+    ...memberQueries.GET_ME(),
+    enabled: isAuthenticated(),
+  });
+
+  const { data: bookDetail } = useQuery({
+    ...libraryBookQueries.GET_LIBRARY_BOOK_DETAIL(libraryBookId!),
+    enabled: isEditMode,
+  });
+
+  const { fileRef, images, openFilePicker, handleFileChange, removeImage, setImages } = useImageUpload({
+    mode: 'multiple',
+  });
 
   const [title, setTitle] = useState('');
   const [author, setAuthor] = useState('');
@@ -15,22 +42,80 @@ export default function BookCreatePage() {
   const [category, setCategory] = useState('');
   const [desc, setDesc] = useState('');
   const [deposit, setDeposit] = useState('');
+  const [isbn, setIsbn] = useState('');
+  const [copies, setCopies] = useState('1');
 
+  const { isOpen, open, close } = useBottomSheet();
+
+  const { submit: createBookSubmit, isSubmitting: isCreating } = useCreateBook();
+
+  const { submit: updateBookSubmit, isSubmitting: isUpdating } = useUpdateBook({
+    libraryBookId: libraryBookId || '',
+  });
+
+  const isSubmitting = isCreating || isUpdating;
   const canSubmit = images.length >= 3 && title.trim().length > 0;
 
-  const submit = () => {
-    if (!canSubmit) return;
-    const payload = {
-      images: images.map((p) => p.url),
-      title: title.trim(),
-      author: author.trim(),
-      publisher: publisher.trim(),
-      price: price.trim(),
-      category: category.trim(),
-      description: desc.trim(),
-      deposit: deposit.trim(),
-    };
-    console.log('create book payload ->', payload);
+  // editMode: bookDetail로 폼 미리 채우기
+  useEffect(() => {
+    if (isEditMode && bookDetail) {
+      const { libraryBookDetailDto, bookDetailDto } = bookDetail;
+
+      setTitle(bookDetailDto.title);
+      setAuthor(bookDetailDto.author);
+      setPublisher(bookDetailDto.publisher);
+      setCategory(bookDetailDto.category);
+
+      setPrice(bookDetailDto.originalPrice.toString());
+      setIsbn(bookDetailDto.isbn);
+      setDeposit(libraryBookDetailDto.deposit.toString());
+      setCopies(libraryBookDetailDto.copies.toString());
+
+      // 기존 이미지 설정
+      if (libraryBookDetailDto.previewImages) {
+        const previewImages = JSON.parse(libraryBookDetailDto.previewImages);
+        setImages(
+          previewImages.map((url: string, index: number) => ({
+            id: `existing-${index}`,
+            url,
+            file: null,
+          }))
+        );
+      }
+    }
+  }, [isEditMode, bookDetail, setImages]);
+
+  const categoryLabel = category
+    ? BOOK_CATEGORY_CREATE_OPTIONS.find((option) => option.value === category)?.label || '카테고리'
+    : '카테고리';
+
+  const submit = async () => {
+    if (!canSubmit || isSubmitting) return;
+
+    if (isEditMode) {
+      await updateBookSubmit({
+        images,
+        copies,
+        deposit,
+      });
+    } else {
+      if (!memberData?.libraryId) {
+        toast.error('도서관 정보를 찾을 수 없습니다');
+        return;
+      }
+
+      await createBookSubmit({
+        images,
+        title,
+        author,
+        publisher,
+        price,
+        category,
+        isbn,
+        deposit,
+        copies,
+      });
+    }
   };
 
   return (
@@ -81,6 +166,7 @@ export default function BookCreatePage() {
           placeholder='책 제목을 입력해 주세요.'
           value={title}
           onChange={(e) => setTitle(e.currentTarget.value)}
+          readOnly={isEditMode}
         />
 
         <Input
@@ -89,6 +175,7 @@ export default function BookCreatePage() {
           placeholder='작가를 입력해 주세요.'
           value={author}
           onChange={(e) => setAuthor(e.currentTarget.value)}
+          readOnly={isEditMode}
         />
 
         <Input
@@ -97,6 +184,7 @@ export default function BookCreatePage() {
           placeholder='출판사를 입력해 주세요.'
           value={publisher}
           onChange={(e) => setPublisher(e.currentTarget.value)}
+          readOnly={isEditMode}
         />
 
         <Input
@@ -106,14 +194,25 @@ export default function BookCreatePage() {
           inputMode='numeric'
           value={price}
           onChange={(e) => setPrice(e.currentTarget.value.replace(/[^\d]/g, ''))}
+          readOnly={isEditMode}
         />
 
         <Input
           id='book-category'
           label='카테고리'
-          placeholder='카테고리를 입력해 주세요.'
-          value={category}
-          onChange={(e) => setCategory(e.currentTarget.value)}
+          value={categoryLabel}
+          endIcon='dropdown'
+          readOnly
+          onClick={isEditMode ? undefined : open}
+        />
+
+        <Input
+          id='book-isbn'
+          label='ISBN'
+          placeholder='ISBN을 입력해 주세요.'
+          value={isbn}
+          onChange={(e) => setIsbn(e.currentTarget.value)}
+          readOnly={isEditMode}
         />
 
         <Input
@@ -127,6 +226,15 @@ export default function BookCreatePage() {
           onChange={(e) => setDesc(e.currentTarget.value)}
           length={desc.length}
         />
+        <Input
+          id='book-copies'
+          label='도서 수량'
+          placeholder='도서 수량을 입력해 주세요.'
+          inputMode='numeric'
+          value={copies}
+          onChange={(e) => setCopies(e.currentTarget.value.replace(/[^\d]/g, ''))}
+        />
+
         <div className='flex-col gap-[0.8rem]'>
           <Input
             id='book-deposit'
@@ -141,10 +249,24 @@ export default function BookCreatePage() {
       </div>
 
       <ButtonFrame>
-        <Button fullWidth roundStyle='rounded-[12px]' className='py-[1.2rem]' disabled={!canSubmit} onClick={submit}>
-          도서 등록
+        <Button
+          fullWidth
+          roundStyle='rounded-[12px]'
+          className='py-[1.2rem]'
+          disabled={!canSubmit || isSubmitting}
+          onClick={submit}
+        >
+          {isSubmitting ? (isEditMode ? '수정 중...' : '등록 중...') : isEditMode ? '도서 수정' : '도서 등록'}
         </Button>
       </ButtonFrame>
+
+      <SelectBottomSheet
+        open={isOpen}
+        onClose={close}
+        options={BOOK_CATEGORY_CREATE_OPTIONS}
+        value={category}
+        onChange={setCategory}
+      />
     </div>
   );
 }

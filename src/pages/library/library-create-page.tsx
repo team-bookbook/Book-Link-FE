@@ -75,8 +75,8 @@ export default function LibraryCreatePage() {
         updateLibrary(
           {
             libraryId,
-            name,
-            description: intro,
+            name: name.trim(),
+            description: intro.trim(),
             thumbnailUrl,
             startTime: formatTime(openAt),
             endTime: formatTime(closeAt),
@@ -101,8 +101,8 @@ export default function LibraryCreatePage() {
 
         createLibrary(
           {
-            name,
-            description: intro,
+            name: name.trim(),
+            description: intro.trim(),
             thumbnailUrl,
             startTime: formatTime(openAt),
             endTime: formatTime(closeAt),

@@ -22,7 +22,7 @@ const COMMUNITY_TABS: TabItem[] = [
 export const CATEGORIES: TabItem[] = [
   { key: 'ALL', label: '전체' },
   { key: 'RECOMMEND', label: '책 추천' },
-  { key: 'GENERAL', label: '일상' },
+  { key: 'DAILY', label: '일상' },
   { key: 'GATHER', label: '모임 모집' },
 ];
 
@@ -72,7 +72,7 @@ export default function BoardPage() {
 
   const topTab = (searchParams.get('tab') as 'community' | 'reading') || 'community';
   const category = searchParams.get('category') || 'ALL';
-  const sort = (searchParams.get('sort') as SortType) || '';
+  const sort = (searchParams.get('sort') as SortType) || 'LATEST';
   const searchKeyword = searchParams.get('search') || '';
 
   const searchAnchorRef = useRef<HTMLDivElement | null>(null);
@@ -105,6 +105,7 @@ export default function BoardPage() {
     boardQueries.GET_BOARD_LIST({
       title: searchKeyword || undefined,
       category: category === 'ALL' ? undefined : category,
+      sort: sort === 'LATEST' ? undefined : sort,
     })
   );
 
