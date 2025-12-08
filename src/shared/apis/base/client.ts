@@ -94,12 +94,17 @@ const createHttpClient = (baseURL: string) => {
       const originalRequest = error.config as InternalAxiosRequestConfig & { _retry?: boolean };
       const status = error.response?.status;
 
-      if (status === HTTP_STATUS.UNAUTHORIZED && !originalRequest._retry) {
+      if (
+        status === HTTP_STATUS.UNAUTHORIZED &&
+        !originalRequest._retry &&
+        originalRequest.url !== END_POINT.TOKEN_REISSUE
+      ) {
         originalRequest._retry = true;
 
         try {
           const response = await instance.post<ApiResponse<string>>(END_POINT.TOKEN_REISSUE, {});
           const newAccessToken = response.data.data;
+          console.log(response, newAccessToken);
 
           if (newAccessToken) {
             setAccessToken(newAccessToken);

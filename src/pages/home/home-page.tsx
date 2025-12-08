@@ -21,7 +21,6 @@ import { isAuthenticated } from '@/shared/utils/auth';
 export default function HomePage() {
   const navigate = useNavigate();
 
-  // 비로그인 상태면 온보딩 페이지로 리다이렉트
   useEffect(() => {
     if (!isAuthenticated()) {
       navigate(ROUTES.ONBOARDING, { replace: true });
