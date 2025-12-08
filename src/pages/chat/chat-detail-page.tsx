@@ -23,7 +23,6 @@ const MESSAGES: Msg[] = [
     time: '오후 1:38',
   },
   { id: 'm3', kind: 'other', text: '', time: '오후 1:34', type: 'renew' },
-  { id: 'm3', kind: 'mine', text: '', time: '오후 1:34', type: 'checkin', status: 'success' },
 ];
 
 const ChatDetailPage = () => {
@@ -57,7 +56,10 @@ const ChatDetailPage = () => {
           if (m.kind === 'mine') {
             if (m.type) {
               return (
-                <div key={m.id} className='flex w-full justify-end'>
+                <div key={m.id} className='flex w-full justify-end gap-[0.8rem]'>
+                  <div className='flex-col justify-end'>
+                    <span className='caption5 shrink-0 text-gray-400'>{m.time}</span>
+                  </div>
                   <EventCard
                     type={m.type}
                     kind='mine'
@@ -83,7 +85,7 @@ const ChatDetailPage = () => {
 
           if (m.type) {
             return (
-              <div key={m.id} className='flex items-start gap-[0.8rem]'>
+              <div key={m.id} className='flex items-end gap-[0.8rem]'>
                 <Icon name='cat-profile' className='text-gray-300' size={3.6} ariaHidden />
                 <EventCard
                   type={m.type}
@@ -93,6 +95,7 @@ const ChatDetailPage = () => {
                   onAccept={() => handleAccept(m.id)}
                   onReject={() => handleReject(m.id)}
                 />
+                <span className='caption5 shrink-0 text-gray-400'>{m.time}</span>
               </div>
             );
           }

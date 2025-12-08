@@ -26,6 +26,7 @@ export const END_POINT = {
 
   // 대여 API
   BORROW: '/borrow',
+  BORROWS: '/borrows',
 
   // 도서 API
   BOOK: '/book',
