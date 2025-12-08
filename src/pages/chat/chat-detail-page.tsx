@@ -1,12 +1,15 @@
 import Icon from '@components/icon';
 import { cn } from '@libs/cn';
 import { TopLabel } from './components/chat-top-label';
+import EventCard from './components/event-card';
 
+type borrowEvent = 'checkout' | 'checkin' | 'renew';
+type CardStatus = 'request' | 'success' | 'fail';
 type Msg =
   | { id: string; kind: 'system'; text: string }
   | { id: string; kind: 'date'; text: string }
-  | { id: string; kind: 'mine'; text: string; time: string }
-  | { id: string; kind: 'other'; text: string; time: string };
+  | { id: string; kind: 'mine'; text: string; time: string; type?: borrowEvent; status?: CardStatus }
+  | { id: string; kind: 'other'; text: string; time: string; type?: borrowEvent; status?: CardStatus };
 
 const MESSAGES: Msg[] = [
   { id: 's1', kind: 'system', text: '사용자 님이 입장하셨습니다.' },
@@ -19,9 +22,21 @@ const MESSAGES: Msg[] = [
     text: `안녕하세요 반갑습니다. 당연히 가능합니다! 원하시는 날짜랑 대여 장소, 대여 기간 말씀해 주세요.`,
     time: '오후 1:38',
   },
+  { id: 'm3', kind: 'other', text: '', time: '오후 1:34', type: 'renew' },
+  { id: 'm3', kind: 'mine', text: '', time: '오후 1:34', type: 'checkin', status: 'success' },
 ];
 
 const ChatDetailPage = () => {
+  const handleAccept = (messageId: string) => {
+    console.log('수락:', messageId);
+    // TODO: API 호출 및 상태 업데이트
+  };
+
+  const handleReject = (messageId: string) => {
+    console.log('거절:', messageId);
+    // TODO: API 호출 및 상태 업데이트
+  };
+
   return (
     <div className='flex-col-between min-h-dvh bg-gray-50 text-gray-900'>
       <TopLabel />
@@ -40,6 +55,20 @@ const ChatDetailPage = () => {
             );
           }
           if (m.kind === 'mine') {
+            if (m.type) {
+              return (
+                <div key={m.id} className='flex w-full justify-end'>
+                  <EventCard
+                    type={m.type}
+                    kind='mine'
+                    status={m.status}
+                    onAccept={() => handleAccept(m.id)}
+                    onReject={() => handleReject(m.id)}
+                  />
+                </div>
+              );
+            }
+
             return (
               <div key={m.id} className='flex w-full justify-end'>
                 <div className='flex max-w-[85%] items-end gap-[0.6rem]'>
@@ -48,6 +77,22 @@ const ChatDetailPage = () => {
                     {m.text}
                   </div>
                 </div>
+              </div>
+            );
+          }
+
+          if (m.type) {
+            return (
+              <div key={m.id} className='flex items-start gap-[0.8rem]'>
+                <Icon name='cat-profile' className='text-gray-300' size={3.6} ariaHidden />
+                <EventCard
+                  type={m.type}
+                  kind='other'
+                  status={m.status}
+                  userName='고양이'
+                  onAccept={() => handleAccept(m.id)}
+                  onReject={() => handleReject(m.id)}
+                />
               </div>
             );
           }
