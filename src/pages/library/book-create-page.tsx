@@ -40,7 +40,7 @@ export default function BookCreatePage() {
   const [publisher, setPublisher] = useState('');
   const [price, setPrice] = useState('');
   const [category, setCategory] = useState('');
-  const [desc, setDesc] = useState('');
+  const [description, setdescription] = useState('');
   const [deposit, setDeposit] = useState('');
   const [isbn, setIsbn] = useState('');
   const [copies, setCopies] = useState('1');
@@ -97,6 +97,7 @@ export default function BookCreatePage() {
         images,
         copies,
         deposit,
+        description,
       });
     } else {
       if (!memberData?.libraryId) {
@@ -113,6 +114,7 @@ export default function BookCreatePage() {
         category,
         isbn,
         deposit,
+        description,
         copies,
       });
     }
@@ -216,15 +218,15 @@ export default function BookCreatePage() {
         />
 
         <Input
-          id='book-desc'
+          id='book-description'
           label='상세 설명'
           placeholder='상세 설명을 작성해 주세요.'
           multiline
           maxLength={1000}
           hasLength
-          value={desc}
-          onChange={(e) => setDesc(e.currentTarget.value)}
-          length={desc.length}
+          value={description}
+          onChange={(e) => setdescription(e.currentTarget.value)}
+          length={description.length}
         />
         <Input
           id='book-copies'

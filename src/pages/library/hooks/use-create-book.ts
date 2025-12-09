@@ -10,6 +10,7 @@ import { get } from '@apis/base/client';
 import { END_POINT } from '@constants/end-point';
 import type { IBookInfo } from '@apis/book/book-queries';
 import type { ImagePreview } from '@hooks/use-image-upload';
+import { LIBRARY_MESSAGES } from '../constants/library-messages';
 
 interface CreateBookData {
   images: ImagePreview[];
@@ -20,6 +21,7 @@ interface CreateBookData {
   category: string;
   isbn: string;
   deposit: string;
+  description: string;
   copies: string;
 }
 
@@ -31,10 +33,10 @@ export function useCreateBook() {
   const { mutate: createLibraryBook } = useMutation(libraryBookMutations.POST_LIBRARY_BOOK());
 
   const submit = async (data: CreateBookData) => {
-    const { images, title, author, publisher, price, category, isbn, deposit, copies } = data;
+    const { images, title, author, publisher, price, category, isbn, deposit, copies, description } = data;
 
     if (!isbn.trim()) {
-      toast.error('ISBN을 입력해 주세요');
+      toast.error(LIBRARY_MESSAGES.ISBN_REQUIRED);
       return;
     }
 
@@ -91,6 +93,7 @@ export function useCreateBook() {
               copies: Number(copies) || 1,
               deposit: Number(deposit.trim()) || 0,
               previewImages: uploadedImageUrls,
+              description: description,
             };
 
             console.log('도서관 도서 등록 요청 데이터:', libraryBookData);
@@ -98,12 +101,12 @@ export function useCreateBook() {
             // 4. POST /library-book (도서관 도서 등록)
             createLibraryBook(libraryBookData, {
               onSuccess: () => {
-                toast.success('도서 등록이 완료되었어요');
+                toast.success(LIBRARY_MESSAGES.BOOK_CREATE_SUCCESS);
                 navigate(ROUTES.LIBRARY);
               },
               onError: (error) => {
                 console.error('도서관 도서 등록 실패:', error);
-                toast.error('도서관 도서 등록에 실패했어요');
+                toast.error(LIBRARY_MESSAGES.LIBRARY_BOOK_CREATE_FAILED);
                 setIsSubmitting(false);
               },
             });
@@ -111,7 +114,7 @@ export function useCreateBook() {
           onError: (error) => {
             console.error('도서 등록 실패:', error);
             console.error('에러 상세:', JSON.stringify(error, null, 2));
-            toast.error('도서 등록에 실패했어요');
+            toast.error(LIBRARY_MESSAGES.BOOK_CREATE_FAILED);
             setIsSubmitting(false);
           },
         });
@@ -121,6 +124,7 @@ export function useCreateBook() {
           id: bookId,
           copies: Number(copies) || 1,
           deposit: Number(deposit.trim()) || 0,
+          description: description,
           previewImages: uploadedImageUrls,
         };
 
@@ -128,19 +132,19 @@ export function useCreateBook() {
 
         createLibraryBook(libraryBookData, {
           onSuccess: () => {
-            toast.success('도서 등록이 완료되었어요');
+            toast.success(LIBRARY_MESSAGES.BOOK_CREATE_SUCCESS);
             navigate(ROUTES.LIBRARY);
           },
           onError: (error) => {
             console.error('도서관 도서 등록 실패:', error);
-            toast.error('도서관 도서 등록에 실패했어요');
+            toast.error(LIBRARY_MESSAGES.LIBRARY_BOOK_CREATE_FAILED);
             setIsSubmitting(false);
           },
         });
       }
     } catch (error) {
       console.error('이미지 업로드 실패:', error);
-      toast.error('이미지 업로드에 실패했어요');
+      toast.error(LIBRARY_MESSAGES.IMAGE_UPLOAD_FAILED);
       setIsSubmitting(false);
     }
   };

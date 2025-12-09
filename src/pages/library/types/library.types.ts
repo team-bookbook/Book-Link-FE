@@ -14,7 +14,6 @@ export interface ILibraryBook {
   expectedReturnDate: string;
 }
 
-// 도서 상세 조회 응답 타입
 export interface ILibraryBookDetail {
   libraryDto: {
     id: string;
@@ -26,6 +25,7 @@ export interface ILibraryBookDetail {
     id: string;
     status: BookStatus;
     copies: number;
+    description?: string;
     deposit: number;
     borrowedCount: number;
     previewImages: string;
@@ -44,6 +44,7 @@ export interface ILibraryBookDetail {
     publishedDate: string;
     isbn: string;
   };
+  mine: boolean;
 }
 
 export interface IBookDetail {

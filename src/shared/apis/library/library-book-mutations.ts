@@ -10,6 +10,7 @@ export interface ICreateLibraryBookParams {
   copies: number;
   deposit: number;
   previewImages: string[];
+  description: string;
 }
 
 export interface IUpdateLibraryBookParams {
@@ -17,6 +18,7 @@ export interface IUpdateLibraryBookParams {
   copies: number;
   deposit: number;
   previewImages: string[];
+  description: string;
 }
 
 export interface ICreateLibraryBookResponse {
@@ -34,7 +36,6 @@ export const libraryBookMutations = {
           },
         }),
       onSuccess: () => {
-        // Invalidate library book queries to refetch updated list
         queryClient.invalidateQueries({ queryKey: queryKeys.libraryBook.lists() });
       },
     }),

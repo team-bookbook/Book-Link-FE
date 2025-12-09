@@ -12,8 +12,6 @@ import { useKakaoMaps } from '@hooks/use-kakao-map';
 import { useMemo } from 'react';
 import type { ActionId } from '@layouts/header';
 import { useHeaderOverride } from '@contexts/header-context';
-import { memberQueries } from '@apis/member/member-queries';
-import { isAuthenticated } from '@utils/auth';
 import SelectBottomSheet from '@components/bottom-sheet/select-bottom-sheet';
 import { REVIEW_MANAGE_OPTIONS } from '@components/dropdown/constants/select-options';
 import ButtonFrame from '@components/button/button-frame';
@@ -23,7 +21,7 @@ export default function BookDetailPage() {
   const params = useParams<{ id: string }>();
   const navigate = useNavigate();
 
-  useKakaoMaps(); // Kakao Maps SDK 로드
+  useKakaoMaps();
 
   const bookId = params.id;
   const { isManageBottomSheetOpen, selectedManageOption, openManageSheet, closeManageSheet, handleManageOptionChange } =
@@ -38,25 +36,20 @@ export default function BookDetailPage() {
     enabled: !!bookId,
   });
 
-  const { data: memberData } = useQuery({
-    ...memberQueries.GET_ME(),
-    enabled: isAuthenticated(),
-  });
-
   const headerConfig = useMemo(() => {
-    if (!bookDetail || !memberData) return null;
+    if (!bookDetail) return null;
     return {
       left: 'back' as const,
       safeTop: true,
       title: bookDetail.bookDetailDto.title,
-      actions: bookDetail.libraryDto.id === memberData?.libraryId ? ['kebab' as const] : [],
+      actions: bookDetail.mine ? ['kebab' as const] : [],
       onAction: (action: ActionId) => {
         if (action === 'kebab') {
           openManageSheet();
         }
       },
     };
-  }, [bookDetail, memberData]);
+  }, [bookDetail]);
 
   useHeaderOverride(headerConfig);
 
@@ -69,7 +62,7 @@ export default function BookDetailPage() {
     );
   }
 
-  if (error || !bookDetail || !memberData) {
+  if (error || !bookDetail) {
     return null;
   }
 
@@ -85,13 +78,13 @@ export default function BookDetailPage() {
     author: bookDetailDto.author,
     publisher: bookDetailDto.publisher,
     library: libraryDto.name,
-    maxDays: 14, // TODO: API에서 제공하지 않는 필드, 기본값 설정
+    maxDays: 14,
     deposit: libraryBookDetailDto.deposit,
     status: libraryBookDetailDto.status,
-    imgUrl: libraryBookDetailDto.previewImages ? JSON.parse(libraryBookDetailDto.previewImages)[0] : undefined,
+    imgUrl: libraryBookDetailDto.previewImages,
     genre: bookDetailDto.category,
     price: bookDetailDto.originalPrice,
-    description: undefined, // TODO: API에서 제공하지 않는 필드
+    description: libraryBookDetailDto.description,
     latitude: libraryDto.latitude,
     longitude: libraryDto.longitude,
   };
